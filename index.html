@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SBA Genius — Member Onboarding</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root {
+  --bg-primary: #0a0a0f;
+  --bg-secondary: #111118;
+  --bg-card: #16161f;
+  --bg-card-hover: #1c1c28;
+  --border: #2a2a3a;
+  --border-active: #3a3a5a;
+  --gold: #d4a843;
+  --gold-dim: #b8922e;
+  --gold-glow: rgba(212, 168, 67, 0.15);
+  --gold-glow-strong: rgba(212, 168, 67, 0.35);
+  --green: #2ecc71;
+  --green-dim: rgba(46, 204, 113, 0.15);
+  --blue: #3498db;
+  --blue-dim: rgba(52, 152, 219, 0.15);
+  --orange: #e67e22;
+  --orange-dim: rgba(230, 126, 34, 0.15);
+  --red: #e74c3c;
+  --red-dim: rgba(231, 76, 60, 0.15);
+  --purple: #9b59b6;
+  --purple-dim: rgba(155, 89, 182, 0.15);
+  --text-primary: #f0ece4;
+  --text-secondary: #8a8a9a;
+  --text-muted: #5a5a6a;
+  --white: #ffffff;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: 'Outfit', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+.bg-grid {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background-image: 
+    linear-gradient(rgba(212,168,67,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(212,168,67,0.03) 1px, transparent 1px);
+  background-size: 60px 60px;
+  pointer-events: none; z-index: 0;
+}
+
+.bg-glow {
+  position: fixed; top: -200px; left: 50%; transform: translateX(-50%);
+  width: 800px; height: 600px;
+  background: radial-gradient(ellipse, rgba(212,168,67,0.08) 0%, transparent 70%);
+  pointer-events: none; z-index: 0;
+}
+
+.header {
+  position: relative; z-index: 10;
+  padding: 24px 40px;
+  display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+  background: rgba(10,10,15,0.9);
+  backdrop-filter: blur(20px);
+}
+
+.logo-area { display: flex; align-items: center; gap: 16px; }
+
+.logo-icon {
+  width: 48px; height: 48px;
+  background: linear-gradient(135deg, var(--gold), var(--gold-dim));
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 900; font-size: 20px; color: var(--bg-primary);
+  box-shadow: 0 0 30px var(--gold-glow);
+}
+
+.logo-text { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; }
+.logo-text span { color: var(--gold); }
+
+.logo-sub {
+  font-size: 11px; color: var(--text-secondary);
+  text-transform: uppercase; letter-spacing: 3px; margin-top: 2px;
+}
+
+.header-right { display: flex; align-items: center; gap: 12px; }
+
+.header-badge {
+  padding: 8px 20px;
+  background: var(--gold-glow);
+  border: 1px solid rgba(212,168,67,0.3);
+  border-radius: 100px;
+  font-size: 12px; font-weight: 600;
+  color: var(--gold);
+  text-transform: uppercase; letter-spacing: 2px;
+}
+
+.db-status {
+  padding: 6px 14px;
+  border-radius: 100px;
+  font-size: 11px; font-weight: 600;
+  display: flex; align-items: center; gap: 6px;
+}
+
+.db-status.connected { background: var(--green-dim); color: var(--green); }
+.db-status.disconnected { background: var(--red-dim); color: var(--red); }
+
+.view-toggle {
+  position: relative; z-index: 10;
+  display: flex; justify-content: center;
+  padding: 20px; gap: 4px;
+}
+
+.view-btn {
+  padding: 10px 28px;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  font-family: 'Outfit', sans-serif;
+  font-size: 13px; font-weight: 600;
+  cursor: pointer; transition: all 0.3s;
+  text-transform: uppercase; letter-spacing: 2px;
+}
+
+.view-btn:first-child { border-radius: 8px 0 0 8px; }
+.view-btn:last-child { border-radius: 0 8px 8px 0; }
+
+.view-btn.active { background: var(--gold); border-color: var(--gold); color: var(--bg-primary); }
+.view-btn:hover:not(.active) { border-color: var(--gold-dim); color: var(--gold); }
+
+.admin-panel, .member-portal {
+  position: relative; z-index: 10;
+  max-width: 1200px; margin: 0 auto; padding: 0 40px 60px;
+}
+
+.section-title { font-size: 28px; font-weight: 800; margin-bottom: 8px; letter-spacing: -0.5px; }
+.section-sub { color: var(--text-secondary); font-size: 14px; margin-bottom: 32px; }
+
+.onboard-form, .card-section {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 16px; padding: 40px; margin-bottom: 24px;
+}
+
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 28px; }
+.form-group { display: flex; flex-direction: column; gap: 8px; }
+.form-group.full-width { grid-column: 1 / -1; }
+
+.form-label {
+  font-size: 12px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 2px; color: var(--text-secondary);
+}
+
+.form-input, .form-select {
+  padding: 14px 18px; background: var(--bg-primary);
+  border: 1px solid var(--border); border-radius: 10px;
+  color: var(--text-primary); font-family: 'Outfit', sans-serif;
+  font-size: 15px; transition: all 0.3s; outline: none;
+}
+
+.form-input:focus, .form-select:focus { border-color: var(--gold); box-shadow: 0 0 0 3px var(--gold-glow); }
+.form-input::placeholder { color: var(--text-muted); }
+
+.form-select {
+  cursor: pointer; appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238a8a9a' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 16px center;
+}
+
+.form-select option { background: var(--bg-primary); color: var(--text-primary); }
+
+.onboard-btn, .primary-btn {
+  width: 100%; padding: 18px;
+  background: linear-gradient(135deg, var(--gold), var(--gold-dim));
+  border: none; border-radius: 12px; color: var(--bg-primary);
+  font-family: 'Outfit', sans-serif; font-size: 16px; font-weight: 700;
+  cursor: pointer; transition: all 0.3s;
+  text-transform: uppercase; letter-spacing: 3px;
+}
+
+.onboard-btn:hover, .primary-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 30px var(--gold-glow-strong); }
+.onboard-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+.primary-btn.small { width: auto; padding: 10px 24px; font-size: 13px; letter-spacing: 2px; }
+
+.pkg-badge {
+  display: inline-block; padding: 4px 12px; border-radius: 6px;
+  font-size: 12px; font-weight: 700; font-family: 'JetBrains Mono', monospace;
+  text-transform: uppercase; letter-spacing: 1px;
+}
+
+.pkg-starter { background: var(--blue-dim); color: var(--blue); }
+.pkg-pro { background: var(--green-dim); color: var(--green); }
+.pkg-premium { background: var(--orange-dim); color: var(--orange); }
+.pkg-elite { background: var(--gold-glow); color: var(--gold); }
+.pkg-vip { background: var(--red-dim); color: var(--red); }
+
+.status-dot { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; }
+.status-dot::before { content: ''; width: 8px; height: 8px; border-radius: 50%; }
+.status-pending { color: var(--orange); }
+.status-pending::before { background: var(--orange); }
+.status-provisioning { color: var(--blue); }
+.status-provisioning::before { background: var(--blue); animation: pulse-dot 2s infinite; }
+.status-active { color: var(--green); }
+.status-active::before { background: var(--green); }
+
+@keyframes pulse-dot { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+.pay-badge {
+  display: inline-block; padding: 3px 10px; border-radius: 4px;
+  font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+}
+
+.pay-paid { background: var(--green-dim); color: var(--green); }
+.pay-pending { background: var(--orange-dim); color: var(--orange); }
+.pay-overdue { background: var(--red-dim); color: var(--red); }
+
+.members-table-wrap {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 16px; overflow: hidden; margin-bottom: 24px;
+}
+
+.table-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 24px 32px; border-bottom: 1px solid var(--border); flex-wrap: wrap; gap: 12px;
+}
+
+.table-header h3 { font-size: 18px; font-weight: 700; }
+.table-actions { display: flex; gap: 8px; align-items: center; }
+
+.member-count {
+  padding: 6px 16px; background: var(--gold-glow); border-radius: 100px;
+  font-size: 13px; font-weight: 600; color: var(--gold); font-family: 'JetBrains Mono', monospace;
+}
+
+.table-scroll { overflow-x: auto; }
+.members-table { width: 100%; border-collapse: collapse; min-width: 950px; }
+
+.members-table th {
+  padding: 14px 14px; text-align: left; font-size: 10px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted);
+  border-bottom: 1px solid var(--border); background: rgba(0,0,0,0.2); white-space: nowrap;
+}
+
+.members-table td {
+  padding: 12px 14px; font-size: 13px;
+  border-bottom: 1px solid rgba(42,42,58,0.5); vertical-align: middle;
+}
+
+.members-table tr:last-child td { border-bottom: none; }
+.members-table tr:hover td { background: rgba(212,168,67,0.03); }
+.member-name { font-weight: 600; font-size: 14px; }
+.member-email { color: var(--text-secondary); font-family: 'JetBrains Mono', monospace; font-size: 11px; }
+.member-discord { color: #7289da; font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+
+.action-btn {
+  padding: 5px 10px; background: transparent; border: 1px solid var(--border);
+  border-radius: 6px; color: var(--text-secondary); font-family: 'Outfit', sans-serif;
+  font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.2s; margin: 1px;
+}
+
+.action-btn:hover { border-color: var(--gold); color: var(--gold); background: var(--gold-glow); }
+.action-btn.activate { border-color: var(--green); color: var(--green); }
+.action-btn.activate:hover { background: var(--green-dim); }
+
+.member-portal { display: none; }
+.welcome-hero { text-align: center; padding: 60px 40px 40px; }
+.welcome-hero h1 { font-size: 42px; font-weight: 900; letter-spacing: -1px; margin-bottom: 12px; }
+.welcome-hero h1 span { color: var(--gold); }
+.welcome-hero p { color: var(--text-secondary); font-size: 16px; max-width: 500px; margin: 0 auto; line-height: 1.6; }
+
+.member-info-card {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 16px; padding: 32px; margin-bottom: 24px;
+  display: flex; align-items: center; gap: 24px;
+}
+
+.member-avatar {
+  width: 72px; height: 72px;
+  background: linear-gradient(135deg, var(--gold), var(--gold-dim));
+  border-radius: 16px; display: flex; align-items: center; justify-content: center;
+  font-size: 28px; font-weight: 900; color: var(--bg-primary); flex-shrink: 0;
+}
+
+.member-details h3 { font-size: 22px; font-weight: 700; }
+.member-details .member-meta { display: flex; gap: 20px; margin-top: 6px; color: var(--text-secondary); font-size: 13px; flex-wrap: wrap; }
+.member-details .member-meta span { display: flex; align-items: center; gap: 6px; }
+.member-pkg-display { margin-left: auto; text-align: right; }
+.member-pkg-display .pkg-name { font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: var(--gold); }
+.member-pkg-display .pkg-price { font-size: 28px; font-weight: 900; font-family: 'JetBrains Mono', monospace; color: var(--text-primary); margin-top: 2px; }
+.member-pkg-display .pkg-cycle { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+.cycle-bar {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 16px; padding: 24px 32px; margin-bottom: 24px;
+  display: flex; align-items: center; gap: 24px;
+}
+
+.cycle-ring { width: 80px; height: 80px; position: relative; flex-shrink: 0; }
+.cycle-ring svg { transform: rotate(-90deg); }
+.cycle-ring .ring-bg { stroke: var(--border); }
+.cycle-ring .ring-fill { stroke: var(--gold); transition: stroke-dashoffset 1s ease; }
+.cycle-ring .ring-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 20px; font-weight: 900; font-family: 'JetBrains Mono', monospace; }
+.cycle-info h4 { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+.cycle-info p { font-size: 13px; color: var(--text-secondary); }
+.cycle-dates { margin-left: auto; text-align: right; font-size: 12px; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; }
+.cycle-dates strong { color: var(--text-secondary); }
+
+.tos-gate {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 16px; padding: 40px; margin-bottom: 24px; text-align: center;
+}
+
+.tos-gate h3 { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
+.tos-gate .tos-sub { color: var(--text-secondary); font-size: 14px; margin-bottom: 24px; }
+
+.tos-scroll {
+  background: var(--bg-primary); border: 1px solid var(--border);
+  border-radius: 10px; padding: 24px; max-height: 300px; overflow-y: auto;
+  text-align: left; font-size: 13px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px;
+}
+
+.tos-scroll h4 { color: var(--text-primary); margin: 16px 0 8px; font-size: 14px; }
+.tos-scroll h4:first-child { margin-top: 0; }
+
+.tos-check { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 20px; }
+.tos-check input[type="checkbox"] { width: 20px; height: 20px; accent-color: var(--gold); cursor: pointer; }
+.tos-check label { font-size: 14px; font-weight: 600; cursor: pointer; }
+
+.progress-section {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 16px; padding: 40px; margin-bottom: 24px;
+}
+
+.progress-section h3 { font-size: 18px; font-weight: 700; margin-bottom: 32px; display: flex; align-items: center; gap: 12px; }
+.progress-section h3 .est-time { margin-left: auto; font-size: 12px; font-weight: 500; color: var(--text-secondary); padding: 6px 14px; background: var(--bg-primary); border-radius: 100px; }
+.progress-steps { display: flex; flex-direction: column; position: relative; }
+.progress-step { display: flex; align-items: flex-start; gap: 20px; padding: 20px 0; position: relative; }
+.step-line { position: absolute; left: 19px; top: 52px; width: 2px; height: calc(100% - 32px); background: var(--border); }
+.progress-step:last-child .step-line { display: none; }
+
+.step-icon {
+  width: 40px; height: 40px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; font-size: 18px; background: var(--bg-primary);
+  border: 2px solid var(--border); position: relative; z-index: 2; transition: all 0.5s;
+}
+
+.step-icon.completed { background: var(--green); border-color: var(--green); color: var(--bg-primary); box-shadow: 0 0 20px var(--green-dim); }
+.step-icon.in-progress { background: var(--gold-glow); border-color: var(--gold); color: var(--gold); animation: step-pulse 2s infinite; }
+.step-icon.pending { color: var(--text-muted); }
+
+@keyframes step-pulse { 0%, 100% { box-shadow: 0 0 0 0 var(--gold-glow-strong); } 50% { box-shadow: 0 0 0 10px transparent; } }
+
+.step-content { flex: 1; padding-top: 2px; }
+.step-title { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+.step-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
+.step-time { font-size: 11px; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; margin-top: 6px; }
+.step-line.completed { background: var(--green); }
+.step-line.in-progress { background: linear-gradient(to bottom, var(--gold), var(--border)); }
+
+.checklist-section { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 32px; margin-bottom: 24px; }
+.checklist-section h3 { font-size: 18px; font-weight: 700; margin-bottom: 8px; display: flex; align-items: center; gap: 10px; }
+.checklist-progress-bar { height: 6px; background: var(--bg-primary); border-radius: 3px; margin-bottom: 24px; overflow: hidden; }
+.checklist-progress-fill { height: 100%; background: linear-gradient(90deg, var(--gold), var(--green)); border-radius: 3px; transition: width 0.5s ease; }
+
+.checklist-item { display: flex; align-items: flex-start; gap: 14px; padding: 14px 0; border-bottom: 1px solid rgba(42,42,58,0.4); cursor: pointer; transition: all 0.2s; }
+.checklist-item:last-child { border-bottom: none; }
+.checklist-item:hover { padding-left: 6px; }
+
+.check-box { width: 28px; height: 28px; border-radius: 8px; border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 14px; transition: all 0.3s; margin-top: 2px; }
+.checklist-item.done .check-box { background: var(--green); border-color: var(--green); color: var(--bg-primary); }
+.check-content h4 { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+.check-content p { font-size: 12px; color: var(--text-secondary); line-height: 1.4; }
+.checklist-item.done .check-content h4 { text-decoration: line-through; color: var(--text-muted); }
+
+.included-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+.included-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 28px; transition: all 0.3s; }
+.included-card:hover { border-color: var(--gold-dim); transform: translateY(-2px); }
+.included-card .card-icon { font-size: 28px; margin-bottom: 16px; }
+.included-card h4 { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+.included-card p { font-size: 12px; color: var(--text-secondary); line-height: 1.5; }
+.included-card.locked { opacity: 0.5; position: relative; }
+.included-card.locked::after { content: 'COMING SOON'; position: absolute; top: 12px; right: 12px; font-size: 9px; font-weight: 700; padding: 3px 8px; background: var(--bg-primary); border: 1px solid var(--border); border-radius: 4px; color: var(--text-muted); letter-spacing: 1px; }
+
+.password-section { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 32px; margin-bottom: 24px; }
+.password-section h3 { font-size: 18px; font-weight: 700; margin-bottom: 6px; display: flex; align-items: center; gap: 10px; }
+.password-section .pw-sub { font-size: 13px; color: var(--text-secondary); margin-bottom: 24px; }
+.pw-current { display: flex; align-items: center; gap: 16px; padding: 16px 20px; background: var(--bg-primary); border: 1px solid var(--border); border-radius: 10px; margin-bottom: 20px; }
+.pw-current .pw-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); white-space: nowrap; }
+.pw-current .pw-value { font-family: 'JetBrains Mono', monospace; font-size: 15px; font-weight: 600; color: var(--gold); letter-spacing: 1px; }
+.pw-current .pw-copy-btn { margin-left: auto; padding: 6px 14px; background: var(--gold-glow); border: 1px solid rgba(212,168,67,0.3); border-radius: 6px; color: var(--gold); font-family: 'Outfit', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+.pw-current .pw-copy-btn:hover { background: rgba(212,168,67,0.25); }
+.pw-changed-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; background: var(--green-dim); border-radius: 100px; font-size: 11px; font-weight: 600; color: var(--green); margin-left: 12px; }
+.pw-change-form { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; align-items: end; }
+
+.pw-change-btn { padding: 14px 24px; background: linear-gradient(135deg, var(--gold), var(--gold-dim)); border: none; border-radius: 10px; color: var(--bg-primary); font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.3s; text-transform: uppercase; letter-spacing: 1px; }
+.pw-change-btn:hover { box-shadow: 0 4px 20px var(--gold-glow-strong); transform: translateY(-1px); }
+.pw-requirements { margin-top: 12px; font-size: 11px; color: var(--text-muted); display: flex; gap: 16px; }
+.pw-input-wrap { position: relative; }
+.pw-toggle { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 16px; padding: 4px; }
+
+.upgrade-bar { background: linear-gradient(135deg, rgba(212,168,67,0.08), rgba(212,168,67,0.02)); border: 1px solid rgba(212,168,67,0.2); border-radius: 12px; padding: 20px 28px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+.upgrade-bar p { font-size: 14px; color: var(--text-secondary); }
+.upgrade-bar p strong { color: var(--gold); }
+.upgrade-btn { padding: 10px 24px; background: var(--gold); border: none; border-radius: 8px; color: var(--bg-primary); font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.3s; text-transform: uppercase; letter-spacing: 1px; }
+
+.support-bar { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 24px 32px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+.support-bar p { color: var(--text-secondary); font-size: 14px; }
+.support-bar p strong { color: var(--text-primary); }
+.discord-link { display: inline-flex; align-items: center; gap: 8px; padding: 10px 24px; background: #5865F2; border: none; border-radius: 8px; color: white; font-family: 'Outfit', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s; text-decoration: none; }
+
+.modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
+.modal-overlay.show { display: flex; }
+.modal { background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px; width: 100%; max-width: 700px; max-height: 85vh; overflow-y: auto; padding: 40px; animation: modalIn 0.3s ease; }
+@keyframes modalIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+.modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+.modal-header h3 { font-size: 20px; font-weight: 700; }
+.modal-close { width: 36px; height: 36px; border-radius: 8px; background: var(--bg-primary); border: 1px solid var(--border); color: var(--text-secondary); font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.email-preview { background: var(--bg-primary); border: 1px solid var(--border); border-radius: 12px; padding: 32px; font-size: 14px; line-height: 1.8; color: var(--text-secondary); margin-bottom: 20px; }
+.email-preview .email-subject { font-weight: 700; color: var(--text-primary); font-size: 16px; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+.email-preview strong { color: var(--text-primary); }
+.modal-actions { display: flex; gap: 12px; justify-content: flex-end; }
+
+.member-lookup { max-width: 480px; margin: 0 auto 40px; }
+.lookup-wrap { display: flex; gap: 8px; }
+.lookup-wrap input { flex: 1; padding: 14px 20px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; color: var(--text-primary); font-family: 'Outfit', sans-serif; font-size: 15px; outline: none; transition: all 0.3s; }
+.lookup-wrap input:focus { border-color: var(--gold); box-shadow: 0 0 0 3px var(--gold-glow); }
+.lookup-wrap input::placeholder { color: var(--text-muted); }
+.lookup-btn { padding: 14px 28px; background: var(--gold); border: none; border-radius: 10px; color: var(--bg-primary); font-family: 'Outfit', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; white-space: nowrap; }
+
+.toast { position: fixed; bottom: 30px; right: 30px; padding: 16px 28px; background: var(--green); color: var(--bg-primary); border-radius: 12px; font-weight: 700; font-size: 14px; transform: translateY(100px); opacity: 0; transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); z-index: 1000; }
+.toast.show { transform: translateY(0); opacity: 1; }
+.empty-state { padding: 60px; text-align: center; color: var(--text-muted); }
+.empty-state .empty-icon { font-size: 48px; margin-bottom: 16px; opacity: 0.5; }
+
+.loading-spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid var(--border); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.6s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+@media (max-width: 768px) {
+  .header { padding: 16px 20px; }
+  .admin-panel, .member-portal { padding: 0 20px 40px; }
+  .form-grid, .pw-change-form { grid-template-columns: 1fr; }
+  .included-grid { grid-template-columns: 1fr; }
+  .member-info-card, .cycle-bar { flex-direction: column; text-align: center; }
+  .member-pkg-display, .cycle-dates { margin-left: 0; text-align: center; }
+  .welcome-hero h1 { font-size: 28px; }
+  .support-bar, .upgrade-bar { flex-direction: column; gap: 16px; text-align: center; }
+  .modal { padding: 24px; }
+}
+
+@keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+.animate-in { animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
+.delay-1 { animation-delay: 0.1s; }
+.delay-2 { animation-delay: 0.2s; }
+.delay-3 { animation-delay: 0.3s; }
+.delay-4 { animation-delay: 0.4s; }
+</style>
+</head>
+<body>
+
+<div class="bg-grid"></div>
+<div class="bg-glow"></div>
+
+<header class="header">
+  <div class="logo-area">
+    <div class="logo-icon">SBA</div>
+    <div>
+      <div class="logo-text">SBA <span>GENIUS</span></div>
+      <div class="logo-sub">Onboarding Portal</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="db-status" id="dbStatus"><span class="loading-spinner"></span> Connecting...</div>
+    <div class="header-badge">⚡ Active System</div>
+  </div>
+</header>
+
+<div class="view-toggle">
+  <button class="view-btn active" onclick="switchView('admin')">Admin Panel</button>
+  <button class="view-btn" onclick="switchView('member')">Member View</button>
+</div>
+
+<!-- ADMIN PANEL -->
+<div class="admin-panel" id="adminPanel">
+  <div class="animate-in delay-1">
+    <h2 class="section-title">Onboard New Member</h2>
+    <p class="section-sub">Enter member details to create their account and begin provisioning.</p>
+  </div>
+
+  <div class="onboard-form animate-in delay-2">
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label">Full Name</label>
+        <input type="text" class="form-input" id="memberName" placeholder="e.g. John Smith">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email Address</label>
+        <input type="email" class="form-input" id="memberEmail" placeholder="e.g. john@email.com">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Phone Number</label>
+        <input type="tel" class="form-input" id="memberPhone" placeholder="e.g. (555) 123-4567">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Discord Username</label>
+        <input type="text" class="form-input" id="memberDiscord" placeholder="e.g. john#1234">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Package Tier</label>
+        <select class="form-select" id="memberPackage">
+          <option value="" disabled selected>Select their package...</option>
+          <option value="starter">Starter — $500 / 40-Day Cycle</option>
+          <option value="pro">Pro — $1,000 / 40-Day Cycle</option>
+          <option value="premium">Premium — $2,000 / 40-Day Cycle</option>
+          <option value="elite">Elite — $5,000 / 40-Day Cycle (Most Popular)</option>
+          <option value="vip">VIP — $10,000 / 40-Day Cycle</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">VPN Add-On</label>
+        <select class="form-select" id="memberVPN">
+          <option value="no">No VPN Add-On</option>
+          <option value="yes">VPN Access — $1,000 Add-On</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Payment Status</label>
+        <select class="form-select" id="memberPayment">
+          <option value="paid">Paid in Full</option>
+          <option value="pending">Payment Pending</option>
+          <option value="overdue">Overdue</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Referred By (optional)</label>
+        <input type="text" class="form-input" id="memberReferral" placeholder="e.g. Waleed, Discord name, or Rep ID">
+      </div>
+    </div>
+    <button class="onboard-btn" id="onboardBtn" onclick="onboardMember()">⚡ Onboard Member</button>
+  </div>
+
+  <div class="members-table-wrap animate-in delay-3">
+    <div class="table-header">
+      <h3>Onboarded Members</h3>
+      <div class="table-actions">
+        <div class="member-count" id="memberCount">0 Members</div>
+        <button class="action-btn" onclick="exportMembers()" style="padding:8px 16px;">📥 Export CSV</button>
+      </div>
+    </div>
+    <div class="table-scroll"><div id="membersTableBody"><div class="empty-state"><div class="empty-icon">👥</div><p>Loading members...</p></div></div></div>
+  </div>
+</div>
+
+<!-- MEMBER PORTAL -->
+<div class="member-portal" id="memberPortal">
+  <div class="welcome-hero animate-in delay-1">
+    <h1>Welcome to <span>SBA Genius</span></h1>
+    <p>Your account is being provisioned. Track your activation progress below.</p>
+  </div>
+
+  <div class="member-lookup animate-in delay-2">
+    <div class="lookup-wrap">
+      <input type="email" id="lookupEmail" placeholder="Enter your email to check status..." onkeypress="if(event.key==='Enter')lookupMember()">
+      <button class="lookup-btn" onclick="lookupMember()">Check Status</button>
+    </div>
+  </div>
+
+  <div id="memberInfoSection" style="display:none;">
+    <div class="tos-gate" id="tosGate" style="display:none;">
+      <h3>📋 Terms of Service Agreement</h3>
+      <p class="tos-sub">Please review and accept our terms before accessing your account.</p>
+      <div class="tos-scroll">
+        <h4>1. Platform Usage Agreement</h4>
+        By accessing SBA Genius ("the Platform"), you agree to use it solely for legal sports betting arbitrage activities in jurisdictions where such activities are permitted. You acknowledge that arbitrage betting, while mathematically sound, carries execution risk and that SBA does not guarantee profits.
+        <h4>2. Account & Credentials</h4>
+        Your account credentials are personal and non-transferable. You are responsible for maintaining the confidentiality of your login information. Sharing account access with unauthorized individuals will result in immediate account termination without refund.
+        <h4>3. Subscription & Billing</h4>
+        Your subscription operates on a 40-day cycle. Access begins upon account activation, not upon payment. Refunds are not available once your account has been activated and you have received platform access. Cycle renewals are due before the current cycle expires.
+        <h4>4. VPN & Sportsbook Access</h4>
+        If you have purchased VPN access, you agree to use it solely for the purpose of accessing legal sportsbooks. SBA provides VPN access as a tool; you are solely responsible for compliance with local laws and sportsbook terms of service.
+        <h4>5. Intellectual Property</h4>
+        All algorithms, calculations, data feeds, and proprietary analysis within SBA Genius are the exclusive intellectual property of Sports Bet Arbitrage LLC. You may not reverse-engineer, copy, distribute, or share any platform data, screenshots, or methodology with non-members.
+        <h4>6. Risk Acknowledgment</h4>
+        Sports betting involves financial risk. While arbitrage strategies aim to minimize risk, factors such as line movement, sportsbook limits, account restrictions, and execution timing can affect outcomes. SBA is not a financial advisor and does not provide investment advice.
+        <h4>7. Community Standards</h4>
+        As a member of the SBA Discord community, you agree to conduct yourself professionally, support fellow members, and refrain from sharing proprietary picks or strategies outside the community.
+        <h4>8. Limitation of Liability</h4>
+        Sports Bet Arbitrage LLC shall not be liable for any direct, indirect, incidental, or consequential damages arising from your use of the Platform, including but not limited to losses from sportsbook account closures, delayed bet placement, or line changes.
+      </div>
+      <div class="tos-check">
+        <input type="checkbox" id="tosCheckbox" onchange="checkTOS()">
+        <label for="tosCheckbox">I have read and agree to the Terms of Service</label>
+      </div>
+      <button class="primary-btn" id="tosAcceptBtn" onclick="acceptTOS()" disabled style="max-width:400px;margin:0 auto;opacity:0.5;">Accept & Continue</button>
+    </div>
+
+    <div id="memberMainContent" style="display:none;">
+      <div class="member-info-card animate-in">
+        <div class="member-avatar" id="portalAvatar">JS</div>
+        <div class="member-details">
+          <h3 id="portalName">—</h3>
+          <div class="member-meta">
+            <span>📧 <span id="portalEmail">—</span></span>
+            <span>💬 <span id="portalDiscord">—</span></span>
+          </div>
+        </div>
+        <div class="member-pkg-display">
+          <div class="pkg-name" id="portalPkgName">—</div>
+          <div class="pkg-price" id="portalPkgPrice">—</div>
+          <div class="pkg-cycle">per 40-day cycle</div>
+        </div>
+      </div>
+
+      <div class="cycle-bar animate-in delay-1">
+        <div class="cycle-ring">
+          <svg width="80" height="80" viewBox="0 0 80 80">
+            <circle class="ring-bg" cx="40" cy="40" r="34" fill="none" stroke-width="6" />
+            <circle class="ring-fill" id="cycleRing" cx="40" cy="40" r="34" fill="none" stroke-width="6" stroke-linecap="round" stroke-dasharray="213.6" stroke-dashoffset="0" />
+          </svg>
+          <span class="ring-text" id="cycleDaysLeft">40</span>
+        </div>
+        <div class="cycle-info">
+          <h4 id="cycleLabel">—</h4>
+          <p id="cycleStatus">—</p>
+        </div>
+        <div class="cycle-dates">
+          <div>Start: <strong id="cycleStart">—</strong></div>
+          <div>End: <strong id="cycleEnd">—</strong></div>
+        </div>
+      </div>
+
+      <div class="progress-section animate-in delay-1">
+        <h3>Activation Progress <span class="est-time" id="portalETA">⏱ Est. 24-48 hours</span></h3>
+        <div class="progress-steps" id="progressSteps"></div>
+      </div>
+
+      <div class="checklist-section animate-in delay-2">
+        <h3>🚀 Getting Started Checklist <span style="margin-left:auto;font-size:13px;font-weight:500;color:var(--text-secondary);" id="checklistCount">0/6</span></h3>
+        <div class="checklist-progress-bar"><div class="checklist-progress-fill" id="checklistBar" style="width:0%"></div></div>
+        <div id="checklistItems"></div>
+      </div>
+
+      <div class="included-grid animate-in delay-2" id="includedGrid"></div>
+
+      <div class="password-section animate-in delay-3">
+        <h3>🔑 Your Login Credentials <span class="pw-changed-badge" id="pwChangedBadge" style="display:none;">✓ Password Updated</span></h3>
+        <p class="pw-sub">Use these credentials to log in to SBA Genius. We recommend changing your temporary password.</p>
+        <div class="pw-current">
+          <span class="pw-label">Current Password</span>
+          <span class="pw-value" id="portalPassword">••••••••</span>
+          <button class="pw-copy-btn" onclick="copyMemberPassword()">📋 Copy</button>
+        </div>
+        <div class="pw-change-form">
+          <div class="form-group"><label class="form-label">Current Password</label><div class="pw-input-wrap"><input type="password" class="form-input" id="pwCurrent" placeholder="Enter current password"><button class="pw-toggle" onclick="togglePwVis('pwCurrent')">👁</button></div></div>
+          <div class="form-group"><label class="form-label">New Password</label><div class="pw-input-wrap"><input type="password" class="form-input" id="pwNew" placeholder="Min 8 characters"><button class="pw-toggle" onclick="togglePwVis('pwNew')">👁</button></div></div>
+          <div class="form-group"><label class="form-label">Confirm New</label><div class="pw-input-wrap"><input type="password" class="form-input" id="pwConfirm" placeholder="Re-enter password"><button class="pw-toggle" onclick="togglePwVis('pwConfirm')">👁</button></div></div>
+        </div>
+        <div class="pw-requirements"><span>✦ Min 8 chars</span><span>✦ 1 number</span><span>✦ 1 uppercase</span></div>
+        <div style="margin-top:16px;"><button class="pw-change-btn" onclick="changePassword()">🔒 Update Password</button></div>
+      </div>
+
+      <div class="upgrade-bar animate-in delay-3">
+        <p>Want more features? <strong>Upgrade your package</strong> for War Room, Power Play, and more.</p>
+        <button class="upgrade-btn" onclick="requestUpgrade()">⬆ Request Upgrade</button>
+      </div>
+
+      <div class="support-bar animate-in delay-4">
+        <p>Questions? Reach out on Discord or contact <strong>support@sportsbetarbitrage.com</strong></p>
+        <a href="#" class="discord-link">💬 Join Discord</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODALS -->
+<div class="modal-overlay" id="emailModal">
+  <div class="modal">
+    <div class="modal-header"><h3>📧 Welcome Email Preview</h3><button class="modal-close" onclick="closeModal('emailModal')">✕</button></div>
+    <div class="email-preview" id="emailPreviewContent"></div>
+    <div class="modal-actions">
+      <button class="action-btn" onclick="closeModal('emailModal')">Close</button>
+      <button class="primary-btn small" onclick="copyWelcomeEmail()">📋 Copy Email Text</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="upgradeModal">
+  <div class="modal">
+    <div class="modal-header"><h3>⬆ Request Package Upgrade</h3><button class="modal-close" onclick="closeModal('upgradeModal')">✕</button></div>
+    <p style="color:var(--text-secondary);margin-bottom:20px;">Select the package you'd like to upgrade to.</p>
+    <div class="form-group" style="margin-bottom:20px;"><label class="form-label">Upgrade To</label>
+      <select class="form-select" id="upgradeSelect">
+        <option value="pro">Pro — $1,000</option><option value="premium">Premium — $2,000</option>
+        <option value="elite">Elite — $5,000</option><option value="vip">VIP — $10,000</option>
+      </select>
+    </div>
+    <div class="form-group" style="margin-bottom:20px;"><label class="form-label">Notes (optional)</label><input type="text" class="form-input" id="upgradeNotes" placeholder="Questions or preferences..."></div>
+    <button class="primary-btn" onclick="submitUpgrade()">Submit Upgrade Request</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════ SUPABASE INIT ═══════════════
+const SUPABASE_URL = 'https://anjlmooskwvjystmrhxr.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFuamxtb29za3d2anlzdG1yaHhyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU0NjYzNTUsImV4cCI6MjA4MTA0MjM1NX0.DVLjp9PzNIPNSp2HAGtKTaPVfKy3QLs4HTJsy96UsyM';
+
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const TABLE = 'onboarding_members';
+
+let members = [];
+let currentLookupMember = null;
+
+// ═══════════════ CONSTANTS ═══════════════
+const PACKAGES = {
+  starter: { name: 'Starter', price: '$500', features: ['genius', 'discord'] },
+  pro: { name: 'Pro', price: '$1,000', features: ['genius', 'discord', 'alerts'] },
+  premium: { name: 'Premium', price: '$2,000', features: ['genius', 'discord', 'alerts', 'warroom'] },
+  elite: { name: 'Elite', price: '$5,000', features: ['genius', 'discord', 'alerts', 'warroom', 'powerplay'] },
+  vip: { name: 'VIP', price: '$10,000', features: ['genius', 'discord', 'alerts', 'warroom', 'powerplay', 'concierge'] }
+};
+
+const FEATURES = {
+  genius: { icon: '🧠', title: 'SBA Genius Calculator', desc: 'Full arbitrage calculator with 60+ leagues and 432 market keys' },
+  discord: { icon: '💬', title: 'Discord Community', desc: 'Private Discord with daily picks and alerts' },
+  alerts: { icon: '🔔', title: 'Real-Time Alerts', desc: 'Instant notifications for high-value arbs' },
+  warroom: { icon: '⚔️', title: 'War Room', desc: 'Advanced analysis and live game tracking' },
+  powerplay: { icon: '⚡', title: 'Power Play', desc: 'AI-powered bet sizing and strategy engine' },
+  concierge: { icon: '👑', title: 'VIP Concierge', desc: '1-on-1 support and custom strategy sessions' },
+  vpn: { icon: '🔒', title: 'VPN Access', desc: 'Secure VPN for offshore sportsbooks' },
+  affiliate: { icon: '🤝', title: 'Affiliate Dashboard', desc: 'Earn commissions by referring new members', locked: true }
+};
+
+const STEPS = [
+  { title: 'Account Created', desc: 'Your account has been created in our system.' },
+  { title: 'Genius Platform Access', desc: 'Configuring your access to the SBA Genius arbitrage platform.' },
+  { title: 'VPN Configuration', desc: 'Setting up your secure VPN credentials for sportsbook access.' },
+  { title: 'Discord Role Assignment', desc: 'Assigning your package role in the Discord community.' },
+  { title: 'Full Activation', desc: 'Final review and full platform activation. You\'re ready to start betting.' }
+];
+
+const CHECKLIST = [
+  { id: 'change_password', title: 'Change Your Temporary Password', desc: 'Set a secure password you\'ll remember.' },
+  { id: 'join_discord', title: 'Join the SBA Discord Server', desc: 'Connect with the community and get daily picks.' },
+  { id: 'setup_vpn', title: 'Install & Configure Your VPN', desc: 'Download the VPN app and connect to the recommended server.' },
+  { id: 'open_sportsbooks', title: 'Set Up Sportsbook Accounts', desc: 'Sign up at 3-5 recommended books (DraftKings, FanDuel, BetMGM, etc.).' },
+  { id: 'fund_accounts', title: 'Fund Your First Sportsbook', desc: 'Deposit your starting bankroll — we recommend $200-500 per book.' },
+  { id: 'first_arb', title: 'Place Your First Arbitrage Bet', desc: 'Use SBA Genius to find your first arb and place both sides.' }
+];
+
+// ═══════════════ DB HELPERS ═══════════════
+async function dbInit() {
+  try {
+    const { data, error } = await supabase.from(TABLE).select('id').limit(1);
+    if (error) throw error;
+    document.getElementById('dbStatus').className = 'db-status connected';
+    document.getElementById('dbStatus').innerHTML = '● Supabase Connected';
+    await loadMembers();
+  } catch (e) {
+    console.error('DB init error:', e);
+    document.getElementById('dbStatus').className = 'db-status disconnected';
+    document.getElementById('dbStatus').innerHTML = '● DB Error';
+    showToast('⚠️ Database connection failed. Check console.', '#e74c3c');
+  }
+}
+
+async function loadMembers() {
+  const { data, error } = await supabase.from(TABLE).select('*').order('created_at', { ascending: false });
+  if (error) { console.error('Load error:', error); return; }
+  members = data || [];
+  renderMembersTable();
+}
+
+async function insertMember(member) {
+  const { data, error } = await supabase.from(TABLE).insert([member]).select();
+  if (error) { console.error('Insert error:', error); showToast('⚠️ ' + error.message, '#e74c3c'); return null; }
+  return data[0];
+}
+
+async function updateMember(id, updates) {
+  const { data, error } = await supabase.from(TABLE).update(updates).eq('id', id).select();
+  if (error) { console.error('Update error:', error); showToast('⚠️ ' + error.message, '#e74c3c'); return null; }
+  return data[0];
+}
+
+async function deleteMember(id) {
+  const { error } = await supabase.from(TABLE).delete().eq('id', id);
+  if (error) { console.error('Delete error:', error); return false; }
+  return true;
+}
+
+async function findByEmail(email) {
+  const { data, error } = await supabase.from(TABLE).select('*').ilike('email', email).single();
+  if (error) return null;
+  return data;
+}
+
+// ═══════════════ VIEW SWITCH ═══════════════
+function switchView(view) {
+  document.querySelectorAll('.view-btn').forEach(btn => btn.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('adminPanel').style.display = view === 'admin' ? 'block' : 'none';
+  document.getElementById('memberPortal').style.display = view === 'member' ? 'block' : 'none';
+}
+
+// ═══════════════ ONBOARD ═══════════════
+async function onboardMember() {
+  const btn = document.getElementById('onboardBtn');
+  const name = document.getElementById('memberName').value.trim();
+  const email = document.getElementById('memberEmail').value.trim();
+  const phone = document.getElementById('memberPhone').value.trim();
+  const discord = document.getElementById('memberDiscord').value.trim();
+  const pkg = document.getElementById('memberPackage').value;
+  const vpn = document.getElementById('memberVPN').value;
+  const payment = document.getElementById('memberPayment').value;
+  const referral = document.getElementById('memberReferral').value.trim();
+
+  if (!name || !email || !phone || !discord || !pkg) {
+    showToast('⚠️ Fill in all required fields', '#e74c3c'); return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Creating...';
+
+  const password = generateTempPassword();
+  const now = new Date();
+  const cycleEnd = new Date(now); cycleEnd.setDate(cycleEnd.getDate() + 40);
+
+  const member = {
+    name, email: email.toLowerCase(), phone, discord, pkg,
+    vpn: vpn === 'yes', payment,
+    referral: referral || null,
+    status: 'pending', step_progress: 1,
+    password, password_changed: false,
+    tos_accepted: false, tos_accepted_at: null,
+    checklist: {}, upgrade_requests: [],
+    cycle_start: now.toISOString(),
+    cycle_end: cycleEnd.toISOString()
+  };
+
+  const result = await insertMember(member);
+  btn.disabled = false;
+  btn.textContent = '⚡ Onboard Member';
+
+  if (!result) return;
+
+  await loadMembers();
+
+  ['memberName','memberEmail','memberPhone','memberDiscord','memberReferral'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('memberPackage').selectedIndex = 0;
+  document.getElementById('memberVPN').selectedIndex = 0;
+  document.getElementById('memberPayment').selectedIndex = 0;
+
+  showToast(`✅ ${name} onboarded!`);
+  showWelcomeEmail(result);
+}
+
+function generateTempPassword() {
+  const chars = 'ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
+  let pw = 'SBA-';
+  for (let i = 0; i < 8; i++) pw += chars[Math.floor(Math.random() * chars.length)];
+  return pw;
+}
+
+// ═══════════════ WELCOME EMAIL ═══════════════
+function showWelcomeEmail(member) {
+  const pkg = PACKAGES[member.pkg];
+  document.getElementById('emailPreviewContent').innerHTML = `
+    <div class="email-subject">Welcome to SBA Genius — Your Account is Ready 🎯</div>
+    <p>Hey <strong>${member.name.split(' ')[0]}</strong>,</p>
+    <p>Welcome to the SBA family. Your <strong>${pkg.name} Package</strong> account has been created and we're setting everything up for you.</p>
+    <p><strong>What's happening now:</strong></p>
+    <p>✅ Account created<br>🔄 Genius platform access configuring<br>🔄 VPN credentials provisioning<br>🔄 Discord role assignment in progress</p>
+    <p><strong>Your Login Credentials:</strong></p>
+    <p style="background:rgba(212,168,67,0.1);padding:16px;border-radius:8px;font-family:'JetBrains Mono',monospace;">
+    Email: <strong>${member.email}</strong><br>
+    Temporary Password: <strong>${member.password}</strong><br>
+    Portal: <strong>onboarding.sportsbetarbitrage.com</strong></p>
+    <p>⚠️ Please change your temporary password after first login.</p>
+    <p><strong>Estimated activation:</strong> 24-48 hours</p>
+    <p>Check your status anytime at the onboarding portal.</p>
+    <p>Let's get this money. 💰</p>
+    <p>— <strong>The SBA Team</strong><br><span style="color:var(--text-muted);font-size:12px;">Sports Bet Arbitrage LLC | sportsbetarbitrage.com</span></p>`;
+  document.getElementById('emailModal').classList.add('show');
+}
+
+function copyWelcomeEmail() {
+  navigator.clipboard.writeText(document.getElementById('emailPreviewContent').innerText).then(() => showToast('📋 Email copied!'));
+}
+
+// ═══════════════ RENDER TABLE ═══════════════
+function renderMembersTable() {
+  const container = document.getElementById('membersTableBody');
+  document.getElementById('memberCount').textContent = `${members.length} Member${members.length !== 1 ? 's' : ''}`;
+
+  if (members.length === 0) {
+    container.innerHTML = '<div class="empty-state"><div class="empty-icon">👥</div><p>No members yet.</p></div>';
+    return;
+  }
+
+  const sl = { pending: 'Pending', provisioning: 'Provisioning', active: 'Active' };
+  const pl = { paid: 'Paid', pending: 'Pending', overdue: 'Overdue' };
+
+  let html = `<table class="members-table"><thead><tr>
+    <th>Member</th><th>Discord</th><th>Pkg</th><th>VPN</th><th>Pay</th>
+    <th>Ref</th><th>TOS</th><th>Status</th><th>Password</th><th>Actions</th>
+  </tr></thead><tbody>`;
+
+  members.forEach((m) => {
+    const pkg = PACKAGES[m.pkg];
+    html += `<tr>
+      <td><div class="member-name">${m.name}</div><div class="member-email">${m.email}</div></td>
+      <td><span class="member-discord">${m.discord}</span></td>
+      <td><span class="pkg-badge pkg-${m.pkg}">${pkg.name}</span></td>
+      <td>${m.vpn ? '🔒' : '—'}</td>
+      <td><span class="pay-badge pay-${m.payment}">${pl[m.payment]}</span></td>
+      <td style="font-size:11px;color:var(--text-secondary);">${m.referral || '—'}</td>
+      <td>${m.tos_accepted ? '<span style="color:var(--green);">✓</span>' : '—'}</td>
+      <td><span class="status-dot status-${m.status}">${sl[m.status]}</span></td>
+      <td><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--gold);cursor:pointer;" onclick="copyText('${m.password}')">${m.password}</span>
+      ${m.password_changed ? ' <span style="font-size:9px;color:var(--green);">✓</span>' : ''}</td>
+      <td style="white-space:nowrap;">
+        ${m.status !== 'active' ? `
+          <button class="action-btn" onclick="advanceStep('${m.id}')">▶</button>
+          <button class="action-btn activate" onclick="activateMember('${m.id}')">✓</button>
+        ` : '<span style="color:var(--green);font-size:11px;font-weight:700;">LIVE</span>'}
+        <button class="action-btn" onclick="showWelcomeEmailById('${m.id}')">📧</button>
+        <button class="action-btn" onclick="removeMember('${m.id}')" style="color:var(--red);">✕</button>
+      </td>
+    </tr>`;
+  });
+
+  html += '</tbody></table>';
+  container.innerHTML = html;
+}
+
+// ═══════════════ ADMIN ACTIONS ═══════════════
+async function advanceStep(id) {
+  const m = members.find(x => x.id === id);
+  if (!m || m.step_progress >= 5) return;
+  const newStep = m.step_progress + 1;
+  const newStatus = newStep >= 5 ? 'active' : (newStep >= 2 ? 'provisioning' : 'pending');
+  await updateMember(id, { step_progress: newStep, status: newStatus });
+  await loadMembers();
+  showToast(`⬆️ ${m.name} → step ${newStep}/5`);
+}
+
+async function activateMember(id) {
+  const m = members.find(x => x.id === id);
+  if (!m) return;
+  await updateMember(id, { step_progress: 5, status: 'active' });
+  await loadMembers();
+  showToast(`🎉 ${m.name} is ACTIVE!`);
+}
+
+async function removeMember(id) {
+  const m = members.find(x => x.id === id);
+  if (!m || !confirm(`Remove ${m.name}?`)) return;
+  await deleteMember(id);
+  await loadMembers();
+  showToast(`Removed ${m.name}`, '#e74c3c');
+}
+
+function showWelcomeEmailById(id) {
+  const m = members.find(x => x.id === id);
+  if (m) showWelcomeEmail(m);
+}
+
+// ═══════════════ EXPORT ═══════════════
+function exportMembers() {
+  if (!members.length) { showToast('No members', '#e74c3c'); return; }
+  const h = ['Name','Email','Phone','Discord','Package','VPN','Payment','Referral','Status','TOS','Password','Created'];
+  const rows = members.map(m => [m.name,m.email,m.phone,m.discord,PACKAGES[m.pkg].name,m.vpn?'Yes':'No',m.payment,m.referral||'',m.status,m.tos_accepted?'Yes':'No',m.password,new Date(m.created_at).toLocaleDateString()]);
+  let csv = h.join(',') + '\n';
+  rows.forEach(r => csv += r.map(v => `"${v}"`).join(',') + '\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
+  a.download = `sba-members-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  showToast('📥 Exported!');
+}
+
+// ═══════════════ MEMBER LOOKUP ═══════════════
+async function lookupMember() {
+  const email = document.getElementById('lookupEmail').value.trim().toLowerCase();
+  if (!email) return;
+
+  const member = await findByEmail(email);
+  if (!member) { showToast('⚠️ No account found', '#e74c3c'); return; }
+
+  currentLookupMember = member;
+  document.getElementById('memberInfoSection').style.display = 'block';
+
+  if (!member.tos_accepted) {
+    document.getElementById('tosGate').style.display = 'block';
+    document.getElementById('memberMainContent').style.display = 'none';
+    document.getElementById('tosCheckbox').checked = false;
+    document.getElementById('tosAcceptBtn').disabled = true;
+    document.getElementById('tosAcceptBtn').style.opacity = '0.5';
+  } else {
+    document.getElementById('tosGate').style.display = 'none';
+    showMemberContent(member);
+  }
+
+  document.getElementById('memberInfoSection').scrollIntoView({ behavior: 'smooth' });
+}
+
+function checkTOS() {
+  const c = document.getElementById('tosCheckbox').checked;
+  document.getElementById('tosAcceptBtn').disabled = !c;
+  document.getElementById('tosAcceptBtn').style.opacity = c ? '1' : '0.5';
+}
+
+async function acceptTOS() {
+  if (!currentLookupMember) return;
+  const updated = await updateMember(currentLookupMember.id, { tos_accepted: true, tos_accepted_at: new Date().toISOString() });
+  if (!updated) return;
+  currentLookupMember = updated;
+  document.getElementById('tosGate').style.display = 'none';
+  showMemberContent(updated);
+  showToast('✅ Terms accepted! Welcome aboard.');
+}
+
+function showMemberContent(member) {
+  const pkg = PACKAGES[member.pkg];
+  document.getElementById('memberMainContent').style.display = 'block';
+
+  const initials = member.name.split(' ').map(n => n[0]).join('').toUpperCase();
+  document.getElementById('portalAvatar').textContent = initials;
+  document.getElementById('portalName').textContent = member.name;
+  document.getElementById('portalEmail').textContent = member.email;
+  document.getElementById('portalDiscord').textContent = member.discord;
+  document.getElementById('portalPkgName').textContent = pkg.name;
+  document.getElementById('portalPkgPrice').textContent = pkg.price;
+
+  document.getElementById('portalPassword').textContent = member.password_changed ? '••••••••' : member.password;
+  document.getElementById('pwChangedBadge').style.display = member.password_changed ? 'inline-flex' : 'none';
+  ['pwCurrent','pwNew','pwConfirm'].forEach(id => document.getElementById(id).value = '');
+
+  document.getElementById('portalETA').textContent = member.status === 'active' ? '✅ Fully Activated' : '⏱ Est. 24-48 hours';
+
+  // Cycle
+  const start = new Date(member.cycle_start);
+  const end = new Date(member.cycle_end);
+  const daysLeft = Math.max(0, Math.ceil((end - new Date()) / 86400000));
+  const offset = 213.6 * (1 - daysLeft / 40);
+  document.getElementById('cycleDaysLeft').textContent = daysLeft;
+  document.getElementById('cycleRing').setAttribute('stroke-dashoffset', offset);
+  document.getElementById('cycleLabel').textContent = daysLeft > 0 ? `${daysLeft} Days Remaining` : 'Cycle Complete';
+  document.getElementById('cycleStatus').textContent = daysLeft > 0 ? `Day ${40 - daysLeft + 1} of 40` : 'Cycle ended — contact support to renew.';
+  const fmt = d => d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  document.getElementById('cycleStart').textContent = fmt(start);
+  document.getElementById('cycleEnd').textContent = fmt(end);
+
+  renderProgressSteps(member);
+  renderChecklist(member);
+  renderFeatureCards(member);
+}
+
+function renderProgressSteps(member) {
+  let html = '';
+  STEPS.forEach((step, i) => {
+    const n = i + 1;
+    let sc = 'pending', lc = '';
+    if (n < member.step_progress) { sc = 'completed'; lc = 'completed'; }
+    else if (n === member.step_progress) { sc = member.status === 'active' ? 'completed' : 'in-progress'; lc = sc === 'completed' ? 'completed' : 'in-progress'; }
+    const t = n <= member.step_progress ? new Date(member.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }) : '';
+    html += `<div class="progress-step"><div class="step-line ${lc}"></div>
+      <div class="step-icon ${sc}">${sc === 'completed' ? '✓' : sc === 'in-progress' ? '◉' : '○'}</div>
+      <div class="step-content"><div class="step-title">${step.title}</div><div class="step-desc">${step.desc}</div>
+      ${t ? `<div class="step-time">${t}</div>` : ''}</div></div>`;
+  });
+  document.getElementById('progressSteps').innerHTML = html;
+}
+
+function renderChecklist(member) {
+  const cl = member.checklist || {};
+  let done = 0, html = '';
+  CHECKLIST.forEach(item => {
+    const d = cl[item.id] || false;
+    if (d) done++;
+    html += `<div class="checklist-item ${d ? 'done' : ''}" onclick="toggleCheck('${item.id}')">
+      <div class="check-box">${d ? '✓' : ''}</div>
+      <div class="check-content"><h4>${item.title}</h4><p>${item.desc}</p></div></div>`;
+  });
+  document.getElementById('checklistItems').innerHTML = html;
+  document.getElementById('checklistCount').textContent = `${done}/${CHECKLIST.length}`;
+  document.getElementById('checklistBar').style.width = Math.round(done / CHECKLIST.length * 100) + '%';
+}
+
+async function toggleCheck(itemId) {
+  if (!currentLookupMember) return;
+  const cl = { ...(currentLookupMember.checklist || {}) };
+  cl[itemId] = !cl[itemId];
+  const updated = await updateMember(currentLookupMember.id, { checklist: cl });
+  if (updated) { currentLookupMember = updated; renderChecklist(updated); }
+}
+
+function renderFeatureCards(member) {
+  const pkg = PACKAGES[member.pkg];
+  let fl = [...pkg.features];
+  if (member.vpn) fl.push('vpn');
+  fl.push('affiliate');
+  document.getElementById('includedGrid').innerHTML = fl.map(k => {
+    const f = FEATURES[k];
+    return `<div class="included-card ${f.locked ? 'locked' : ''}"><div class="card-icon">${f.icon}</div><h4>${f.title}</h4><p>${f.desc}</p></div>`;
+  }).join('');
+}
+
+// ═══════════════ PASSWORD ═══════════════
+function copyMemberPassword() {
+  if (currentLookupMember) navigator.clipboard.writeText(currentLookupMember.password).then(() => showToast('📋 Copied!'));
+}
+
+function togglePwVis(id) {
+  const el = document.getElementById(id);
+  el.type = el.type === 'password' ? 'text' : 'password';
+}
+
+async function changePassword() {
+  if (!currentLookupMember) return;
+  const cur = document.getElementById('pwCurrent').value;
+  const np = document.getElementById('pwNew').value;
+  const cp = document.getElementById('pwConfirm').value;
+
+  if (cur !== currentLookupMember.password) { showToast('⚠️ Wrong current password', '#e74c3c'); return; }
+  if (np.length < 8) { showToast('⚠️ Min 8 characters', '#e74c3c'); return; }
+  if (!/[A-Z]/.test(np)) { showToast('⚠️ Need uppercase letter', '#e74c3c'); return; }
+  if (!/[0-9]/.test(np)) { showToast('⚠️ Need a number', '#e74c3c'); return; }
+  if (np !== cp) { showToast('⚠️ Passwords don\'t match', '#e74c3c'); return; }
+
+  const cl = { ...(currentLookupMember.checklist || {}), change_password: true };
+  const updated = await updateMember(currentLookupMember.id, { password: np, password_changed: true, checklist: cl });
+  if (!updated) return;
+  currentLookupMember = updated;
+
+  document.getElementById('portalPassword').textContent = '••••••••';
+  document.getElementById('pwChangedBadge').style.display = 'inline-flex';
+  ['pwCurrent','pwNew','pwConfirm'].forEach(id => document.getElementById(id).value = '');
+  renderChecklist(updated);
+  showToast('🔒 Password updated!');
+}
+
+// ═══════════════ UPGRADE ═══════════════
+function requestUpgrade() {
+  if (currentLookupMember) document.getElementById('upgradeModal').classList.add('show');
+}
+
+async function submitUpgrade() {
+  if (!currentLookupMember) return;
+  const reqs = [...(currentLookupMember.upgrade_requests || []), {
+    from: currentLookupMember.pkg,
+    to: document.getElementById('upgradeSelect').value,
+    notes: document.getElementById('upgradeNotes').value.trim(),
+    requested_at: new Date().toISOString()
+  }];
+  const updated = await updateMember(currentLookupMember.id, { upgrade_requests: reqs });
+  if (updated) currentLookupMember = updated;
+  closeModal('upgradeModal');
+  showToast('⬆️ Upgrade request submitted!');
+}
+
+// ═══════════════ UTILS ═══════════════
+function showToast(msg, color) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.style.background = color || '#2ecc71';
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+function copyText(text) { navigator.clipboard.writeText(text).then(() => showToast('📋 Copied!')); }
+function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+
+document.querySelectorAll('.modal-overlay').forEach(o => o.addEventListener('click', e => { if (e.target === o) o.classList.remove('show'); }));
+
+// ═══════════════ INIT ═══════════════
+dbInit();
+</script>
+</body>
+</html>
