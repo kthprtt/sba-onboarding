@@ -94,6 +94,15 @@ select:focus,input:focus{border-color:var(--gold);}
         <input type="text" id="codeRef" placeholder="Optional">
       </div>
       <div>
+        <label>Assign To</label>
+        <select id="codeAssign">
+          <option value="">Unassigned</option>
+          <option value="vegas">Vegas</option>
+          <option value="waleed">Waleed</option>
+          <option value="keith">Keith (self)</option>
+        </select>
+      </div>
+      <div>
         <label>For (member name)</label>
         <input type="text" id="codeFor" placeholder="Optional">
       </div>
@@ -114,7 +123,7 @@ select:focus,input:focus{border-color:var(--gold);}
   <div class="card" style="border-color:rgba(59,130,246,0.2);">
     <h3>⚡ Batch Generate Codes</h3>
     <div style="font-size:11px;color:var(--t2);margin-bottom:12px;">Generate multiple codes at once. Copy the list and send to your team.</div>
-    <div class="grid" style="grid-template-columns:1fr 1fr 1fr;">
+    <div class="grid">
       <div>
         <label>Package</label>
         <select id="batchType">
@@ -132,6 +141,14 @@ select:focus,input:focus{border-color:var(--gold);}
           <option value="10">10 codes</option>
           <option value="20">20 codes</option>
           <option value="50">50 codes</option>
+        </select>
+      </div>
+      <div>
+        <label>Assign To</label>
+        <select id="batchAssign">
+          <option value="">Unassigned</option>
+          <option value="vegas">Vegas</option>
+          <option value="waleed">Waleed</option>
         </select>
       </div>
       <div>
@@ -202,7 +219,9 @@ async function generateCode(forRequest){
     payment_amount:AMOUNTS[type],
     payment_method:pay,payment_ref:ref||null,
     payment_notes:forName?'For: '+forName:null,
-    generated_by:'keith'
+    generated_by:'keith',
+      assigned_to:document.getElementById('batchAssign')?.value||null,
+    assigned_to:forRequest?.assigned_to||document.getElementById('codeAssign')?.value||null
   }]);
   
   if(error){showToast('❌ '+error.message);return null;}
@@ -335,6 +354,8 @@ async function batchGenerate(){
       payment_amount:AMOUNTS[type],
       payment_method:pay,
       generated_by:'keith',
+      assigned_to:document.getElementById('batchAssign')?.value||null,
+    assigned_to:forRequest?.assigned_to||document.getElementById('codeAssign')?.value||null,
       payment_notes:'Batch #'+(i+1)+' of '+count
     }]);
     if(!error) codes.push(code);
