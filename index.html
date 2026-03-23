@@ -631,12 +631,11 @@ body {
       <!-- VPN Credentials (shows when VPN = yes) -->
       <div id="vpnCredsSection" class="form-group" style="display:none;grid-column:1/-1;">
         <label class="form-label">VPN Credentials (if already provisioned)</label>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
-          <input type="text" class="form-input" id="vpnUsername" placeholder="VPN Username">
-          <input type="text" class="form-input" id="vpnPassword" placeholder="VPN Password">
-          <input type="text" class="form-input" id="vpnServer" placeholder="VPN Server (e.g. Toronto 1)">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          <input type="text" class="form-input" id="vpnUsername" placeholder="VPN Username (leave blank to auto-create)">
+          <input type="text" class="form-input" id="vpnPassword" placeholder="VPN Password (leave blank to auto-create)">
         </div>
-        <div style="font-size:10px;color:#8b8fa3;margin-top:4px;">Leave blank if VPN hasn't been set up yet — you can add these later by editing the member.</div>
+        <div style="font-size:10px;color:#22c55e;margin-top:4px;">💡 Leave blank = system auto-creates VPN account via API. Or enter existing credentials.</div>
       </div>
       <div class="form-group">
         <label class="form-label">Member Type</label>
@@ -1366,18 +1365,55 @@ async function onboardMember() {
   const pkgAmounts = {basic:1000, plus:2000, elite:5000, pro:10000};
   const packageAmount = pkgAmounts[pkg] || 0;
 
-  // VPN credentials
-  const vpnUser = document.getElementById('vpnUsername')?.value?.trim() || null;
-  const vpnPass = document.getElementById('vpnPassword')?.value?.trim() || null;
-  const vpnServ = document.getElementById('vpnServer')?.value?.trim() || null;
+  // VPN: Auto-create via VPNresellers API if VPN = yes
+  let vpnUser = document.getElementById('vpnUsername')?.value?.trim() || null;
+  let vpnPass = document.getElementById('vpnPassword')?.value?.trim() || null;
+  let vpnStatus = null;
+  
+  if (vpn === 'yes' && !vpnUser) {
+    // Auto-create VPN account
+    btn.textContent = 'Creating VPN account...';
+    const vpnUsername = 'sba_' + firstName + Math.floor(100 + Math.random() * 900);
+    const vpnPassword = 'SBA-' + generateTempPassword().slice(4);
+    
+    try {
+      const vpnResp = await fetch('https://api.vpnresellers.com/v3/accounts', {
+        method: 'POST',
+        headers: {
+          'Authorization': 'Bearer ID-10030~X10cagYNspCzhIjkmDTI46bMBOeQ8wLEx97HZVv53tSJoidyfU2PWuFqrKGnAR',
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({ username: vpnUsername, password: vpnPassword })
+      });
+      const vpnData = await vpnResp.json();
+      
+      if (vpnResp.ok && vpnData.data) {
+        vpnUser = vpnUsername;
+        vpnPass = vpnPassword;
+        vpnStatus = 'provisioned';
+        showToast(`✅ VPN account created: ${vpnUsername}`);
+      } else {
+        showToast(`⚠️ VPN creation failed: ${vpnData.message || 'Unknown error'}. Adding member without VPN creds.`, '#e74c3c');
+        vpnStatus = 'pending';
+      }
+    } catch(e) {
+      console.error('VPN API error:', e);
+      showToast('⚠️ VPN API unreachable. Member created without VPN creds — add manually later.', '#e74c3c');
+      vpnStatus = 'pending';
+    }
+    
+    btn.textContent = 'Creating member...';
+  } else if (vpn === 'yes' && vpnUser) {
+    vpnStatus = 'provisioned';
+  }
 
   const member = {
     name, email: email.toLowerCase(), phone, discord, pkg,
     vpn: vpn === 'yes', payment,
     vpn_username: vpnUser,
     vpn_password: vpnPass,
-    vpn_server: vpnServ,
-    vpn_status: vpn === 'yes' ? (vpnUser ? 'provisioned' : 'pending') : null,
+    vpn_status: vpnStatus,
     referral_code: refCode,
     referred_by_code: referredBy || null,
     package_amount: packageAmount,
