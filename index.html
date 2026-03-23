@@ -665,10 +665,10 @@ body {
       </div>
       <div class="form-group">
         <label class="form-label">Payment Status</label>
-        <select class="form-select" id="memberPayment">
-          <option value="paid">Paid in Full</option>
+        <select class="form-select" id="memberPayment" onchange="toggleCodeRequired()">
+          <option value="paid">Paid — Manual (CashApp/Zelle/Crypto/Cash)</option>
+          <option value="stripe_auto">Paid — Stripe (auto-verified, no code needed)</option>
           <option value="pending">Payment Pending</option>
-          <option value="overdue">Overdue</option>
         </select>
       </div>
       <div class="form-group" style="grid-column:1/-1;">
@@ -1368,15 +1368,18 @@ async function onboardMember() {
     showToast('⚠️ Fill in name, email, and package', '#e74c3c'); return;
   }
 
-  // Validate activation code (required for active and legacy members)
+  // Validate activation code
+  // REQUIRED: only when payment is manual (not Stripe) AND member is not a free affiliate
   const activationCode = document.getElementById('memberActivationCode')?.value?.trim()?.toUpperCase() || '';
   const vpnCode = document.getElementById('memberVPNCode')?.value?.trim()?.toUpperCase() || '';
+  const isManualPayment = payment !== 'stripe_auto';
+  const needsCode = memberType !== 'affiliate_only' && isManualPayment;
   
-  if(memberType !== 'affiliate_only' && !activationCode){
-    showToast('⚠️ Activation code required. Generate one above after confirming payment.', '#e74c3c'); return;
+  if(needsCode && !activationCode){
+    showToast('⚠️ Activation code required for manual payments. Get one from Keith.', '#e74c3c'); return;
   }
   
-  // Validate package code against Supabase
+  // Validate package code against Supabase (only if code entered)
   let validatedPkg = null;
   if(activationCode){
     const{data:codeData,error:codeErr} = await sb.from('activation_codes').select('*').eq('code',activationCode).single();
@@ -1389,7 +1392,7 @@ async function onboardMember() {
     validatedPkg = codeData;
   }
   
-  // Validate VPN code if VPN selected
+  // Validate VPN code if VPN selected AND manual payment
   let validatedVPN = null;
   if(vpn === 'yes' && vpnCode){
     const{data:vpnData,error:vpnErr} = await sb.from('activation_codes').select('*').eq('code',vpnCode).single();
@@ -1403,8 +1406,8 @@ async function onboardMember() {
       showToast('❌ That is not a VPN code', '#e74c3c'); return;
     }
     validatedVPN = vpnData;
-  } else if(vpn === 'yes' && !vpnCode && memberType !== 'affiliate_only'){
-    showToast('⚠️ VPN activation code required when VPN is selected', '#e74c3c'); return;
+  } else if(vpn === 'yes' && !vpnCode && needsCode){
+    showToast('⚠️ VPN activation code required for manual VPN payments', '#e74c3c'); return;
   }
 
   btn.disabled = true;
@@ -1650,6 +1653,36 @@ async function validateCodeLive(code, type){
 }
 
 // REQUEST CODE — sends request to Keith's dashboard
+function toggleCodeRequired(){
+  const payment = document.getElementById('memberPayment')?.value;
+  const memberType = document.getElementById('memberType')?.value;
+  const codeGroup = document.getElementById('memberActivationCode')?.parentElement?.parentElement;
+  const codeLabel = document.getElementById('codeValidation');
+  
+  if(payment === 'stripe_auto' || memberType === 'affiliate_only'){
+    if(codeLabel){
+      codeLabel.style.color = '#22c55e';
+      codeLabel.textContent = payment === 'stripe_auto' 
+        ? '✅ Stripe payment — no activation code needed (auto-verified)' 
+        : '✅ Free affiliate — no activation code needed';
+    }
+  } else {
+    if(codeLabel){
+      codeLabel.style.color = '#d4a843';
+      codeLabel.textContent = '🔑 Activation code REQUIRED — get one from Keith after confirming payment';
+    }
+  }
+}
+
+// Also add onchange to member type selector
+document.addEventListener('DOMContentLoaded',()=>{
+  const mtEl = document.getElementById('memberType');
+  if(mtEl){
+    const orig = mtEl.onchange;
+    mtEl.onchange = function(){if(orig)orig.call(this);toggleCodeRequired();};
+  }
+});
+
 async function requestCode(type){
   const name = document.getElementById('memberName')?.value?.trim() || '';
   const pkg = document.getElementById('memberPackage')?.value || '';

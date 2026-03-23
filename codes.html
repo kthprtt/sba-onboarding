@@ -109,6 +109,52 @@ select:focus,input:focus{border-color:var(--gold);}
     </div>
   </div>
 
+
+  <!-- Batch Generate -->
+  <div class="card" style="border-color:rgba(59,130,246,0.2);">
+    <h3>⚡ Batch Generate Codes</h3>
+    <div style="font-size:11px;color:var(--t2);margin-bottom:12px;">Generate multiple codes at once. Copy the list and send to your team.</div>
+    <div class="grid" style="grid-template-columns:1fr 1fr 1fr;">
+      <div>
+        <label>Package</label>
+        <select id="batchType">
+          <option value="basic">Basic $1K</option>
+          <option value="plus">Plus $2K</option>
+          <option value="elite">Elite $5K</option>
+          <option value="pro">Pro $10K</option>
+          <option value="vpn">VPN $1K</option>
+        </select>
+      </div>
+      <div>
+        <label>How Many</label>
+        <select id="batchCount">
+          <option value="5">5 codes</option>
+          <option value="10">10 codes</option>
+          <option value="20">20 codes</option>
+          <option value="50">50 codes</option>
+        </select>
+      </div>
+      <div>
+        <label>Payment Method</label>
+        <select id="batchPay">
+          <option value="cashapp">CashApp</option>
+          <option value="zelle">Zelle</option>
+          <option value="crypto">Crypto</option>
+          <option value="stripe">Stripe</option>
+          <option value="cash">Cash</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn" style="background:var(--blue);margin-top:10px;" onclick="batchGenerate()">⚡ Generate Batch</button>
+    <div id="batchResult" style="display:none;margin-top:12px;padding:14px;background:var(--bg);border:1px solid var(--border);border-radius:8px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <span style="font-size:12px;font-weight:700;" id="batchCountLabel">0 codes generated</span>
+        <button class="btn-sm btn-green" onclick="copyBatchCodes()" style="cursor:pointer;">📋 Copy All</button>
+      </div>
+      <pre id="batchCodes" style="font-family:JetBrains Mono;font-size:12px;color:var(--green);white-space:pre-wrap;max-height:200px;overflow-y:auto;"></pre>
+    </div>
+  </div>
+
   <!-- All Codes -->
   <div class="card">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
@@ -273,6 +319,39 @@ async function denyRequest(id){
   await sb.from('code_requests').update({status:'denied'}).eq('id',id);
   showToast('❌ Request denied');
   loadRequests();
+}
+
+
+async function batchGenerate(){
+  const type=document.getElementById('batchType').value;
+  const count=parseInt(document.getElementById('batchCount').value);
+  const pay=document.getElementById('batchPay').value;
+  const codes=[];
+  
+  for(let i=0;i<count;i++){
+    const code=genStr(type);
+    const{error}=await sb.from('activation_codes').insert([{
+      code,code_type:type,status:'unused',
+      payment_amount:AMOUNTS[type],
+      payment_method:pay,
+      generated_by:'keith',
+      payment_notes:'Batch #'+(i+1)+' of '+count
+    }]);
+    if(!error) codes.push(code);
+  }
+  
+  document.getElementById('batchResult').style.display='block';
+  document.getElementById('batchCountLabel').textContent=codes.length+' codes generated';
+  document.getElementById('batchCodes').textContent=codes.join('
+');
+  showToast('⚡ '+codes.length+' codes generated!');
+  loadCodes();
+}
+
+function copyBatchCodes(){
+  const text=document.getElementById('batchCodes').textContent;
+  navigator.clipboard.writeText(text);
+  showToast('📋 All codes copied!');
 }
 
 // Init
