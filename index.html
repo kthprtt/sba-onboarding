@@ -623,10 +623,20 @@ body {
       </div>
       <div class="form-group">
         <label class="form-label">VPN Add-On</label>
-        <select class="form-select" id="memberVPN">
+        <select class="form-select" id="memberVPN" onchange="document.getElementById('vpnCredsSection').style.display=this.value==='yes'?'grid':'none'">
           <option value="no">No VPN Add-On</option>
           <option value="yes">VPN Access — $1,000 Add-On</option>
         </select>
+      </div>
+      <!-- VPN Credentials (shows when VPN = yes) -->
+      <div id="vpnCredsSection" class="form-group" style="display:none;grid-column:1/-1;">
+        <label class="form-label">VPN Credentials (if already provisioned)</label>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
+          <input type="text" class="form-input" id="vpnUsername" placeholder="VPN Username">
+          <input type="text" class="form-input" id="vpnPassword" placeholder="VPN Password">
+          <input type="text" class="form-input" id="vpnServer" placeholder="VPN Server (e.g. Toronto 1)">
+        </div>
+        <div style="font-size:10px;color:#8b8fa3;margin-top:4px;">Leave blank if VPN hasn't been set up yet — you can add these later by editing the member.</div>
       </div>
       <div class="form-group">
         <label class="form-label">Member Type</label>
@@ -1356,9 +1366,18 @@ async function onboardMember() {
   const pkgAmounts = {basic:1000, plus:2000, elite:5000, pro:10000};
   const packageAmount = pkgAmounts[pkg] || 0;
 
+  // VPN credentials
+  const vpnUser = document.getElementById('vpnUsername')?.value?.trim() || null;
+  const vpnPass = document.getElementById('vpnPassword')?.value?.trim() || null;
+  const vpnServ = document.getElementById('vpnServer')?.value?.trim() || null;
+
   const member = {
     name, email: email.toLowerCase(), phone, discord, pkg,
     vpn: vpn === 'yes', payment,
+    vpn_username: vpnUser,
+    vpn_password: vpnPass,
+    vpn_server: vpnServ,
+    vpn_status: vpn === 'yes' ? (vpnUser ? 'provisioned' : 'pending') : null,
     referral_code: refCode,
     referred_by_code: referredBy || null,
     package_amount: packageAmount,
