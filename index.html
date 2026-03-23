@@ -615,11 +615,10 @@ body {
         <label class="form-label">Package Tier</label>
         <select class="form-select" id="memberPackage">
           <option value="" disabled selected>Select their package...</option>
-          <option value="starter">Starter — $500 / 40-Day Cycle</option>
-          <option value="pro">Pro — $1,000 / 40-Day Cycle</option>
-          <option value="premium">Premium — $2,000 / 40-Day Cycle</option>
-          <option value="elite">Elite — $5,000 / 40-Day Cycle (Most Popular)</option>
-          <option value="vip">VIP — $10,000 / 40-Day Cycle</option>
+          <option value="basic">Basic — $1,000 / 40-Day Cycle</option>
+          <option value="plus">Plus — $2,000 / 40-Day Cycle</option>
+          <option value="elite">Elite — $5,000 / 40-Day Cycle</option>
+          <option value="pro">Pro — $10,000 / 40-Day Cycle</option>
         </select>
       </div>
       <div class="form-group">
@@ -630,6 +629,14 @@ body {
         </select>
       </div>
       <div class="form-group">
+        <label class="form-label">Member Type</label>
+        <select class="form-select" id="memberType">
+          <option value="active">Active — Paid member, full access</option>
+          <option value="affiliate_only">Affiliate Only — Can recruit, commissions held until they pay</option>
+          <option value="legacy">Legacy — Already paid out, in tree for structure</option>
+        </select>
+      </div>
+      <div class="form-group">
         <label class="form-label">Payment Status</label>
         <select class="form-select" id="memberPayment">
           <option value="paid">Paid in Full</option>
@@ -637,9 +644,16 @@ body {
           <option value="overdue">Overdue</option>
         </select>
       </div>
-      <div class="form-group">
-        <label class="form-label">Referred By (optional)</label>
-        <input type="text" class="form-input" id="memberReferral" placeholder="e.g. Waleed, Discord name, or Rep ID">
+      <div class="form-group" style="grid-column:1/-1;">
+        <label class="form-label">Referred By (Who brought them in?)</label>
+        <select class="form-select" id="memberReferral">
+          <option value="">Select who referred them...</option>
+          <option value="loading">Loading members...</option>
+        </select>
+        <div id="placementPreview" style="margin-top:8px;padding:10px;background:rgba(212,168,67,0.06);border:1px solid rgba(212,168,67,0.15);border-radius:8px;font-size:12px;color:#8b8fa3;display:none;">
+          <strong style="color:#d4a843;">📍 Tree Placement Preview:</strong>
+          <div id="placementTree" style="margin-top:6px;font-family:monospace;font-size:11px;line-height:1.6;"></div>
+        </div>
       </div>
     </div>
     <button class="onboard-btn" id="onboardBtn" onclick="onboardMember()">⚡ Onboard Member</button>
@@ -1320,10 +1334,11 @@ async function onboardMember() {
   const pkg = document.getElementById('memberPackage').value;
   const vpn = document.getElementById('memberVPN').value;
   const payment = document.getElementById('memberPayment').value;
-  const referral = document.getElementById('memberReferral').value.trim();
+  const referredBy = document.getElementById('memberReferral').value;
+  const memberType = document.getElementById('memberType')?.value || 'active';
 
-  if (!name || !email || !phone || !discord || !pkg) {
-    showToast('⚠️ Fill in all required fields', '#e74c3c'); return;
+  if (!name || !email || !pkg) {
+    showToast('⚠️ Fill in name, email, and package', '#e74c3c'); return;
   }
 
   btn.disabled = true;
@@ -1332,17 +1347,34 @@ async function onboardMember() {
   const password = generateTempPassword();
   const now = new Date();
   const cycleEnd = new Date(now); cycleEnd.setDate(cycleEnd.getDate() + 40);
+  
+  // Auto-generate referral code: firstname + random 4 digits
+  const firstName = name.split(' ')[0].toLowerCase().replace(/[^a-z]/g,'');
+  const refCode = firstName + Math.floor(1000 + Math.random() * 9000);
+  
+  // Map package to amount
+  const pkgAmounts = {basic:1000, plus:2000, elite:5000, pro:10000};
+  const packageAmount = pkgAmounts[pkg] || 0;
 
   const member = {
     name, email: email.toLowerCase(), phone, discord, pkg,
     vpn: vpn === 'yes', payment,
-    referral: referral || null,
-    status: 'pending', step_progress: 1,
+    referral_code: refCode,
+    referred_by_code: referredBy || null,
+    package_amount: packageAmount,
+    member_type: memberType,
+    commission_status: memberType === 'affiliate_only' ? 'held' : memberType === 'legacy' ? 'legacy_paid' : 'active',
+    status: memberType === 'affiliate_only' ? 'affiliate_only' : memberType === 'legacy' ? 'legacy' : 'active',
+    step_progress: 1,
     password, password_changed: false,
     tos_accepted: false, tos_accepted_at: null,
     checklist: {}, upgrade_requests: [],
     cycle_start: now.toISOString(),
-    cycle_end: cycleEnd.toISOString()
+    cycle_end: memberType === 'legacy' ? null : cycleEnd.toISOString(),
+    affiliate_rank: 'starter',
+    affiliate_type: 'standard',
+    total_referrals: 0,
+    held_commissions: 0
   };
 
   const result = await insertMember(member);
@@ -1352,14 +1384,20 @@ async function onboardMember() {
   if (!result) return;
 
   await loadMembers();
+  populateReferralDropdown();
 
-  ['memberName','memberEmail','memberPhone','memberDiscord','memberReferral'].forEach(id => document.getElementById(id).value = '');
+  ['memberName','memberEmail','memberPhone','memberDiscord'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('memberPackage').selectedIndex = 0;
   document.getElementById('memberVPN').selectedIndex = 0;
   document.getElementById('memberPayment').selectedIndex = 0;
+  document.getElementById('memberReferral').selectedIndex = 0;
+  document.getElementById('memberType').selectedIndex = 0;
+  document.getElementById('placementPreview').style.display = 'none';
 
-  showToast(`✅ ${name} onboarded!`);
-  showWelcomeEmail(result);
+  const typeLabel = memberType === 'legacy' ? ' (Legacy)' : memberType === 'affiliate_only' ? ' (Affiliate)' : '';
+  showToast(`✅ ${name} onboarded${typeLabel}! Code: ${refCode}`);
+  
+  if(memberType !== 'legacy') showWelcomeEmail(result);
 }
 
 function generateTempPassword() {
@@ -1368,6 +1406,68 @@ function generateTempPassword() {
   for (let i = 0; i < 8; i++) pw += chars[Math.floor(Math.random() * chars.length)];
   return pw;
 }
+
+// Populate referral dropdown with existing members
+function populateReferralDropdown(){
+  const sel = document.getElementById('memberReferral');
+  if(!sel) return;
+  let html = '<option value="">No referral (direct to SBA)</option>';
+  const sorted = [...members].sort((a,b)=>(a.name||'').localeCompare(b.name||''));
+  sorted.forEach(m=>{
+    const code = m.referral_code || m.name;
+    const type = m.member_type === 'legacy' ? ' [LEGACY]' : m.member_type === 'affiliate_only' ? ' [AFFILIATE]' : '';
+    html += `<option value="${code}">${m.name} (${code})${type}</option>`;
+  });
+  sel.innerHTML = html;
+  
+  // Add change listener for tree preview
+  sel.onchange = function(){
+    showPlacementPreview(this.value);
+  };
+}
+
+// Show tree placement preview when selecting a referrer
+function showPlacementPreview(refCode){
+  const preview = document.getElementById('placementPreview');
+  const tree = document.getElementById('placementTree');
+  if(!preview || !tree) return;
+  
+  if(!refCode){
+    preview.style.display = 'none';
+    return;
+  }
+  
+  // Walk up the tree from the referrer
+  let chain = [];
+  let current = refCode;
+  let safety = 0;
+  while(current && safety < 10){
+    const member = members.find(m=>m.referral_code === current);
+    if(!member) break;
+    const type = member.member_type === 'legacy' ? ' 👑' : member.member_type === 'affiliate_only' ? ' 🔓' : ' ✅';
+    chain.unshift(member.name + type);
+    current = member.referred_by_code;
+    safety++;
+  }
+  
+  // Build visual tree
+  const referrer = members.find(m=>m.referral_code === refCode);
+  let treeHtml = '';
+  chain.forEach((name, i)=>{
+    treeHtml += '&nbsp;'.repeat(i*4) + (i>0?'└── ':'') + name + '<br>';
+  });
+  treeHtml += '&nbsp;'.repeat(chain.length*4) + '└── <strong style="color:#22c55e;">🆕 NEW MEMBER (L' + (chain.length) + ' to ' + chain[0] + ')</strong>';
+  
+  tree.innerHTML = treeHtml;
+  preview.style.display = 'block';
+}
+
+// Load dropdown after members load
+const origLoadMembers = loadMembers;
+loadMembers = async function(){
+  await origLoadMembers();
+  populateReferralDropdown();
+};
 
 // ═══════════════ WELCOME EMAIL ═══════════════
 function showWelcomeEmail(member) {
