@@ -588,13 +588,80 @@ body {
 
 <!-- ADMIN PANEL -->
 <div class="admin-panel" id="adminPanel">
+  <!-- ═══ CODE GENERATOR ═══ -->
+  <div class="animate-in delay-1" style="margin-bottom:24px;">
+    <h2 class="section-title">🔑 Generate Activation Codes</h2>
+    <p class="section-sub">Generate codes AFTER payment is confirmed. Each code is one-time use and tied to a payment.</p>
+  </div>
+  
+  <div class="onboard-form animate-in delay-1" style="margin-bottom:32px;border:2px solid rgba(212,168,67,0.2);background:linear-gradient(135deg,rgba(212,168,67,0.04),transparent);">
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label">Code Type</label>
+        <select class="form-select" id="codeType">
+          <option value="basic">📦 Basic — $1,000</option>
+          <option value="plus">📦 Plus — $2,000</option>
+          <option value="elite">📦 Elite — $5,000</option>
+          <option value="pro">📦 Pro — $10,000</option>
+          <option value="vpn">🔒 VPN Add-On — $1,000</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Payment Method</label>
+        <select class="form-select" id="codePayMethod">
+          <option value="stripe">Stripe</option>
+          <option value="crypto">Crypto</option>
+          <option value="cashapp">CashApp</option>
+          <option value="zelle">Zelle</option>
+          <option value="bank_transfer">Bank Transfer</option>
+          <option value="cash">Cash</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Payment Reference (optional)</label>
+        <input type="text" class="form-input" id="codePayRef" placeholder="Transaction ID, confirmation #, etc.">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Notes (optional)</label>
+        <input type="text" class="form-input" id="codeNotes" placeholder="e.g. Paid via CashApp 3/23">
+      </div>
+    </div>
+    <button class="onboard-btn" style="background:linear-gradient(135deg,#d4a843,#b8922e);margin-top:12px;" onclick="generateActivationCode()">🔑 Generate Code</button>
+    
+    <!-- Generated code display -->
+    <div id="generatedCodeDisplay" style="display:none;margin-top:16px;padding:20px;background:rgba(34,197,94,0.06);border:2px solid rgba(34,197,94,0.3);border-radius:12px;text-align:center;">
+      <div style="font-size:12px;color:#8b8fa3;margin-bottom:4px;">Generated Activation Code:</div>
+      <div id="generatedCode" style="font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:900;color:#22c55e;letter-spacing:3px;margin:8px 0;user-select:all;"></div>
+      <div style="font-size:11px;color:#8b8fa3;margin-bottom:12px;" id="generatedCodeMeta"></div>
+      <button onclick="navigator.clipboard.writeText(document.getElementById('generatedCode').textContent);showToast('📋 Code copied!')" style="padding:8px 20px;background:rgba(34,197,94,0.15);border:1px solid rgba(34,197,94,0.3);border-radius:8px;color:#22c55e;font-weight:700;font-size:12px;cursor:pointer;">📋 Copy Code</button>
+    </div>
+    
+    <!-- Recent codes -->
+    <div style="margin-top:16px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <h3 style="font-size:14px;color:#f0ece4;margin:0;">Recent Codes</h3>
+        <button onclick="loadRecentCodes()" style="padding:4px 12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:#8b8fa3;font-size:11px;cursor:pointer;">🔄 Refresh</button>
+      </div>
+      <div id="recentCodesTable" style="font-size:12px;color:#8b8fa3;">Loading...</div>
+    </div>
+  </div>
+
+  <!-- ═══ ONBOARD NEW MEMBER ═══ -->
   <div class="animate-in delay-1">
     <h2 class="section-title">Onboard New Member</h2>
-    <p class="section-sub">Enter member details to create their account and begin provisioning.</p>
+    <p class="section-sub">Enter member details and activation code to create their account.</p>
   </div>
 
   <div class="onboard-form animate-in delay-2">
     <div class="form-grid">
+      <!-- ACTIVATION CODE — REQUIRED -->
+      <div class="form-group" style="grid-column:1/-1;">
+        <label class="form-label" style="color:#d4a843;font-size:13px;">🔑 Package Activation Code (REQUIRED)</label>
+        <input type="text" class="form-input" id="memberActivationCode" placeholder="e.g. SBA-PLUS-R4T8W2" style="font-family:'JetBrains Mono',monospace;font-size:16px;letter-spacing:2px;text-transform:uppercase;border-color:rgba(212,168,67,0.3);" oninput="validateCodeLive(this.value,'pkg')">
+        <div id="codeValidation" style="font-size:11px;margin-top:4px;color:#8b8fa3;">Enter the activation code provided after payment confirmation</div>
+      </div>
+      
       <div class="form-group">
         <label class="form-label">Full Name</label>
         <input type="text" class="form-input" id="memberName" placeholder="e.g. John Smith">
@@ -623,7 +690,7 @@ body {
       </div>
       <div class="form-group">
         <label class="form-label">VPN Add-On</label>
-        <select class="form-select" id="memberVPN" onchange="document.getElementById('vpnCredsSection').style.display=this.value==='yes'?'grid':'none'">
+        <select class="form-select" id="memberVPN" onchange="document.getElementById('vpnCredsSection').style.display=this.value==='yes'?'grid':'none';document.getElementById('vpnCodeSection').style.display=this.value==='yes'?'block':'none'">
           <option value="no">No VPN Add-On</option>
           <option value="yes">VPN Access — $1,000 Add-On</option>
         </select>
@@ -636,6 +703,12 @@ body {
           <input type="text" class="form-input" id="vpnPassword" placeholder="VPN Password (leave blank to auto-create)">
         </div>
         <div style="font-size:10px;color:#22c55e;margin-top:4px;">💡 Leave blank = system auto-creates VPN account via API. Or enter existing credentials.</div>
+      </div>
+      <!-- VPN Activation Code -->
+      <div id="vpnCodeSection" class="form-group" style="display:none;grid-column:1/-1;">
+        <label class="form-label" style="color:#a78bfa;">🔒 VPN Activation Code (REQUIRED for VPN)</label>
+        <input type="text" class="form-input" id="memberVPNCode" placeholder="e.g. VPN-H7M3K9" style="font-family:'JetBrains Mono',monospace;font-size:16px;letter-spacing:2px;text-transform:uppercase;border-color:rgba(167,139,250,0.3);" oninput="validateCodeLive(this.value,'vpn')">
+        <div id="vpnCodeValidation" style="font-size:11px;margin-top:4px;color:#8b8fa3;">Enter the VPN activation code provided after VPN payment confirmation</div>
       </div>
       <div class="form-group">
         <label class="form-label">Member Type</label>
@@ -1350,6 +1423,45 @@ async function onboardMember() {
     showToast('⚠️ Fill in name, email, and package', '#e74c3c'); return;
   }
 
+  // Validate activation code (required for active and legacy members)
+  const activationCode = document.getElementById('memberActivationCode')?.value?.trim()?.toUpperCase() || '';
+  const vpnCode = document.getElementById('memberVPNCode')?.value?.trim()?.toUpperCase() || '';
+  
+  if(memberType !== 'affiliate_only' && !activationCode){
+    showToast('⚠️ Activation code required. Generate one above after confirming payment.', '#e74c3c'); return;
+  }
+  
+  // Validate package code against Supabase
+  let validatedPkg = null;
+  if(activationCode){
+    const{data:codeData,error:codeErr} = await sb.from('activation_codes').select('*').eq('code',activationCode).single();
+    if(codeErr || !codeData){
+      showToast('❌ Invalid activation code — not found', '#e74c3c'); return;
+    }
+    if(codeData.status !== 'unused'){
+      showToast('❌ This code has already been used' + (codeData.used_by_name ? ' by ' + codeData.used_by_name : ''), '#e74c3c'); return;
+    }
+    validatedPkg = codeData;
+  }
+  
+  // Validate VPN code if VPN selected
+  let validatedVPN = null;
+  if(vpn === 'yes' && vpnCode){
+    const{data:vpnData,error:vpnErr} = await sb.from('activation_codes').select('*').eq('code',vpnCode).single();
+    if(vpnErr || !vpnData){
+      showToast('❌ Invalid VPN code — not found', '#e74c3c'); return;
+    }
+    if(vpnData.status !== 'unused'){
+      showToast('❌ VPN code already used', '#e74c3c'); return;
+    }
+    if(vpnData.code_type !== 'vpn'){
+      showToast('❌ That is not a VPN code', '#e74c3c'); return;
+    }
+    validatedVPN = vpnData;
+  } else if(vpn === 'yes' && !vpnCode && memberType !== 'affiliate_only'){
+    showToast('⚠️ VPN activation code required when VPN is selected', '#e74c3c'); return;
+  }
+
   btn.disabled = true;
   btn.textContent = 'Creating...';
 
@@ -1425,7 +1537,9 @@ async function onboardMember() {
     affiliate_rank: 'starter',
     affiliate_type: 'standard',
     total_referrals: 0,
-    held_commissions: 0
+    held_commissions: 0,
+    activation_code: activationCode || null,
+    vpn_activation_code: vpnCode || null
   };
 
   const result = await insertMember(member);
@@ -1433,6 +1547,18 @@ async function onboardMember() {
   btn.textContent = '⚡ Onboard Member';
 
   if (!result) return;
+
+  // BURN CODES — mark as used
+  if(validatedPkg){
+    await sb.from('activation_codes').update({
+      status:'used', used_by_email:email.toLowerCase(), used_by_name:name, used_at:new Date().toISOString(), member_id:result.id
+    }).eq('code',activationCode);
+  }
+  if(validatedVPN){
+    await sb.from('activation_codes').update({
+      status:'used', used_by_email:email.toLowerCase(), used_by_name:name, used_at:new Date().toISOString(), member_id:result.id
+    }).eq('code',vpnCode);
+  }
 
   await loadMembers();
   populateReferralDropdown();
@@ -1457,6 +1583,129 @@ function generateTempPassword() {
   for (let i = 0; i < 8; i++) pw += chars[Math.floor(Math.random() * chars.length)];
   return pw;
 }
+
+// ═══════════════ ACTIVATION CODES ═══════════════
+const CODE_TABLE = 'activation_codes';
+const CODE_AMOUNTS = {basic:1000, plus:2000, elite:5000, pro:10000, vpn:1000};
+
+function generateCodeString(type){
+  const chars = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+  let rand = '';
+  for(let i=0;i<6;i++) rand += chars[Math.floor(Math.random()*chars.length)];
+  if(type === 'vpn') return 'VPN-' + rand;
+  return 'SBA-' + type.toUpperCase() + '-' + rand;
+}
+
+async function generateActivationCode(){
+  const type = document.getElementById('codeType').value;
+  const payMethod = document.getElementById('codePayMethod').value;
+  const payRef = document.getElementById('codePayRef').value.trim();
+  const notes = document.getElementById('codeNotes').value.trim();
+  const amount = CODE_AMOUNTS[type];
+  
+  const code = generateCodeString(type);
+  
+  const{data,error} = await sb.from(CODE_TABLE).insert([{
+    code: code,
+    code_type: type,
+    status: 'unused',
+    payment_amount: amount,
+    payment_method: payMethod,
+    payment_ref: payRef || null,
+    payment_notes: notes || null,
+    generated_by: 'admin'
+  }]).select();
+  
+  if(error){
+    showToast('⚠️ ' + error.message, '#e74c3c');
+    return;
+  }
+  
+  // Show the generated code
+  document.getElementById('generatedCode').textContent = code;
+  document.getElementById('generatedCodeMeta').textContent = 
+    (type==='vpn'?'VPN Add-On':type.charAt(0).toUpperCase()+type.slice(1)+' Package') + 
+    ' — $' + amount.toLocaleString() + ' — ' + payMethod;
+  document.getElementById('generatedCodeDisplay').style.display = 'block';
+  
+  // Clear inputs
+  document.getElementById('codePayRef').value = '';
+  document.getElementById('codeNotes').value = '';
+  
+  showToast('🔑 Code generated: ' + code);
+  loadRecentCodes();
+}
+
+async function loadRecentCodes(){
+  const{data,error} = await sb.from(CODE_TABLE).select('*').order('created_at',{ascending:false}).limit(10);
+  if(error || !data){
+    document.getElementById('recentCodesTable').innerHTML = '<div style="color:#555;">No codes yet</div>';
+    return;
+  }
+  
+  if(!data.length){
+    document.getElementById('recentCodesTable').innerHTML = '<div style="color:#555;">No codes generated yet</div>';
+    return;
+  }
+  
+  let html = '<div style="display:grid;gap:4px;">';
+  data.forEach(c=>{
+    const statusColor = c.status==='unused'?'#22c55e':c.status==='used'?'#8b8fa3':'#ef4444';
+    const statusIcon = c.status==='unused'?'🟢':c.status==='used'?'✅':'❌';
+    const date = new Date(c.created_at).toLocaleDateString();
+    const usedBy = c.used_by_name ? ' → ' + c.used_by_name : '';
+    html += `<div style="display:flex;align-items:center;gap:8px;padding:8px;background:rgba(255,255,255,0.02);border-radius:6px;border:1px solid rgba(255,255,255,0.05);">
+      <span style="font-size:12px;">${statusIcon}</span>
+      <span style="font-family:'JetBrains Mono';font-size:12px;font-weight:700;color:${statusColor};flex:1;">${c.code}</span>
+      <span style="font-size:10px;color:#555;">$${c.payment_amount}</span>
+      <span style="font-size:10px;color:#555;">${c.payment_method||''}</span>
+      <span style="font-size:10px;color:#555;">${date}${usedBy}</span>
+    </div>`;
+  });
+  html += '</div>';
+  document.getElementById('recentCodesTable').innerHTML = html;
+}
+
+async function validateCodeLive(code, type){
+  code = code.trim().toUpperCase();
+  const elId = type==='vpn'?'vpnCodeValidation':'codeValidation';
+  const el = document.getElementById(elId);
+  if(!el) return;
+  
+  if(code.length < 8){
+    el.style.color = '#8b8fa3';
+    el.textContent = type==='vpn'?'Enter VPN activation code':'Enter the activation code';
+    return;
+  }
+  
+  const{data,error} = await sb.from(CODE_TABLE).select('*').eq('code',code).single();
+  
+  if(error || !data){
+    el.style.color = '#ef4444';
+    el.textContent = '❌ Invalid code — not found in system';
+    return;
+  }
+  
+  if(data.status === 'used'){
+    el.style.color = '#ef4444';
+    el.textContent = '❌ This code has already been used by ' + (data.used_by_name||'unknown');
+    return;
+  }
+  
+  if(data.status === 'revoked' || data.status === 'expired'){
+    el.style.color = '#ef4444';
+    el.textContent = '❌ This code has been ' + data.status;
+    return;
+  }
+  
+  // Valid!
+  const tierName = data.code_type==='vpn'?'VPN Add-On':data.code_type.charAt(0).toUpperCase()+data.code_type.slice(1)+' Package';
+  el.style.color = '#22c55e';
+  el.textContent = '✅ Valid — ' + tierName + ' ($' + data.payment_amount + ') — Ready to activate';
+}
+
+// Auto-load codes on page load
+setTimeout(()=>{ try{loadRecentCodes();}catch(e){} }, 2000);
 
 // Populate referral dropdown with existing members
 function populateReferralDropdown(){
