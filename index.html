@@ -1377,13 +1377,9 @@ async function onboardMember() {
     const vpnPassword = 'SBA-' + generateTempPassword().slice(4);
     
     try {
-      const vpnResp = await fetch('https://api.vpnresellers.com/v3/accounts', {
+      const vpnResp = await fetch('/api/create-vpn', {
         method: 'POST',
-        headers: {
-          'Authorization': 'Bearer ID-10030~X10cagYNspCzhIjkmDTI46bMBOeQ8wLEx97HZVv53tSJoidyfU2PWuFqrKGnAR',
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username: vpnUsername, password: vpnPassword })
       });
       const vpnData = await vpnResp.json();
