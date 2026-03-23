@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SBA Code Dashboard — Admin Only</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--bg:#07080c;--card:#12141c;--border:#1e2130;--gold:#d4a843;--green:#22c55e;--red:#ef4444;--blue:#3b82f6;--purple:#a78bfa;--orange:#f59e0b;--t1:#f0ece4;--t2:#8b8fa3;--t3:#555872;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--t1);font-family:'Outfit',sans-serif;min-height:100vh;padding:20px;}
+.container{max-width:1000px;margin:0 auto;}
+h1{font-size:24px;font-weight:900;margin-bottom:4px;}
+h1 span{color:var(--gold);}
+.sub{font-size:12px;color:var(--t2);margin-bottom:24px;}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:16px;}
+.card h3{font-size:15px;font-weight:800;margin-bottom:12px;}
+label{display:block;font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;}
+select,input{width:100%;padding:10px 12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--t1);font-family:'Outfit';font-size:13px;outline:none;}
+select:focus,input:focus{border-color:var(--gold);}
+.grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin-bottom:12px;}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.btn{padding:12px 24px;background:linear-gradient(135deg,var(--gold),#b8922e);border:none;border-radius:10px;color:var(--bg);font-family:'Outfit';font-weight:800;font-size:14px;cursor:pointer;transition:all 0.2s;width:100%;}
+.btn:hover{transform:translateY(-1px);box-shadow:0 4px 15px rgba(212,168,67,0.3);}
+.btn-sm{padding:6px 12px;font-size:11px;border-radius:6px;}
+.btn-green{background:var(--green);color:#000;}
+.btn-red{background:rgba(239,68,68,0.15);color:var(--red);border:1px solid rgba(239,68,68,0.3);}
+.code-display{font-family:'JetBrains Mono';font-size:32px;font-weight:900;color:var(--green);letter-spacing:4px;text-align:center;padding:20px;background:rgba(34,197,94,0.06);border:2px solid rgba(34,197,94,0.2);border-radius:12px;margin:12px 0;user-select:all;cursor:pointer;}
+.code-row{display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;margin-bottom:4px;font-size:12px;}
+.code-row .code{font-family:'JetBrains Mono';font-weight:700;font-size:13px;min-width:180px;}
+.status{padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;}
+.s-unused{background:rgba(34,197,94,0.1);color:var(--green);}
+.s-used{background:rgba(139,92,246,0.1);color:var(--purple);}
+.s-revoked{background:rgba(239,68,68,0.1);color:var(--red);}
+.request-card{padding:14px;background:rgba(212,168,67,0.06);border:1px solid rgba(212,168,67,0.2);border-radius:10px;margin-bottom:8px;display:flex;align-items:center;gap:12px;}
+.mono{font-family:'JetBrains Mono';}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px;}
+.stat{padding:16px;background:var(--card);border:1px solid var(--border);border-radius:10px;text-align:center;}
+.stat-val{font-family:'JetBrains Mono';font-size:24px;font-weight:900;}
+.stat-lab{font-size:10px;color:var(--t3);margin-top:2px;}
+.toast{position:fixed;top:20px;right:20px;padding:12px 20px;background:var(--green);color:#000;font-weight:700;font-size:13px;border-radius:8px;z-index:9999;display:none;animation:slideIn 0.3s;}
+@keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+</style>
+</head>
+<body>
+<div id="toast" class="toast"></div>
+
+<div class="container">
+  <h1>🔑 <span>SBA</span> Code Dashboard</h1>
+  <div class="sub">Keith Only — Generate activation codes, approve requests, track all payments</div>
+
+  <!-- Stats -->
+  <div class="stats">
+    <div class="stat"><div class="stat-val" style="color:var(--green);" id="statUnused">0</div><div class="stat-lab">Unused Codes</div></div>
+    <div class="stat"><div class="stat-val" style="color:var(--purple);" id="statUsed">0</div><div class="stat-lab">Used Codes</div></div>
+    <div class="stat"><div class="stat-val" style="color:var(--gold);" id="statRevenue">$0</div><div class="stat-lab">Total Revenue</div></div>
+    <div class="stat"><div class="stat-val" style="color:var(--orange);" id="statPending">0</div><div class="stat-lab">Pending Requests</div></div>
+  </div>
+
+  <!-- Pending Requests -->
+  <div class="card" id="requestsSection" style="border-color:rgba(212,168,67,0.3);display:none;">
+    <h3>📩 Pending Code Requests</h3>
+    <div id="requestsList"></div>
+  </div>
+
+  <!-- Generate Code -->
+  <div class="card" style="border-color:rgba(34,197,94,0.2);">
+    <h3>🔑 Generate New Code</h3>
+    <div class="grid">
+      <div>
+        <label>Package</label>
+        <select id="codeType">
+          <option value="basic">Basic $1K</option>
+          <option value="plus">Plus $2K</option>
+          <option value="elite">Elite $5K</option>
+          <option value="pro">Pro $10K</option>
+          <option value="vpn">VPN $1K</option>
+        </select>
+      </div>
+      <div>
+        <label>Payment Method</label>
+        <select id="codePay">
+          <option value="stripe">Stripe</option>
+          <option value="crypto">Crypto</option>
+          <option value="cashapp">CashApp</option>
+          <option value="zelle">Zelle</option>
+          <option value="bank_transfer">Bank Transfer</option>
+          <option value="cash">Cash</option>
+        </select>
+      </div>
+      <div>
+        <label>Reference / TX ID</label>
+        <input type="text" id="codeRef" placeholder="Optional">
+      </div>
+      <div>
+        <label>For (member name)</label>
+        <input type="text" id="codeFor" placeholder="Optional">
+      </div>
+    </div>
+    <button class="btn" onclick="generateCode()">🔑 Generate Code</button>
+    
+    <div id="codeResult" style="display:none;">
+      <div class="code-display" id="newCode" onclick="navigator.clipboard.writeText(this.textContent);showToast('📋 Copied!')"></div>
+      <div style="text-align:center;font-size:11px;color:var(--t2);" id="codeMeta"></div>
+      <div style="text-align:center;margin-top:8px;">
+        <button class="btn-sm btn-green" onclick="navigator.clipboard.writeText(document.getElementById('newCode').textContent);showToast('📋 Copied!')">📋 Copy Code</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- All Codes -->
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+      <h3 style="margin:0;">📋 All Codes</h3>
+      <div style="display:flex;gap:6px;">
+        <button class="btn-sm" style="background:rgba(34,197,94,0.1);color:var(--green);border:1px solid rgba(34,197,94,0.2);cursor:pointer;" onclick="filterCodes('unused')">Unused</button>
+        <button class="btn-sm" style="background:rgba(139,92,246,0.1);color:var(--purple);border:1px solid rgba(139,92,246,0.2);cursor:pointer;" onclick="filterCodes('used')">Used</button>
+        <button class="btn-sm" style="background:rgba(255,255,255,0.05);color:var(--t2);border:1px solid var(--border);cursor:pointer;" onclick="filterCodes('all')">All</button>
+        <button class="btn-sm" style="background:rgba(255,255,255,0.05);color:var(--t2);border:1px solid var(--border);cursor:pointer;" onclick="loadCodes()">🔄</button>
+      </div>
+    </div>
+    <div id="codesList"></div>
+  </div>
+</div>
+
+<script>
+const sb = supabase.createClient(
+  'https://anjlmooskwvjystmrhxr.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFuamxtb29za3d2anlzdG1yaHhyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI1MDU3NDYsImV4cCI6MjA1ODA4MTc0Nn0.3eg5oiWMPJN0V73PXJg-HY0YPMkQ03EjVST8jzqj5iQ'
+);
+
+const AMOUNTS = {basic:1000,plus:2000,elite:5000,pro:10000,vpn:1000};
+let allCodes = [];
+
+function showToast(msg){
+  const t=document.getElementById('toast');t.textContent=msg;t.style.display='block';
+  setTimeout(()=>t.style.display='none',3000);
+}
+
+function genStr(type){
+  const c='ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+  let r='';for(let i=0;i<6;i++)r+=c[Math.floor(Math.random()*c.length)];
+  return type==='vpn'?'VPN-'+r:'SBA-'+type.toUpperCase()+'-'+r;
+}
+
+async function generateCode(forRequest){
+  const type=forRequest?.code_type||document.getElementById('codeType').value;
+  const pay=document.getElementById('codePay').value;
+  const ref=document.getElementById('codeRef').value.trim();
+  const forName=forRequest?.member_name||document.getElementById('codeFor').value.trim();
+  const code=genStr(type);
+  
+  const{error}=await sb.from('activation_codes').insert([{
+    code,code_type:type,status:'unused',
+    payment_amount:AMOUNTS[type],
+    payment_method:pay,payment_ref:ref||null,
+    payment_notes:forName?'For: '+forName:null,
+    generated_by:'keith'
+  }]);
+  
+  if(error){showToast('❌ '+error.message);return null;}
+  
+  document.getElementById('newCode').textContent=code;
+  document.getElementById('codeMeta').textContent=
+    (type==='vpn'?'VPN Add-On':type.toUpperCase())+' — $'+AMOUNTS[type].toLocaleString()+' — '+pay+(forName?' — For: '+forName:'');
+  document.getElementById('codeResult').style.display='block';
+  
+  showToast('🔑 Code generated: '+code);
+  loadCodes();
+  
+  // If approving a request, update it
+  if(forRequest?.id){
+    await sb.from('code_requests').update({status:'approved',approved_code:code,approved_at:new Date().toISOString()}).eq('id',forRequest.id);
+    loadRequests();
+  }
+  
+  return code;
+}
+
+async function loadCodes(){
+  const{data}=await sb.from('activation_codes').select('*').order('created_at',{ascending:false});
+  allCodes=data||[];
+  renderCodes(allCodes);
+  updateStats();
+}
+
+function filterCodes(status){
+  if(status==='all') renderCodes(allCodes);
+  else renderCodes(allCodes.filter(c=>c.status===status));
+}
+
+function renderCodes(codes){
+  if(!codes.length){
+    document.getElementById('codesList').innerHTML='<div style="text-align:center;padding:20px;color:var(--t3);">No codes yet. Generate your first one above.</div>';
+    return;
+  }
+  
+  let html='';
+  codes.forEach(c=>{
+    const sc=c.status==='unused'?'s-unused':c.status==='used'?'s-used':'s-revoked';
+    const date=new Date(c.created_at).toLocaleDateString();
+    const usedInfo=c.used_by_name?' → '+c.used_by_name+(c.used_at?' ('+new Date(c.used_at).toLocaleDateString()+')':''):'';
+    const notes=c.payment_notes?'<span style="color:var(--t3);font-size:10px;margin-left:8px;">'+c.payment_notes+'</span>':'';
+    
+    html+=`<div class="code-row">
+      <span class="code" style="color:${c.status==='unused'?'var(--green)':c.status==='used'?'var(--t2)':'var(--red)'};">${c.code}</span>
+      <span class="status ${sc}">${c.status.toUpperCase()}</span>
+      <span style="color:var(--t3);font-size:11px;">$${c.payment_amount}</span>
+      <span style="color:var(--t3);font-size:11px;">${c.payment_method||''}</span>
+      <span style="color:var(--t3);font-size:10px;">${date}</span>
+      <span style="color:var(--t2);font-size:10px;flex:1;">${usedInfo}${notes}</span>
+      ${c.status==='unused'?`<button class="btn-sm btn-red" onclick="revokeCode('${c.code}')" style="cursor:pointer;">Revoke</button>`:''}
+    </div>`;
+  });
+  document.getElementById('codesList').innerHTML=html;
+}
+
+async function revokeCode(code){
+  if(!confirm('Revoke code '+code+'? This cannot be undone.'))return;
+  await sb.from('activation_codes').update({status:'revoked'}).eq('code',code);
+  showToast('❌ Code revoked: '+code);
+  loadCodes();
+}
+
+function updateStats(){
+  const unused=allCodes.filter(c=>c.status==='unused').length;
+  const used=allCodes.filter(c=>c.status==='used').length;
+  const revenue=allCodes.filter(c=>c.status==='used').reduce((s,c)=>s+parseFloat(c.payment_amount||0),0);
+  document.getElementById('statUnused').textContent=unused;
+  document.getElementById('statUsed').textContent=used;
+  document.getElementById('statRevenue').textContent='$'+revenue.toLocaleString();
+}
+
+// CODE REQUESTS
+async function loadRequests(){
+  try{
+    const{data}=await sb.from('code_requests').select('*').eq('status','pending').order('requested_at',{ascending:false});
+    const reqs=data||[];
+    document.getElementById('statPending').textContent=reqs.length;
+    
+    if(reqs.length){
+      document.getElementById('requestsSection').style.display='block';
+      let html='';
+      reqs.forEach(r=>{
+        const time=new Date(r.requested_at).toLocaleString();
+        html+=`<div class="request-card">
+          <div style="font-size:20px;">📩</div>
+          <div style="flex:1;">
+            <div style="font-weight:700;">${r.member_name||'Unknown'}</div>
+            <div style="font-size:11px;color:var(--t2);">${r.code_type?.toUpperCase()||'?'} code requested by ${r.requested_by||'team'} — ${time}</div>
+          </div>
+          <button class="btn-sm btn-green" style="cursor:pointer;" onclick="approveRequest(${JSON.stringify(r).replace(/"/g,'&quot;')})">✅ Approve</button>
+          <button class="btn-sm btn-red" style="cursor:pointer;" onclick="denyRequest('${r.id}')">❌ Deny</button>
+        </div>`;
+      });
+      document.getElementById('requestsList').innerHTML=html;
+    } else {
+      document.getElementById('requestsSection').style.display='none';
+    }
+  }catch(e){
+    document.getElementById('requestsSection').style.display='none';
+  }
+}
+
+async function approveRequest(req){
+  document.getElementById('codeType').value=req.code_type||'basic';
+  await generateCode(req);
+  showToast('✅ Request approved for '+req.member_name);
+}
+
+async function denyRequest(id){
+  await sb.from('code_requests').update({status:'denied'}).eq('id',id);
+  showToast('❌ Request denied');
+  loadRequests();
+}
+
+// Init
+loadCodes();
+loadRequests();
+// Poll for new requests every 15 seconds
+setInterval(loadRequests, 15000);
+</script>
+</body>
+</html>
