@@ -758,8 +758,7 @@ function renderDashboard(){
 
 }
 
-// Auto-refresh pending queue every 10 seconds
-setInterval(loadPendingQueue,10000);
+
 
 
 
@@ -807,53 +806,7 @@ async function batchCreatePhantoms(){
   await loadAll();
 }
 
-async function createPhantom(){
-  const name = document.getElementById('obPendingUpline')?.value?.trim();
-  if(!name){showToast('Enter the pending person\'s name');return;}
-  
-  // Check if phantom already exists
-  const existing = members.find(m=>m.name?.toLowerCase()===name.toLowerCase() && m.member_type==='phantom');
-  if(existing){
-    // Already exists — just select them in dropdown
-    document.getElementById('obRef').value = existing.referral_code;
-    showTreePreview(existing.referral_code);
-    showToast('⏳ '+name+' already in system as pending — selected');
-    document.getElementById('obPendingUpline').value = '';
-    return;
-  }
-  
-  // Create phantom node
-  const firstName = name.split(' ')[0].toLowerCase().replace(/[^a-z]/g,'');
-  const refCode = 'pending_'+firstName+Math.floor(1000+Math.random()*9000);
-  
-  const{data,error} = await sb.from('onboarding_members').insert([{
-    name: name,
-    email: 'pending_'+firstName+'@placeholder.sba',
-    member_type: 'phantom',
-    affiliate_type: 'standard',
-    commission_status: 'phantom',
-    commission_hold: true,
-    commission_hold_reason: 'Phantom node — not yet signed up',
-    referral_code: refCode,
-    referred_by_code: members.find(m=>m.referral_code===leader||m.name?.toLowerCase().includes(leader))?.referral_code || null,
-    pkg: 'none',
-    package_amount: 0,
-    payment: 'none',
-    status: 'phantom',
-    password: 'PENDING',
-    total_referrals: 0
-  }]).select();
-  
-  if(error){showToast('❌ '+error.message);return;}
-  
-  showToast('⏳ '+name+' added as pending placeholder');
-  document.getElementById('obPendingUpline').value = '';
-  
-  // Reload and select them
-  await loadAll();
-  document.getElementById('obRef').value = refCode;
-  showTreePreview(refCode);
-}
+
 
 function renderPersonCards(containerId,byPerson){
   const el=document.getElementById(containerId);
@@ -1450,6 +1403,8 @@ function startAutoRefresh(){
   refreshInterval=setInterval(async()=>{if(leader){await loadCodes();renderDashboard();}},10000);
 }
 }
+// Auto-refresh pending queue every 10 seconds
+setInterval(function(){if(typeof loadPendingQueue==="function")loadPendingQueue()},10000);
 </script>
 </body>
 </html>
