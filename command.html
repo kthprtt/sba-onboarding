@@ -697,6 +697,10 @@ async function validateCode(code){
   el.style.color='var(--green)';el.textContent='✅ Valid — '+(TL[data.code_type]||data.code_type)+' — Ready';
   // Auto-set package
   if(data.code_type!=='vpn')document.getElementById('obPkg').value=data.code_type;
+    if(data.code_type==='promo_launch'){
+      document.getElementById('obVPN').value='yes';
+      document.getElementById('obVPNCode')?.parentElement?.parentElement&&(document.getElementById('obVPNCode').parentElement.style.display='none');
+    }
 }
 
 async function onboardMember(){
@@ -827,6 +831,15 @@ async function submitRequest(){
   const email=document.getElementById('reqEmail')?.value?.trim()||'';
   const phone=document.getElementById('reqPhone')?.value?.trim()||'';
   if(!name){showToast("Enter the person's name");return;}
+  
+  // Dedup check
+  const lastReq = window._lastReqName;
+  const lastTime = window._lastReqTime || 0;
+  if(lastReq === name.toLowerCase() && (Date.now() - lastTime) < 300000){
+    if(!confirm('You already submitted a request for "'+name+'" in the last 5 minutes. Submit again?')) return;
+  }
+  window._lastReqName = name.toLowerCase();
+  window._lastReqTime = Date.now();
   
   const statusEmoji={paid:'✅ PAID',partial:'⚠️ PARTIAL',unpaid:'❌ UNPAID',affiliate:'🆓 FREE'};
   const pkgLabels={basic:'Basic $1K',plus:'Plus $2K',elite:'Elite $5K',pro:'Pro $10K'};
