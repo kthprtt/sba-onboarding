@@ -1158,6 +1158,7 @@ function startAutoRefresh(){
   if(refreshInterval)clearInterval(refreshInterval);
   refreshInterval=setInterval(async()=>{if(leader){await loadCodes();renderDashboard();}},10000);
 }
+}
 </script>
 </body>
 </html>
