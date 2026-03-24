@@ -1905,57 +1905,80 @@ function showWelcomeEmail(member) {
   const pkgAmt = pkgAmounts[member.pkg] || '';
   
   document.getElementById('emailPreviewContent').innerHTML = `
-    <div class="email-subject">🎯 Welcome to SBA — You're In, ${firstName}!</div>
-    <p>Hey <strong>${firstName}</strong>,</p>
-    <p>Welcome to the SBA family! Your <strong>${pkg?.name || member.pkg} Package${pkgAmt ? ' ('+pkgAmt+')' : ''}</strong> account has been created and you're ready to go.</p>
+    <div class="email-subject">🎯 You're In, ${firstName}. Welcome to the SBA Family.</div>
     
-    <p style="background:rgba(212,168,67,0.15);padding:20px;border-radius:12px;border:1px solid rgba(212,168,67,0.3);margin:16px 0;">
-      <strong style="color:#d4a843;font-size:15px;">🔑 Your Login Credentials</strong><br><br>
-      <span style="font-family:'JetBrains Mono',monospace;font-size:14px;">
-      <strong>Email:</strong> ${member.email}<br>
-      <strong>Password:</strong> ${member.password}<br><br>
-      </span>
-      <strong>🏠 Your Portal:</strong> <a href="https://affiliate.sportsbetarbitrage.com" style="color:#d4a843;">affiliate.sportsbetarbitrage.com</a><br>
-      ${!isAffiliate ? '<strong>🚀 SBA Genius:</strong> <a href="https://app.sportsbetarbitrage.com" style="color:#22c55e;">app.sportsbetarbitrage.com</a> <em>(same login)</em><br>' : ''}
+    <p>Hey <strong>${firstName}</strong>,</p>
+    
+    <p>You just made one of the smartest financial decisions of your life. Welcome to <strong>Sports Bet Arbitrage</strong> — where guaranteed profit isn't a pitch, it's math.</p>
+    
+    <p style="background:linear-gradient(135deg,rgba(212,168,67,0.12),rgba(212,168,67,0.04));padding:20px;border-radius:12px;border:1px solid rgba(212,168,67,0.3);margin:16px 0;">
+      <strong style="color:#d4a843;font-size:16px;">🔑 YOUR ACCESS — SAVE THIS</strong><br><br>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:15px;line-height:2;">
+      📧 <strong>Email:</strong> ${member.email}<br>
+      🔒 <strong>Password:</strong> ${member.password}<br>
+      </span><br>
+      <strong>🏠 Your Portal:</strong> <a href="https://affiliate.sportsbetarbitrage.com" style="color:#d4a843;font-weight:700;">affiliate.sportsbetarbitrage.com</a><br>
+      ${!isAffiliate ? '<strong>🚀 SBA Genius:</strong> <a href="https://app.sportsbetarbitrage.com" style="color:#22c55e;font-weight:700;">app.sportsbetarbitrage.com</a> <em>(same login!)</em><br>' : ''}
       <br>
-      <em style="font-size:12px;color:#8b8fa3;">⚠️ Change your password after first login (Settings tab)</em>
+      <em style="font-size:12px;color:#8b8fa3;">⚠️ Change your password after first login (Settings tab in your portal)</em>
     </p>
 
-    <p><strong>📋 Your First 3 Steps:</strong></p>
-    <p>
-      <strong>Step 1:</strong> Log in to your portal at <a href="https://affiliate.sportsbetarbitrage.com" style="color:#d4a843;">affiliate.sportsbetarbitrage.com</a><br>
-      <strong>Step 2:</strong> Go to <strong>Get Started</strong> tab → Follow the Hub (7 steps)<br>
-      <strong>Step 3:</strong> Open <strong>SBA Genius</strong> → Start finding guaranteed profits
+    <p style="background:rgba(34,197,94,0.06);padding:18px;border-radius:12px;border:1px solid rgba(34,197,94,0.2);margin:16px 0;">
+      <strong style="color:#22c55e;font-size:14px;">📊 HERE'S WHAT GUARANTEED PROFIT LOOKS LIKE:</strong><br><br>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.8;">
+      🏀 NBA — Lakers vs Celtics<br>
+      Side A: Lakers +150 on DraftKings → Bet $400<br>
+      Side B: Celtics -130 on FanDuel → Bet $600<br>
+      <strong style="color:#22c55e;">✅ Profit: +$62 NO MATTER WHO WINS</strong><br>
+      </span><br>
+      <span style="font-size:12px;color:#8b8fa3;">This is real. SBA Genius finds these plays across 60+ leagues every 60 seconds. You bet both sides on different sportsbooks — one HAS to win — and you keep the guaranteed profit. No sports knowledge needed. No gambling. Pure math.</span>
+    </p>
+
+    <p><strong style="font-size:14px;">🚀 YOUR FIRST 3 STEPS (do these NOW):</strong></p>
+    <p style="line-height:2;">
+      <strong>Step 1:</strong> Log in to <a href="https://affiliate.sportsbetarbitrage.com" style="color:#d4a843;">your portal</a> → Go to <strong>Get Started</strong><br>
+      <strong>Step 2:</strong> Set up your sportsbooks (the portal shows you exactly which ones for your state)<br>
+      <strong>Step 3:</strong> Follow the 7-step Hub — by the end, you'll be placing your first guaranteed profit bet
     </p>
     
-    ${hasVPN ? `<p style="background:rgba(139,92,246,0.1);padding:14px;border-radius:8px;border:1px solid rgba(139,92,246,0.2);margin:12px 0;">
-      <strong style="color:#a78bfa;">🔒 VPN Access Included</strong><br>
-      Your VPN credentials${member.vpn_username ? ':<br><span style="font-family:monospace;"><strong>Username:</strong> '+member.vpn_username+'<br><strong>Password:</strong> '+member.vpn_password+'</span>' : ' are being set up and will appear in your portal under Get Started → VPN Setup.'}<br>
-      <span style="font-size:11px;color:#8b8fa3;">Download the VPN app from your portal → connect → access offshore sportsbooks</span>
+    ${hasVPN ? `<p style="background:rgba(139,92,246,0.1);padding:16px;border-radius:10px;border:1px solid rgba(139,92,246,0.2);margin:16px 0;">
+      <strong style="color:#a78bfa;font-size:13px;">🔒 VPN ACCESS — UNLOCKED</strong><br><br>
+      ${member.vpn_username ? '<span style="font-family:JetBrains Mono,monospace;font-size:13px;"><strong>Username:</strong> '+member.vpn_username+'<br><strong>Password:</strong> '+member.vpn_password+'</span><br><br>' : 'Your VPN credentials are being set up and will appear in your portal under Get Started → VPN Setup.<br><br>'}
+      <span style="font-size:11px;color:#8b8fa3;">With VPN, you unlock 20+ offshore sportsbooks that most people can't access. More books = more arb opportunities = more profit. Download the VPN app from your portal and connect before opening any offshore sportsbook apps.</span>
     </p>` : ''}
     
-    ${member.referral_code ? `<p style="background:rgba(34,197,94,0.08);padding:14px;border-radius:8px;border:1px solid rgba(34,197,94,0.2);margin:12px 0;">
-      <strong style="color:#22c55e;">📣 Your Referral Link</strong><br>
-      <span style="font-family:monospace;font-size:13px;">sportsbetarbitrage.com/?ref=${member.referral_code}</span><br>
-      <span style="font-size:11px;color:#8b8fa3;">Share this link to earn commissions on everyone who joins through you — 7 levels deep!</span>
+    ${member.referral_code ? `<p style="background:rgba(212,168,67,0.08);padding:16px;border-radius:10px;border:1px solid rgba(212,168,67,0.2);margin:16px 0;">
+      <strong style="color:#d4a843;font-size:13px;">💰 YOUR MONEY-MAKING REFERRAL LINK</strong><br><br>
+      <span style="font-family:JetBrains Mono,monospace;font-size:14px;font-weight:700;color:#d4a843;">sportsbetarbitrage.com/?ref=${member.referral_code}</span><br><br>
+      <span style="font-size:12px;color:#8b8fa3;">Share this link and earn commissions on everyone who joins — <strong>7 levels deep</strong>. Your friend joins, their friend joins, their friend joins... you earn on ALL of them. The Bookie Program pays up to 60% in commissions. Open your portal → Resources tab → AI Closing Machine to get AI-powered recruiting scripts.</span>
     </p>` : ''}
-    
-    <p><strong>What SBA Does:</strong> Our AI scanner (SBA Genius) finds guaranteed profit opportunities in sports betting. You bet BOTH sides on different sportsbooks — one HAS to win — and you profit either way. No sports knowledge needed. No gambling. Pure math.</p>
-    
-    <p><strong>What Your Portal Has:</strong></p>
-    <p>
-      📖 <strong>Playbook</strong> — All 5 strategies + calculators<br>
-      🏁 <strong>Get Started</strong> — Step-by-step setup (sportsbooks, VPN, first bet)<br>
-      👥 <strong>My Team</strong> — Track your referrals and commissions<br>
-      🤖 <strong>AI Closer</strong> — AI-powered recruiting assistant<br>
-      📊 <strong>Analytics</strong> — Your performance dashboard
+
+    <p><strong style="font-size:13px;">🛠️ EVERYTHING IN YOUR PORTAL:</strong></p>
+    <p style="line-height:1.8;">
+      📖 <strong>Playbook</strong> — 5 profit strategies + live calculators<br>
+      🏁 <strong>Get Started</strong> — 7-step setup (sportsbooks, VPN, first bet)<br>
+      🧮 <strong>Sure Bet Calculator</strong> — See exactly how much you'll make per day/week/month<br>
+      👥 <strong>My Team</strong> — Track referrals and commissions across 7 levels<br>
+      🤖 <strong>AI Closer</strong> — AI writes your recruiting messages for you<br>
+      📊 <strong>Analytics</strong> — Your personal performance dashboard
     </p>
+
+    <p style="font-size:13px;line-height:1.7;">
+      <strong>Remember:</strong> Sportsbooks are NOT your bank. <strong>Deposit → Bet → Withdraw → Repeat.</strong> Keep your money in YOUR bank account. When SBA Genius shows you a play, deposit to the two sportsbooks, place both sides within 1-2 minutes, and pull your profit out after the game settles. 20 minutes a day. That's it.
+    </p>
+
+    <p style="background:rgba(0,0,0,0.3);padding:16px;border-radius:10px;margin:16px 0;text-align:center;">
+      <span style="font-size:16px;">🏆</span><br>
+      <strong style="font-size:14px;color:#d4a843;">You didn't just sign up for a tool.<br>You joined a movement.</strong><br>
+      <span style="font-size:12px;color:#8b8fa3;">The people making $300-$500/week with SBA started exactly where you are right now. The only difference between them and everyone else? They started.</span>
+    </p>
+
+    <p>Questions? Hit up your person who invited you, reply to this email, or reach us on Discord. We're here to make sure you win.</p>
     
-    <p>Questions? Reply to this email or reach out on Discord. We're here to help you win.</p>
-    
-    <p>Let's get this money. 💰</p>
-    <p>— <strong>Keith Pratt & The SBA Team</strong><br>
-    <span style="color:#8b8fa3;font-size:12px;">Sports Bet Arbitrage LLC | sportsbetarbitrage.com</span></p>`;
+    <p style="font-size:15px;font-weight:800;">Let's get this money. 💰🚀</p>
+    <p>— <strong>Keith Pratt</strong><br>
+    <span style="color:#d4a843;">Founder & CEO, Sports Bet Arbitrage LLC</span><br>
+    <span style="color:#8b8fa3;font-size:11px;">sportsbetarbitrage.com | SBA Genius | BMF 🏆</span></p>`;
   document.getElementById('emailModal').classList.add('show');
 }
 
