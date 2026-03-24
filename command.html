@@ -191,8 +191,21 @@ body{background:var(--bg);color:var(--t1);font-family:'Outfit',sans-serif;min-he
     <!-- DASHBOARD PAGE -->
     <div class="page active" id="page-dashboard">
       <div style="margin-bottom:20px;">
-        <h1 style="font-size:22px;font-weight:900;" id="greeting">Good evening</h1>
-        <div style="font-size:13px;color:var(--t2);">Here's your command center overview.</div>
+        <h1 style="font-size:24px;font-weight:900;" id="greeting">Good evening</h1>
+        <div style="font-size:13px;color:var(--t2);">Your command center is live. Let's build this empire.</div>
+      </div>
+      
+      <!-- Motivational Banner -->
+      <div style="background:linear-gradient(135deg,rgba(212,168,67,0.08),rgba(0,255,136,0.04));border:1px solid rgba(212,168,67,0.15);border-radius:14px;padding:16px 20px;margin-bottom:20px;display:flex;align-items:center;gap:16px;">
+        <div style="font-size:32px;">🏆</div>
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:700;color:var(--gold);margin-bottom:2px;">THE MISSION</div>
+          <div style="font-size:12px;color:var(--t2);line-height:1.5;">"I don't need anyone else to do anything for me to make money. But if I bring people in, it's a fortune." Every person you onboard tonight is building generational wealth — yours and theirs.</div>
+        </div>
+        <div style="text-align:center;padding:10px 16px;background:var(--card);border:1px solid var(--border);border-radius:10px;">
+          <div style="font-family:'JetBrains Mono';font-size:20px;font-weight:900;color:var(--green);" id="dLiveCount">0</div>
+          <div style="font-size:9px;color:var(--t3);">LIVE MEMBERS</div>
+        </div>
       </div>
       
       <div class="stats-row">
@@ -210,20 +223,20 @@ body{background:var(--bg);color:var(--t1);font-family:'Outfit',sans-serif;min-he
       
       <!-- Quick Actions -->
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px;">
-        <div class="card" style="cursor:pointer;text-align:center;padding:24px 16px;border-color:rgba(0,255,136,0.15);transition:all 0.2s;" onclick="showPage('onboard')" onmouseover="this.style.borderColor='var(--green)'" onmouseout="this.style.borderColor='rgba(0,255,136,0.15)'">
-          <div style="font-size:28px;margin-bottom:8px;">⚡</div>
-          <div style="font-size:13px;font-weight:800;">Onboard Member</div>
-          <div style="font-size:10px;color:var(--t3);margin-top:4px;">Use a code to add someone</div>
+        <div class="card" style="cursor:pointer;text-align:center;padding:24px 16px;border-color:rgba(0,255,136,0.15);transition:all 0.2s;position:relative;overflow:hidden;" onclick="showPage('onboard')" onmouseover="this.style.borderColor='var(--green)';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='rgba(0,255,136,0.15)';this.style.transform=''">
+          <div style="font-size:32px;margin-bottom:8px;">⚡</div>
+          <div style="font-size:14px;font-weight:800;color:var(--green);">Onboard Now</div>
+          <div style="font-size:10px;color:var(--t3);margin-top:4px;">Add someone to the SBA family</div>
         </div>
-        <div class="card" style="cursor:pointer;text-align:center;padding:24px 16px;border-color:rgba(212,168,67,0.15);transition:all 0.2s;" onclick="requestMore()" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='rgba(212,168,67,0.15)'">
-          <div style="font-size:28px;margin-bottom:8px;">📩</div>
-          <div style="font-size:13px;font-weight:800;">Request Codes</div>
-          <div style="font-size:10px;color:var(--t3);margin-top:4px;">Ask Keith for activation codes</div>
+        <div class="card" style="cursor:pointer;text-align:center;padding:24px 16px;border-color:rgba(212,168,67,0.15);transition:all 0.2s;" onclick="showPage('codes')" onmouseover="this.style.borderColor='var(--gold)';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='rgba(212,168,67,0.15)';this.style.transform=''">
+          <div style="font-size:32px;margin-bottom:8px;">🔑</div>
+          <div style="font-size:14px;font-weight:800;color:var(--gold);">My Codes</div>
+          <div style="font-size:10px;color:var(--t3);margin-top:4px;">View & request activation codes</div>
         </div>
-        <div class="card" style="cursor:pointer;text-align:center;padding:24px 16px;border-color:rgba(139,92,246,0.15);transition:all 0.2s;" onclick="showPage('team')" onmouseover="this.style.borderColor='var(--purple)'" onmouseout="this.style.borderColor='rgba(139,92,246,0.15)'">
-          <div style="font-size:28px;margin-bottom:8px;">👥</div>
-          <div style="font-size:13px;font-weight:800;">View My Team</div>
-          <div style="font-size:10px;color:var(--t3);margin-top:4px;">See your downline tree</div>
+        <div class="card" style="cursor:pointer;text-align:center;padding:24px 16px;border-color:rgba(139,92,246,0.15);transition:all 0.2s;" onclick="showPage('team')" onmouseover="this.style.borderColor='var(--purple)';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='rgba(139,92,246,0.15)';this.style.transform=''">
+          <div style="font-size:32px;margin-bottom:8px;">👥</div>
+          <div style="font-size:14px;font-weight:800;color:var(--purple);">My Downline</div>
+          <div style="font-size:10px;color:var(--t3);margin-top:4px;">See who's building under you</div>
         </div>
       </div>
       
@@ -244,12 +257,28 @@ body{background:var(--bg);color:var(--t1);font-family:'Outfit',sans-serif;min-he
         <div id="codesUsed"></div>
       </div>
       <div class="request-section">
-        <h4>📩 Need More Codes?</h4>
-        <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:8px;">
-          <input class="form-input" id="reqName" placeholder="Member name">
-          <select class="form-select" id="reqType"><option value="basic">Basic $1K</option><option value="plus">Plus $2K</option><option value="elite">Elite $5K</option><option value="pro">Pro $10K</option><option value="vpn">VPN $1K</option></select>
-          <button class="btn btn-gold" style="width:auto;padding:10px 20px;" onclick="submitRequest()">Send Request</button>
+        <h4>📩 Request Code from Keith</h4>
+        <div style="font-size:11px;color:var(--t2);margin-bottom:10px;">Tell Keith who needs a code, what package, and whether they've paid.</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
+          <input class="form-input" id="reqName" placeholder="Member's full name">
+          <select class="form-select" id="reqType">
+            <option value="basic">📦 Basic — $1,000</option>
+            <option value="plus">📦 Plus — $2,000</option>
+            <option value="elite">📦 Elite — $5,000</option>
+            <option value="pro">📦 Pro — $10,000</option>
+            <option value="vpn">🔒 VPN Add-On — $1,000</option>
+          </select>
         </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
+          <select class="form-select" id="reqPayStatus">
+            <option value="paid">✅ Already Paid — Money Received</option>
+            <option value="partial">⚠️ Partial Payment — Owes Balance</option>
+            <option value="unpaid">❌ Not Paid Yet — Waiting on Payment</option>
+            <option value="affiliate">🆓 Free Affiliate — No Payment</option>
+          </select>
+          <input class="form-input" id="reqPayNote" placeholder="Payment note (e.g. $1K via CashApp, owes $1K)">
+        </div>
+        <button class="btn btn-gold" onclick="submitRequest()" style="width:100%;">📩 Send Request to Keith</button>
       </div>
     </div>
 
@@ -410,11 +439,12 @@ function renderDashboard(){
   document.getElementById('dCodesHint').textContent=allCodes.available.length+' codes total';
   
   // Find leader's member record for earnings
-  const me=members.find(m=>m.name?.toLowerCase().includes(leader));
+  const me=members.find(m=>m.name?.toLowerCase().includes(leader)||m.referral_code===leader||m.email?.includes(leader));
   if(me){
     document.getElementById('dTeam').textContent=me.total_referrals||0;
     document.getElementById('dEarned').textContent='$'+(parseFloat(me.current_cycle_earned||0)).toLocaleString();
   }
+  document.getElementById('dLiveCount').textContent=members.filter(m=>m.member_type==='active').length;
   
   // Render ready to onboard
   renderPersonCards('dashReadyCodes',byPerson);
@@ -641,8 +671,39 @@ async function requestMore(){
 async function submitRequest(){
   const name=document.getElementById('reqName').value.trim();
   const type=document.getElementById('reqType').value;
-  if(!name){showToast('Enter member name');return;}
-  try{await sb.from('code_requests').insert([{requested_by:leader,member_name:name,code_type:type,status:'pending'}]);showToast('📩 Request sent to Keith for '+name);document.getElementById('reqName').value='';}catch(e){showToast('📩 Message Keith');}
+  const payStatus=document.getElementById('reqPayStatus').value;
+  const payNote=document.getElementById('reqPayNote').value.trim();
+  if(!name){showToast('Enter the member name');return;}
+  
+  const statusEmoji={paid:'✅ PAID',partial:'⚠️ PARTIAL',unpaid:'❌ UNPAID',affiliate:'🆓 FREE'};
+  const notes = (statusEmoji[payStatus]||'') + (payNote?' — '+payNote:'');
+  
+  try{
+    await sb.from('code_requests').insert([{
+      requested_by:leader,
+      member_name:name,
+      code_type:type,
+      status:'pending',
+      payment_status:payStatus,
+      payment_note:notes
+    }]);
+    showToast('📩 Request sent to Keith for '+name+' ('+type.toUpperCase()+')');
+    document.getElementById('reqName').value='';
+    document.getElementById('reqPayNote').value='';
+  }catch(e){
+    // payment_status column might not exist yet — send without it
+    try{
+      await sb.from('code_requests').insert([{
+        requested_by:leader,
+        member_name:name+' ['+notes+']',
+        code_type:type,
+        status:'pending'
+      }]);
+      showToast('📩 Request sent to Keith for '+name);
+      document.getElementById('reqName').value='';
+      document.getElementById('reqPayNote').value='';
+    }catch(e2){showToast('📩 Message Keith directly');}
+  }
 }
 
 // Auto-login
