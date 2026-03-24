@@ -688,6 +688,7 @@ body {
 
   <div class="members-table-wrap animate-in delay-3">
     <div class="table-header">
+    <div id="pendingMovesSection" style="display:none;"></div>
       <h3>Onboarded Members</h3>
       <div class="table-actions">
         <div class="member-count" id="memberCount">0 Members</div>
@@ -1318,7 +1319,28 @@ async function loadMembers() {
   const { data, error } = await sb.from(TABLE).select('*').order('created_at', { ascending: false });
   if (error) { console.error('Load error:', error); return; }
   members = data || [];
+  renderPendingMoves();
   renderMembersTable();
+}
+
+function renderPendingMoves(){
+  const pending = members.filter(m=>m.pending_upline && m.pending_upline.trim());
+  const container = document.getElementById('pendingMovesSection');
+  if(!container) return;
+  if(!pending.length){container.innerHTML='';container.style.display='none';return;}
+  container.style.display='block';
+  let html='<div style="background:rgba(255,153,51,0.06);border:1px solid rgba(255,153,51,0.2);border-radius:12px;padding:16px;margin-bottom:16px;"><h4 style="color:#f59e0b;margin-bottom:10px;">⚠️ Pending Tree Moves ('+pending.length+')</h4>';
+  html+='<div style="font-size:11px;color:var(--text-secondary);margin-bottom:10px;">These members need to be moved under their actual upline. Click Edit to change their Referred By code.</div>';
+  pending.forEach(m=>{
+    html+='<div style="display:flex;align-items:center;gap:10px;padding:8px;background:rgba(0,0,0,0.2);border-radius:6px;margin-bottom:4px;">';
+    html+='<span style="font-weight:700;">'+m.name+'</span>';
+    html+='<span style="color:var(--text-muted);font-size:11px;">currently under: '+(m.referred_by_code||'none')+'</span>';
+    html+='<span style="color:#f59e0b;font-size:11px;font-weight:700;">→ should be under: '+m.pending_upline+'</span>';
+    html+='<button class="action-btn" onclick="editMember(\''+m.id+'\')" style="margin-left:auto;color:var(--blue);">✏️ Fix</button>';
+    html+='</div>';
+  });
+  html+='</div>';
+  container.innerHTML=html;
 }
 
 async function insertMember(member) {
@@ -2472,6 +2494,7 @@ function editMember(id){
       <div><label ${lbl}>VPN PASSWORD</label><input id="editVP" value="${m.vpn_password||''}" ${mono}></div>
       <div><label ${lbl}>REFERRAL CODE</label><input id="editRC" value="${m.referral_code||''}" ${mono}></div>
       <div><label ${lbl}>REFERRED BY</label><input id="editRB" value="${m.referred_by_code||''}" ${mono}></div>
+      ${m.pending_upline ? '<div style="grid-column:1/-1;padding:8px;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.2);border-radius:6px;font-size:11px;color:#f59e0b;">⚠️ Pending move: should be under <strong>'+m.pending_upline+'</strong> — update Referred By above to fix</div>' : ''}
       <div><label ${lbl}>PASSWORD</label><input id="editPW" value="${m.password||''}" ${mono}></div>
     </div>
     <div style="display:flex;gap:8px;margin-top:16px;">
@@ -2495,6 +2518,7 @@ async function saveEdit(id){
     vpn_status:document.getElementById('editVU').value.trim()?'provisioned':null,
     referral_code:document.getElementById('editRC').value.trim()||null,
     referred_by_code:document.getElementById('editRB').value.trim()||null,
+    pending_upline:null,
     password:document.getElementById('editPW').value.trim(),
     commission_status:document.getElementById('editType').value==='affiliate_only'?'held':document.getElementById('editType').value==='legacy'?'legacy_paid':'active'
   };
