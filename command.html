@@ -442,7 +442,7 @@ async function login(){
   // Authenticated!
   leader=data.username;
   leaderData=data;
-  localStorage.setItem('sba_cmd_leader',JSON.stringify({u:data.username,t:Date.now()}));
+  try{localStorage.setItem('sba_cmd_leader',JSON.stringify({u:data.username,t:Date.now()}));}catch(e){}
   
   document.getElementById('loginScreen').style.display='none';
   document.getElementById('appView').style.display='grid';
@@ -456,7 +456,7 @@ async function login(){
   startAutoRefresh();
 }
 
-function logout(){localStorage.removeItem('sba_cmd_leader');location.reload();}
+function logout(){try{localStorage.removeItem('sba_cmd_leader');}catch(e){}location.reload();}
 
 function showPage(id){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
@@ -799,8 +799,8 @@ async function submitRequest(){
 // Auto-login — just prefill username
 try{
   const saved=JSON.parse(localStorage.getItem('sba_cmd_leader')||'{}');
-  if(saved.u){document.getElementById('loginUser').value=saved.u;}
-}catch(e){}
+  if(saved.u&&document.getElementById('loginUser')){document.getElementById('loginUser').value=saved.u;}
+}catch(e){/* localStorage not available */}
 
 // Auto-refresh — only starts after successful login
 let refreshInterval=null;

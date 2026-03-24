@@ -89,7 +89,7 @@ function showToast(m){const t=document.getElementById('toast');t.textContent=m;t
 function loginLeader(){
   const n=document.getElementById('leaderLogin').value;
   if(!n){showToast('Select your name');return;}
-  leader=n;localStorage.setItem('sba_wallet_leader',n);
+  leader=n;try{localStorage.setItem('sba_wallet_leader',n);
   document.getElementById('loginWrap').style.display='none';
   document.getElementById('walletView').style.display='block';
   document.getElementById('leaderName').textContent=n.charAt(0).toUpperCase()+n.slice(1);
@@ -167,7 +167,7 @@ async function requestMore(){
   try{await sb.from('code_requests').insert([{requested_by:leader,member_name:name,code_type:type.toLowerCase(),status:'pending'}]);showToast('📩 Request sent to Keith for '+name);}catch(e){showToast('📩 Message Keith directly');}
 }
 
-const saved=localStorage.getItem('sba_wallet_leader');
+const saved=try{localStorage.getItem('sba_wallet_leader');
 if(saved){document.getElementById('leaderLogin').value=saved;loginLeader();}
 setInterval(loadWallet,10000);
 </script>
