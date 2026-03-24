@@ -10,210 +10,166 @@
 :root{--bg:#07080c;--card:#12141c;--border:#1e2130;--gold:#d4a843;--green:#22c55e;--red:#ef4444;--blue:#3b82f6;--purple:#a78bfa;--orange:#f59e0b;--t1:#f0ece4;--t2:#8b8fa3;--t3:#555872;}
 *{margin:0;padding:0;box-sizing:border-box;}
 body{background:var(--bg);color:var(--t1);font-family:'Outfit',sans-serif;min-height:100vh;padding:20px;}
-.container{max-width:600px;margin:0 auto;}
-h1{font-size:22px;font-weight:900;text-align:center;}
-h1 span{color:var(--gold);}
+.container{max-width:640px;margin:0 auto;}
+h1{font-size:22px;font-weight:900;text-align:center;}h1 span{color:var(--gold);}
 .sub{font-size:12px;color:var(--t2);text-align:center;margin:4px 0 20px;}
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px;}
 .stat{padding:16px;background:var(--card);border:1px solid var(--border);border-radius:12px;text-align:center;}
 .stat-val{font-family:'JetBrains Mono';font-size:28px;font-weight:900;}
 .stat-lab{font-size:10px;color:var(--t3);margin-top:2px;}
-.section{margin-bottom:20px;}
-.section-title{font-size:14px;font-weight:800;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
-.code-card{padding:14px 16px;background:var(--card);border:1px solid var(--border);border-radius:10px;margin-bottom:6px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:all 0.2s;}
-.code-card:hover{border-color:var(--gold);transform:translateY(-1px);}
-.code-card.new{border-color:rgba(34,197,94,0.4);animation:glow 2s ease-in-out infinite;}
-@keyframes glow{0%,100%{box-shadow:0 0 0 rgba(34,197,94,0)}50%{box-shadow:0 0 12px rgba(34,197,94,0.15)}}
-.code-card .code{font-family:'JetBrains Mono';font-size:16px;font-weight:800;color:var(--green);letter-spacing:1px;flex:1;}
-.code-card .tier{padding:3px 10px;border-radius:6px;font-size:10px;font-weight:700;}
+.person-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:10px;}
+.person-card.new-pulse{border-color:rgba(34,197,94,0.4);animation:pulse 2s ease-in-out 3;}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 rgba(34,197,94,0)}50%{box-shadow:0 0 15px rgba(34,197,94,0.15)}}
+.person-name{font-size:16px;font-weight:800;margin-bottom:8px;display:flex;align-items:center;gap:8px;}
+.person-name .new-badge{font-size:9px;padding:2px 8px;background:var(--green);color:#000;border-radius:4px;font-weight:800;}
+.code-row{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--bg);border:1px solid rgba(255,255,255,0.05);border-radius:6px;margin-bottom:4px;cursor:pointer;transition:all 0.15s;}
+.code-row:hover{border-color:var(--gold);background:rgba(212,168,67,0.04);}
+.code-row .code{font-family:'JetBrains Mono';font-size:15px;font-weight:800;color:var(--green);letter-spacing:1px;flex:1;}
+.tier{padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;}
 .tier-basic{background:rgba(139,92,246,0.1);color:var(--purple);}
 .tier-plus{background:rgba(59,130,246,0.1);color:var(--blue);}
 .tier-elite{background:rgba(212,168,67,0.1);color:var(--gold);}
 .tier-pro{background:rgba(34,197,94,0.1);color:var(--green);}
-.tier-vpn{background:rgba(168,85,247,0.1);color:var(--purple);}
-.code-card .copy-hint{font-size:10px;color:var(--t3);}
-.used-row{padding:10px 14px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04);border-radius:8px;margin-bottom:4px;display:flex;align-items:center;gap:10px;font-size:12px;}
-.used-row .code{font-family:'JetBrains Mono';font-size:12px;color:var(--t3);text-decoration:line-through;}
+.tier-vpn{background:rgba(168,85,247,0.15);color:var(--purple);}
+.copy-hint{font-size:9px;color:var(--t3);}
+.used-person{padding:10px 14px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04);border-radius:8px;margin-bottom:4px;}
+.used-person .name{font-size:13px;font-weight:700;color:var(--t2);}
+.used-person .codes{font-family:'JetBrains Mono';font-size:11px;color:var(--t3);text-decoration:line-through;margin-top:2px;}
+.used-person .meta{font-size:10px;color:var(--t3);margin-top:2px;}
+.section-title{font-size:14px;font-weight:800;margin:20px 0 10px;}
 .empty{text-align:center;padding:30px;color:var(--t3);}
-.empty-icon{font-size:32px;margin-bottom:8px;}
-.request-btn{display:block;width:100%;padding:14px;background:rgba(212,168,67,0.1);border:1px solid rgba(212,168,67,0.3);border-radius:10px;color:var(--gold);font-family:'Outfit';font-weight:700;font-size:14px;cursor:pointer;text-align:center;transition:all 0.2s;margin-top:16px;}
-.request-btn:hover{background:rgba(212,168,67,0.2);}
+.request-btn{display:block;width:100%;padding:14px;background:rgba(212,168,67,0.1);border:1px solid rgba(212,168,67,0.3);border-radius:10px;color:var(--gold);font-family:'Outfit';font-weight:700;font-size:14px;cursor:pointer;text-align:center;margin-top:16px;}
+.onboard-link{display:block;text-align:center;margin-top:12px;padding:10px;background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.2);border-radius:8px;color:var(--blue);text-decoration:none;font-size:12px;font-weight:600;}
 .toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);padding:12px 24px;background:var(--green);color:#000;font-weight:700;font-size:13px;border-radius:8px;z-index:9999;display:none;}
-.login-wrap{max-width:300px;margin:80px auto;text-align:center;}
-.login-wrap input{margin-bottom:10px;}
-.login-wrap button{padding:12px 24px;background:var(--gold);border:none;border-radius:8px;color:var(--bg);font-weight:800;cursor:pointer;width:100%;}
-input{width:100%;padding:10px 12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--t1);font-family:'Outfit';font-size:13px;}
+.login-wrap{max-width:320px;margin:80px auto;text-align:center;}
+.login-wrap select{margin-bottom:12px;width:100%;padding:14px;background:var(--card);border:1px solid var(--border);border-radius:10px;color:var(--t1);font-family:'Outfit';font-size:15px;}
+.login-wrap button{padding:14px;background:linear-gradient(135deg,var(--gold),#b8922e);border:none;border-radius:10px;color:var(--bg);font-weight:800;font-size:14px;cursor:pointer;width:100%;}
 </style>
 </head>
 <body>
 <div id="toast" class="toast"></div>
 
-<!-- Simple Login -->
 <div class="login-wrap" id="loginWrap">
-  <h1>🔑 <span>SBA</span> Code Wallet</h1>
-  <div style="font-size:12px;color:var(--t2);margin:8px 0 20px;">Enter your leader name to access your codes</div>
-  <input type="text" id="leaderLogin" placeholder="Your name (e.g. vegas, waleed)" onkeypress="if(event.key==='Enter')loginLeader()">
+  <div style="font-size:48px;margin-bottom:12px;">🔑</div>
+  <h1><span>SBA</span> Code Wallet</h1>
+  <div style="font-size:12px;color:var(--t2);margin:8px 0 20px;">Select your name to see your assigned codes</div>
+  <select id="leaderLogin">
+    <option value="">Choose your name...</option>
+    <option value="vegas">Vegas</option>
+    <option value="waleed">Waleed</option>
+  </select>
   <button onclick="loginLeader()">Access My Codes</button>
 </div>
 
-<!-- Wallet -->
 <div class="container" id="walletView" style="display:none;">
   <h1>🔑 <span id="leaderName">—</span>'s Code Wallet</h1>
-  <div class="sub">Codes assigned to you by Keith. Click to copy. Use in onboarding form.</div>
-
+  <div class="sub">Codes from Keith, grouped by person. Click a code to copy. <span style="color:var(--green);">Auto-refreshes every 10s.</span></div>
   <div class="stats">
-    <div class="stat"><div class="stat-val" style="color:var(--green);" id="wAvail">0</div><div class="stat-lab">Available</div></div>
-    <div class="stat"><div class="stat-val" style="color:var(--purple);" id="wUsed">0</div><div class="stat-lab">Used Today</div></div>
-    <div class="stat"><div class="stat-val" style="color:var(--gold);" id="wTotal">0</div><div class="stat-lab">Total Used</div></div>
+    <div class="stat"><div class="stat-val" style="color:var(--green);" id="wAvail">0</div><div class="stat-lab">People Ready</div></div>
+    <div class="stat"><div class="stat-val" style="color:var(--purple);" id="wUsed">0</div><div class="stat-lab">Onboarded Today</div></div>
+    <div class="stat"><div class="stat-val" style="color:var(--gold);" id="wTotal">0</div><div class="stat-lab">Total Onboarded</div></div>
   </div>
-
-  <!-- Available Codes -->
-  <div class="section">
-    <div class="section-title">📦 Available Codes <span style="font-size:11px;color:var(--green);font-weight:400;" id="availLabel"></span></div>
-    <div id="availCodes"></div>
-  </div>
-
-  <!-- Recently Used -->
-  <div class="section">
-    <div class="section-title" style="color:var(--t3);">✅ Recently Used</div>
-    <div id="usedCodes"></div>
-  </div>
-
-  <!-- Request More -->
+  <div class="section-title">📦 Ready to Onboard</div>
+  <div id="availSection"></div>
+  <a href="/index.html" target="_blank" class="onboard-link">🚀 Open Onboarding Form →</a>
+  <div class="section-title" style="color:var(--t3);">✅ Recently Completed</div>
+  <div id="usedSection"></div>
   <button class="request-btn" onclick="requestMore()">📩 Request More Codes from Keith</button>
-  <div style="text-align:center;font-size:10px;color:var(--t3);margin-top:8px;">Auto-refreshes every 10 seconds</div>
+  <div style="text-align:center;font-size:10px;color:var(--t3);margin-top:6px;">Page refreshes automatically</div>
 </div>
 
 <script>
-const sb = supabase.createClient(
-  'https://anjlmooskwvjystmrhxr.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFuamxtb29za3d2anlzdG1yaHhyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI1MDU3NDYsImV4cCI6MjA1ODA4MTc0Nn0.3eg5oiWMPJN0V73PXJg-HY0YPMkQ03EjVST8jzqj5iQ'
-);
+const sb=supabase.createClient('https://anjlmooskwvjystmrhxr.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFuamxtb29za3d2anlzdG1yaHhyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI1MDU3NDYsImV4cCI6MjA1ODA4MTc0Nn0.3eg5oiWMPJN0V73PXJg-HY0YPMkQ03EjVST8jzqj5iQ');
+let leader='';
+const TL={basic:'BASIC $1K',plus:'PLUS $2K',elite:'ELITE $5K',pro:'PRO $10K',vpn:'VPN $1K'};
+const TC={basic:'tier-basic',plus:'tier-plus',elite:'tier-elite',pro:'tier-pro',vpn:'tier-vpn'};
 
-let leader = '';
-const TIER_CLASS = {basic:'tier-basic',plus:'tier-plus',elite:'tier-elite',pro:'tier-pro',vpn:'tier-vpn'};
-const TIER_LABEL = {basic:'BASIC $1K',plus:'PLUS $2K',elite:'ELITE $5K',pro:'PRO $10K',vpn:'VPN $1K'};
-
-function showToast(msg){
-  const t=document.getElementById('toast');t.textContent=msg;t.style.display='block';
-  setTimeout(()=>t.style.display='none',2500);
-}
+function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.style.display='block';setTimeout(()=>t.style.display='none',2500);}
 
 function loginLeader(){
-  const name = document.getElementById('leaderLogin').value.trim().toLowerCase();
-  if(!name){showToast('Enter your name');return;}
-  leader = name;
-  localStorage.setItem('sba_wallet_leader', name);
-  document.getElementById('loginWrap').style.display = 'none';
-  document.getElementById('walletView').style.display = 'block';
-  document.getElementById('leaderName').textContent = name.charAt(0).toUpperCase() + name.slice(1);
+  const n=document.getElementById('leaderLogin').value;
+  if(!n){showToast('Select your name');return;}
+  leader=n;localStorage.setItem('sba_wallet_leader',n);
+  document.getElementById('loginWrap').style.display='none';
+  document.getElementById('walletView').style.display='block';
+  document.getElementById('leaderName').textContent=n.charAt(0).toUpperCase()+n.slice(1);
   loadWallet();
 }
 
 async function loadWallet(){
-  if(!leader) return;
+  if(!leader)return;
+  const{data:avail}=await sb.from('activation_codes').select('*').eq('assigned_to',leader).eq('status','unused').order('created_at',{ascending:false});
+  const{data:used}=await sb.from('activation_codes').select('*').eq('assigned_to',leader).eq('status','used').order('used_at',{ascending:false}).limit(30);
+  const available=avail||[],usedCodes=used||[];
   
-  // Get available codes assigned to this leader
-  const{data:avail} = await sb.from('activation_codes')
-    .select('*')
-    .eq('assigned_to', leader)
-    .eq('status', 'unused')
-    .order('created_at', {ascending:false});
+  // Group available by person
+  const byPerson={};
+  available.forEach(c=>{
+    const name=(c.payment_notes||'').replace('For: ','').trim()||'General';
+    if(!byPerson[name])byPerson[name]=[];
+    byPerson[name].push(c);
+  });
   
-  // Get used codes by this leader (via assigned_to)
-  const{data:used} = await sb.from('activation_codes')
-    .select('*')
-    .eq('assigned_to', leader)
-    .eq('status', 'used')
-    .order('used_at', {ascending:false})
-    .limit(20);
+  // Group used by person
+  const usedByPerson={};
+  usedCodes.forEach(c=>{
+    const name=c.used_by_name||(c.payment_notes||'').replace('For: ','')||'Unknown';
+    if(!usedByPerson[name])usedByPerson[name]={codes:[],date:c.used_at};
+    usedByPerson[name].codes.push(c);
+  });
   
-  const available = avail || [];
-  const usedCodes = used || [];
+  const today=new Date().toDateString();
+  const usedToday=usedCodes.filter(c=>c.used_at&&new Date(c.used_at).toDateString()===today);
   
-  // Today's used
-  const today = new Date().toDateString();
-  const usedToday = usedCodes.filter(c => c.used_at && new Date(c.used_at).toDateString() === today);
-  
-  // Stats
-  document.getElementById('wAvail').textContent = available.length;
-  document.getElementById('wUsed').textContent = usedToday.length;
-  document.getElementById('wTotal').textContent = usedCodes.length;
+  document.getElementById('wAvail').textContent=Object.keys(byPerson).length;
+  document.getElementById('wUsed').textContent=usedToday.length;
+  document.getElementById('wTotal').textContent=usedCodes.length;
   
   // Render available
-  if(available.length){
-    document.getElementById('availLabel').textContent = '(' + available.length + ' ready to use)';
-    let html = '';
-    available.forEach((c, i) => {
-      const isNew = (Date.now() - new Date(c.created_at).getTime()) < 60000; // less than 1 min old
-      const forNote = c.payment_notes ? c.payment_notes.replace('For: ','') : '';
-      html += `<div class="code-card ${isNew?'new':''}" onclick="copyCode('${c.code}')">
-        <div class="code">${c.code}</div>
-        <span class="tier ${TIER_CLASS[c.code_type]||''}">${TIER_LABEL[c.code_type]||c.code_type}</span>
-        ${forNote ? '<span style="font-size:10px;color:var(--t2);">'+forNote+'</span>' : ''}
-        <span class="copy-hint">Click to copy</span>
-      </div>`;
+  const names=Object.keys(byPerson);
+  if(names.length){
+    let html='';
+    names.forEach(name=>{
+      const codes=byPerson[name];
+      const isNew=codes.some(c=>(Date.now()-new Date(c.created_at).getTime())<120000);
+      html+=`<div class="person-card ${isNew?'new-pulse':''}"><div class="person-name">👤 ${name} ${isNew?'<span class="new-badge">NEW!</span>':''}</div>`;
+      codes.forEach(c=>{
+        html+=`<div class="code-row" onclick="copyCode('${c.code}')"><span style="font-size:14px;">${c.code_type==='vpn'?'🔒':'📦'}</span><span class="code">${c.code}</span><span class="tier ${TC[c.code_type]||''}">${TL[c.code_type]||c.code_type}</span><span class="copy-hint">tap to copy</span></div>`;
+      });
+      html+='</div>';
     });
-    document.getElementById('availCodes').innerHTML = html;
-  } else {
-    document.getElementById('availLabel').textContent = '';
-    document.getElementById('availCodes').innerHTML = `<div class="empty">
-      <div class="empty-icon">📭</div>
-      <div>No codes available right now</div>
-      <div style="font-size:11px;margin-top:4px;">Keith will push codes here when payments are confirmed</div>
-    </div>`;
+    document.getElementById('availSection').innerHTML=html;
+  }else{
+    document.getElementById('availSection').innerHTML='<div class="empty"><div style="font-size:32px;margin-bottom:8px;">📭</div><div style="font-size:14px;font-weight:700;">No people waiting</div><div style="font-size:11px;margin-top:4px;">When Keith confirms payment and pushes codes, they appear here with the person\'s name.</div></div>';
   }
   
   // Render used
-  if(usedCodes.length){
-    let html = '';
-    usedCodes.forEach(c => {
-      const date = c.used_at ? new Date(c.used_at).toLocaleString() : '';
-      html += `<div class="used-row">
-        <span class="code">${c.code}</span>
-        <span style="color:var(--t3);font-size:10px;">${TIER_LABEL[c.code_type]||''}</span>
-        <span style="color:var(--t2);font-size:10px;flex:1;">→ ${c.used_by_name||'Unknown'}</span>
-        <span style="color:var(--t3);font-size:9px;">${date}</span>
-      </div>`;
+  const usedNames=Object.keys(usedByPerson);
+  if(usedNames.length){
+    let html='';
+    usedNames.slice(0,10).forEach(name=>{
+      const info=usedByPerson[name];
+      const codeStrs=info.codes.map(c=>c.code+' ('+( TL[c.code_type]||'')+')').join(', ');
+      const date=info.date?new Date(info.date).toLocaleString():'';
+      html+=`<div class="used-person"><div class="name">✅ ${name}</div><div class="codes">${codeStrs}</div><div class="meta">${date}</div></div>`;
     });
-    document.getElementById('usedCodes').innerHTML = html;
-  } else {
-    document.getElementById('usedCodes').innerHTML = '<div style="text-align:center;padding:12px;color:var(--t3);font-size:11px;">No codes used yet</div>';
+    document.getElementById('usedSection').innerHTML=html;
+  }else{
+    document.getElementById('usedSection').innerHTML='<div style="text-align:center;padding:12px;color:var(--t3);font-size:11px;">No one onboarded yet</div>';
   }
 }
 
-function copyCode(code){
-  navigator.clipboard.writeText(code);
-  showToast('📋 Copied: ' + code);
-}
+function copyCode(code){navigator.clipboard.writeText(code);showToast('📋 Copied: '+code);}
 
 async function requestMore(){
-  const type = prompt('What type of code do you need? (basic, plus, elite, pro, vpn)');
-  if(!type) return;
-  const name = prompt('For which member? (optional)');
-  
-  try{
-    await sb.from('code_requests').insert([{
-      requested_by: leader,
-      member_name: name || 'General request',
-      code_type: type.toLowerCase(),
-      status: 'pending'
-    }]);
-    showToast('📩 Request sent to Keith!');
-  }catch(e){
-    showToast('📩 Request sent — ask Keith directly');
-  }
+  const name=prompt('Who needs a code? (member name)');if(!name)return;
+  const type=prompt('What package? (basic, plus, elite, pro, vpn)');if(!type)return;
+  try{await sb.from('code_requests').insert([{requested_by:leader,member_name:name,code_type:type.toLowerCase(),status:'pending'}]);showToast('📩 Request sent to Keith for '+name);}catch(e){showToast('📩 Message Keith directly');}
 }
 
-// Auto-login from localStorage
-const saved = localStorage.getItem('sba_wallet_leader');
-if(saved){
-  document.getElementById('leaderLogin').value = saved;
-  loginLeader();
-}
-
-// Auto-refresh every 10 seconds
-setInterval(loadWallet, 10000);
+const saved=localStorage.getItem('sba_wallet_leader');
+if(saved){document.getElementById('leaderLogin').value=saved;loginLeader();}
+setInterval(loadWallet,10000);
 </script>
 </body>
 </html>
