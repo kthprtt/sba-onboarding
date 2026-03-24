@@ -1232,6 +1232,7 @@ async function loadPendingQueue(){
   if(!requests)return;
   
   const pending = requests.filter(r=>r.status==='pending');
+  const cancelled = requests.filter(r=>r.status==='cancelled');
   const approved = requests.filter(r=>r.status==='approved');
   
   const queueEl = document.getElementById('pendingQueue');
@@ -1299,10 +1300,29 @@ function getTimeAgo(dateStr){
 }
 
 async function cancelRequest(id){
-  if(!confirm('Cancel this request?')) return;
-  await sb.from('code_requests').delete().eq('id',id);
-  showToast('🗑️ Request cancelled');
-  await loadPendingQueue();
+  if(!confirm('Cancel this request? The pending request will be removed.')) return;
+  
+  try{
+    await sb.from('code_requests').update({status:'cancelled'}).eq('id',id);
+    showToast('🗑️ Request cancelled and removed');
+    
+    // Show visual feedback where the card was
+    const cards = document.querySelectorAll('#pendingList > div');
+    cards.forEach(card=>{
+      if(card.innerHTML.includes(id)){
+        card.style.transition='all 0.4s';
+        card.style.background='rgba(255,68,102,0.06)';
+        card.style.borderColor='rgba(255,68,102,0.2)';
+        card.innerHTML='<div style="padding:8px;text-align:center;color:#ff4466;font-size:12px;font-weight:700;">🗑️ Cancelled — removed from queue</div>';
+        setTimeout(()=>{card.style.opacity='0';card.style.height='0';card.style.padding='0';card.style.margin='0';card.style.overflow='hidden'},1500);
+      }
+    });
+    
+    // Reload after animation
+    setTimeout(()=>loadPendingQueue(),2000);
+  }catch(e){
+    showToast('❌ Cancel failed — try again');
+  }
 }
 
 

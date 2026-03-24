@@ -344,8 +344,9 @@ function updateStats(){
 // CODE REQUESTS
 async function loadRequests(){
   try{
-    const{data}=await sb.from('code_requests').select('*').eq('status','pending').order('requested_at',{ascending:false});
-    const reqs=data||[];
+    const{data}=await sb.from('code_requests').select('*').in('status',['pending','cancelled']).order('requested_at',{ascending:false});
+    const reqs=(data||[]).filter(r=>r.status==='pending');
+    const cancelled=(data||[]).filter(r=>r.status==='cancelled');
     document.getElementById('statPending').textContent=reqs.length;
     
     if(reqs.length){
@@ -366,6 +367,18 @@ async function loadRequests(){
       document.getElementById('requestsList').innerHTML=html;
     } else {
       document.getElementById('requestsSection').style.display='none';
+    }
+    
+    // Show cancelled requests
+    if(cancelled.length){
+      let cHtml='<div style="margin-top:16px;padding:12px;background:rgba(255,68,102,0.03);border:1px solid rgba(255,68,102,0.1);border-radius:10px;"><h4 style="font-size:13px;color:#ff4466;margin-bottom:8px;">🗑️ Recently Cancelled by Team ('+cancelled.length+')</h4>';
+      cancelled.forEach(r=>{
+        const parts=(r.member_name||'').split(' | ');
+        const name=parts[0]||'Unknown';
+        cHtml+=`<div style="display:flex;align-items:center;gap:8px;padding:6px;border-bottom:1px solid rgba(255,255,255,0.03);font-size:11px;"><span style="color:#ff4466;">🗑️</span><span>${name}</span><span style="color:var(--t2);margin-left:auto;">by ${r.requested_by} — cancelled</span><button onclick="sb.from('code_requests').delete().eq('id','${r.id}');loadRequests();" style="padding:2px 6px;background:none;border:1px solid rgba(255,255,255,0.1);border-radius:4px;color:var(--t2);font-size:9px;cursor:pointer;margin-left:4px;">Clear</button></div>`;
+      });
+      cHtml+='</div>';
+      document.getElementById('requestsList').insertAdjacentHTML('afterend',cHtml);
     }
   }catch(e){
     document.getElementById('requestsSection').style.display='none';
