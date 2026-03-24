@@ -914,6 +914,7 @@ function populateRefDropdown(){
   const phantomMembers = members.filter(m=>m.member_type==='phantom').sort((a,b)=>(a.name||'').localeCompare(b.name||''));
   
   let html='<option value="">Select who referred them...</option>';
+  html+='<option value="HOLDING_TANK" style="color:#3b82f6;">📦 Holding Tank — place in tree later</option>';
   
   if(activeMembers.length){
     html+='<optgroup label="Active Members">';
@@ -1025,7 +1026,7 @@ async function onboardMember(){
     promo_value:pkg==='promo_launch'?3000:0,
     vpn_username:vpnUser,vpn_password:vpnPass,
     vpn_status:vpn==='yes'?(vpnUser?'provisioned':'pending'):null,
-    referral_code:refCode,referred_by_code:ref||null,
+    referral_code:refCode,referred_by_code:(ref==='HOLDING_TANK'?null:ref)||null,
     package_amount:pkgAmounts[pkg]||0,
     member_type:type,
     commission_status:type==='affiliate_only'?'held':type==='legacy'?'legacy_paid':'active',
