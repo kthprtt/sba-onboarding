@@ -405,8 +405,7 @@ async function batchGenerate(){
   
   document.getElementById('batchResult').style.display='block';
   document.getElementById('batchCountLabel').textContent=codes.length+' codes generated';
-  document.getElementById('batchCodes').textContent=codes.join('
-');
+  document.getElementById('batchCodes').textContent=codes.join('\n');
   showToast('⚡ '+codes.length+' codes generated!');
   loadCodes();
 }
