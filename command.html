@@ -422,8 +422,9 @@ body{background:var(--bg);color:var(--t1);font-family:'Outfit',sans-serif;min-he
           <div class="form-group full">
             <div class="form-label">Referred By (Who brought them in?)</div>
             <select class="form-select" id="obRef"><option value="">Loading members...</option></select>
-            <div style="display:flex;gap:8px;margin-top:6px;">
-              <input class="form-input" id="obPendingUpline" placeholder="Upline not in system yet? Type their name (e.g. Mike — we'll move them later)" style="font-size:11px;color:var(--orange);">
+            <div style="display:flex;gap:8px;margin-top:6px;align-items:center;">
+              <input class="form-input" id="obPendingUpline" placeholder="Upline not in system yet? Type their name" style="font-size:11px;flex:1;">
+              <button onclick="createPhantom()" class="btn" style="padding:8px 14px;background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.3);color:var(--orange);font-size:11px;width:auto;white-space:nowrap;">+ Add as Pending</button>
             </div>
             <div id="obTreePreview" style="display:none;margin-top:8px;padding:10px;background:var(--bg);border:1px solid rgba(212,168,67,0.15);border-radius:8px;font-family:'JetBrains Mono';font-size:11px;line-height:1.6;"></div>
           </div>
@@ -572,10 +573,10 @@ function renderDashboard(){
     document.getElementById('dTeam').textContent=me.total_referrals||0;
     document.getElementById('dEarned').textContent='$'+(parseFloat(me.current_cycle_earned||0)).toLocaleString();
   }
-  document.getElementById('dLiveCount').textContent=members.filter(m=>m.member_type==='active').length;
+  document.getElementById('dLiveCount').textContent=members.filter(m=>m.member_type!=='phantom'&&m.member_type!=='suspended').length;
   
   // Mission tracker
-  const activeCount = members.filter(m=>m.member_type==='active'&&!m.is_core_team).length;
+  const activeCount = members.filter(m=>m.member_type!=='phantom'&&!m.is_core_team).length;
   const target = 1000;
   const pct = Math.min(Math.round((activeCount/target)*100),100);
   document.getElementById('missionTotal').textContent = activeCount;
@@ -607,7 +608,7 @@ function renderDashboard(){
   }
   const waleedSide = countDownline('waleed');
   const vegasSide = countDownline('vegas5580');
-  const totalAll = members.filter(m=>!m.is_core_team).length;
+  const totalAll = members.filter(m=>!m.is_core_team&&m.member_type!=='phantom').length;
   
   const lLeft = document.getElementById('ledgerLeft');
   const lRight = document.getElementById('ledgerRight');
@@ -682,6 +683,54 @@ async function snapIntoPlace(memberId, uplineRefCode, uplineName){
   
   showToast('✅ Snapped into place under '+uplineName+'!');
   await loadAll();
+}
+
+async function createPhantom(){
+  const name = document.getElementById('obPendingUpline')?.value?.trim();
+  if(!name){showToast('Enter the pending person\'s name');return;}
+  
+  // Check if phantom already exists
+  const existing = members.find(m=>m.name?.toLowerCase()===name.toLowerCase() && m.member_type==='phantom');
+  if(existing){
+    // Already exists — just select them in dropdown
+    document.getElementById('obRef').value = existing.referral_code;
+    showTreePreview(existing.referral_code);
+    showToast('⏳ '+name+' already in system as pending — selected');
+    document.getElementById('obPendingUpline').value = '';
+    return;
+  }
+  
+  // Create phantom node
+  const firstName = name.split(' ')[0].toLowerCase().replace(/[^a-z]/g,'');
+  const refCode = 'pending_'+firstName+Math.floor(1000+Math.random()*9000);
+  
+  const{data,error} = await sb.from('onboarding_members').insert([{
+    name: name,
+    email: 'pending_'+firstName+'@placeholder.sba',
+    member_type: 'phantom',
+    affiliate_type: 'standard',
+    commission_status: 'phantom',
+    commission_hold: true,
+    commission_hold_reason: 'Phantom node — not yet signed up',
+    referral_code: refCode,
+    referred_by_code: members.find(m=>m.referral_code===leader||m.name?.toLowerCase().includes(leader))?.referral_code || null,
+    pkg: 'none',
+    package_amount: 0,
+    payment: 'none',
+    status: 'phantom',
+    password: 'PENDING',
+    total_referrals: 0
+  }]).select();
+  
+  if(error){showToast('❌ '+error.message);return;}
+  
+  showToast('⏳ '+name+' added as pending placeholder');
+  document.getElementById('obPendingUpline').value = '';
+  
+  // Reload and select them
+  await loadAll();
+  document.getElementById('obRef').value = refCode;
+  showTreePreview(refCode);
 }
 
 function renderPersonCards(containerId,byPerson){
@@ -784,10 +833,27 @@ function prefillOnboard(name, email, codes){
 
 function populateRefDropdown(){
   const sel=document.getElementById('obRef');
+  const activeMembers = members.filter(m=>m.member_type!=='phantom').sort((a,b)=>(a.name||'').localeCompare(b.name||''));
+  const phantomMembers = members.filter(m=>m.member_type==='phantom').sort((a,b)=>(a.name||'').localeCompare(b.name||''));
+  
   let html='<option value="">Select who referred them...</option>';
-  members.sort((a,b)=>(a.name||'').localeCompare(b.name||'')).forEach(m=>{
-    if(m.referral_code)html+=`<option value="${m.referral_code}">${m.name} (${m.referral_code})</option>`;
-  });
+  
+  if(activeMembers.length){
+    html+='<optgroup label="Active Members">';
+    activeMembers.forEach(m=>{
+      if(m.referral_code) html+=`<option value="${m.referral_code}">✅ ${m.name} (${m.referral_code})</option>`;
+    });
+    html+='</optgroup>';
+  }
+  
+  if(phantomMembers.length){
+    html+='<optgroup label="⏳ Pending (Not Yet Signed Up)">';
+    phantomMembers.forEach(m=>{
+      if(m.referral_code) html+=`<option value="${m.referral_code}">⏳ ${m.name} (pending)</option>`;
+    });
+    html+='</optgroup>';
+  }
+  
   sel.innerHTML=html;
   sel.onchange=function(){showTreePreview(this.value);};
 }
@@ -929,6 +995,13 @@ async function calcCommissions(newMember,pkgAmt,actCode){
   while(cur&&level<=7){
     const{data:up}=await sb.from('onboarding_members').select('*').eq('referral_code',cur).single();
     if(!up)break;
+    
+    // SKIP phantom nodes — don't count as a level, don't earn
+    if(up.member_type==='phantom' || up.commission_status==='phantom'){
+      cur=up.referred_by_code;
+      continue; // skip without incrementing level
+    }
+    
     const rates=COMM_RATES[up.affiliate_type||'standard']||COMM_RATES.standard;
     const rate=rates[level-1]||0;
     if(rate>0 && !up.commission_hold){
