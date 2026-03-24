@@ -5,6 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SBA Code Dashboard — Admin Only</title>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+<script>
+// Shim: prevent Supabase SDK storage errors
+try{localStorage.setItem('_','1');localStorage.removeItem('_');}catch(e){
+  Object.defineProperty(window,'localStorage',{value:{getItem:()=>null,setItem:()=>{},removeItem:()=>{},clear:()=>{},length:0,key:()=>null},writable:true});
+}
+</script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{--bg:#07080c;--card:#12141c;--border:#1e2130;--gold:#d4a843;--green:#22c55e;--red:#ef4444;--blue:#3b82f6;--purple:#a78bfa;--orange:#f59e0b;--t1:#f0ece4;--t2:#8b8fa3;--t3:#555872;}
