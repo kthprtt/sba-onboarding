@@ -138,18 +138,6 @@ body{background:var(--bg);color:var(--t1);font-family:'Outfit',sans-serif;min-he
 .login-card button{width:100%;padding:16px;background:linear-gradient(135deg,var(--gold),var(--gold-dim));border:none;border-radius:12px;color:var(--bg);font-family:'Outfit';font-weight:900;font-size:15px;cursor:pointer;letter-spacing:0.5px;}
 
 
-/* Holding Tank */
-.tank{background:var(--card);border:2px dashed rgba(245,158,11,0.3);border-radius:14px;padding:16px;margin-bottom:16px;}
-.tank h3{color:var(--orange);margin-bottom:10px;}
-.tank-card{padding:12px;border:2px dashed rgba(255,255,255,0.1);border-radius:10px;margin-bottom:6px;display:flex;align-items:center;gap:10px;background:rgba(245,158,11,0.03);}
-.tank-card .avatar{width:34px;height:34px;border-radius:8px;background:rgba(245,158,11,0.15);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:11px;color:var(--orange);}
-.tank-card .info{flex:1;}
-.tank-card .name{font-size:13px;font-weight:700;}
-.tank-card .waiting{font-size:10px;color:var(--orange);margin-top:2px;}
-.tank-card .snap-btn{padding:6px 12px;background:var(--green);border:none;border-radius:6px;color:#000;font-family:Outfit;font-weight:700;font-size:10px;cursor:pointer;display:none;}
-.tank-card.ready .snap-btn{display:block;}
-.tank-card.ready{border-color:rgba(0,255,136,0.3);background:rgba(0,255,136,0.04);animation:snapReady 1.5s infinite;}
-@keyframes snapReady{0%,100%{box-shadow:0 0 0 rgba(0,255,136,0)}50%{box-shadow:0 0 12px rgba(0,255,136,0.15)}}
 /* Responsive */
 @media(max-width:768px){.app{grid-template-columns:1fr;}.sidebar{display:none;}.main{padding:16px;}.stats-row{grid-template-columns:repeat(2,1fr);}.form-grid{grid-template-columns:1fr;}}
 </style>
@@ -332,11 +320,7 @@ body{background:var(--bg);color:var(--t1);font-family:'Outfit',sans-serif;min-he
         <div id="dashActivity"></div>
       </div>
       
-      <!-- Holding Tank -->
-      <div class="tank" id="holdingTank" style="display:none;">
-        <h3>📦 Holding Tank <span style="font-size:12px;font-weight:400;color:var(--t2);">— Waiting for their upline to join</span></h3>
-        <div id="tankCards"></div>
-      </div>
+
     </div>
 
     <!-- CODES PAGE -->
@@ -628,62 +612,12 @@ function renderDashboard(){
   // Activity
   renderActivity();
   renderTeam();
-  renderHoldingTank();
+
 }
 
-function renderHoldingTank(){
-  const tank = document.getElementById('holdingTank');
-  const cards = document.getElementById('tankCards');
-  if(!tank||!cards) return;
-  
-  const pending = members.filter(m=>m.pending_upline && m.pending_upline.trim());
-  if(!pending.length){tank.style.display='none';return;}
-  
-  tank.style.display='block';
-  let html='';
-  
-  pending.forEach(m=>{
-    const uplineName = m.pending_upline.trim();
-    const initials = m.name?.split(' ').map(n=>n[0]).join('').toUpperCase().slice(0,2)||'?';
-    
-    // Check if the upline has joined
-    const uplineMatch = members.find(x=>
-      x.name?.toLowerCase().includes(uplineName.toLowerCase()) && 
-      x.id !== m.id && 
-      x.referral_code
-    );
-    const isReady = !!uplineMatch;
-    
-    html+=`<div class="tank-card ${isReady?'ready':''}">
-      <div class="avatar">${initials}</div>
-      <div class="info">
-        <div class="name">${m.name}</div>
-        <div class="waiting">${isReady 
-          ? '🔔 <strong>'+uplineMatch.name+' has joined!</strong> Ready to snap into place' 
-          : '⏳ Waiting for: '+uplineName
-        }</div>
-      </div>
-      ${isReady 
-        ? '<button class="snap-btn" onclick="snapIntoPlace(\''+m.id+'\',\''+uplineMatch.referral_code+'\',\''+uplineMatch.name.replace(/'/g,"\\'")+'\')">⚡ Snap Under '+uplineMatch.name.split(' ')[0]+'</button>' 
-        : '<span style="font-size:20px;">⏳</span>'
-      }
-    </div>`;
-  });
-  
-  cards.innerHTML=html;
-}
 
-async function snapIntoPlace(memberId, uplineRefCode, uplineName){
-  if(!confirm('Move this person under '+uplineName+'?')) return;
-  
-  await sb.from('onboarding_members').update({
-    referred_by_code: uplineRefCode,
-    pending_upline: null
-  }).eq('id', memberId);
-  
-  showToast('✅ Snapped into place under '+uplineName+'!');
-  await loadAll();
-}
+
+
 
 async function createPhantom(){
   const name = document.getElementById('obPendingUpline')?.value?.trim();
