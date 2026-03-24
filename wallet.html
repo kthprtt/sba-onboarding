@@ -9,7 +9,7 @@
 <style>
 :root{--bg:#07080c;--card:#12141c;--border:#1e2130;--gold:#d4a843;--green:#22c55e;--red:#ef4444;--blue:#3b82f6;--purple:#a78bfa;--orange:#f59e0b;--t1:#f0ece4;--t2:#8b8fa3;--t3:#555872;}
 *{margin:0;padding:0;box-sizing:border-box;}
-body{background:var(--bg);color:var(--t1);font-family:'Outfit',sans-serif;min-height:100vh;padding:20px;}
+body{background:var(--bg,{auth:{storage:_sa,autoRefreshToken:false,persistSession:false,detectSessionInUrl:false}});color:var(--t1);font-family:'Outfit',sans-serif;min-height:100vh;padding:20px;}
 .container{max-width:640px;margin:0 auto;}
 h1{font-size:22px;font-weight:900;text-align:center;}h1 span{color:var(--gold);}
 .sub{font-size:12px;color:var(--t2);text-align:center;margin:4px 0 20px;}
@@ -79,6 +79,10 @@ h1{font-size:22px;font-weight:900;text-align:center;}h1 span{color:var(--gold);}
 </div>
 
 <script>
+// Memory storage adapter — prevents storage access errors
+const _ms={};const _memStorage={getItem:(k)=>_ms[k]||null,setItem:(k,v)=>{_ms[k]=v;},removeItem:(k)=>{delete _ms[k];}};
+let _sa=_memStorage;try{localStorage.setItem('_t','1');localStorage.removeItem('_t');_sa=localStorage;}catch(e){}
+
 const sb=supabase.createClient('https://anjlmooskwvjystmrhxr.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFuamxtb29za3d2anlzdG1yaHhyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU0NjYzNTUsImV4cCI6MjA4MTA0MjM1NX0.DVLjp9PzNIPNSp2HAGtKTaPVfKy3QLs4HTJsy96UsyM');
 let leader='';
 const TL={basic:'BASIC $1K',plus:'PLUS $2K',elite:'ELITE $5K',pro:'PRO $10K',vpn:'VPN $1K'};

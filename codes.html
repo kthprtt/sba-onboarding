@@ -200,6 +200,9 @@ select:focus,input:focus{border-color:var(--gold);}
 </div>
 
 <script>
+const _ms={};const _memStorage={getItem:(k)=>_ms[k]||null,setItem:(k,v)=>{_ms[k]=v;},removeItem:(k)=>{delete _ms[k];}};
+let _sa=_memStorage;try{localStorage.setItem('_t','1');localStorage.removeItem('_t');_sa=localStorage;}catch(e){}
+
 const sb = supabase.createClient(
   'https://anjlmooskwvjystmrhxr.supabase.co',
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFuamxtb29za3d2anlzdG1yaHhyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU0NjYzNTUsImV4cCI6MjA4MTA0MjM1NX0.DVLjp9PzNIPNSp2HAGtKTaPVfKy3QLs4HTJsy96UsyM'

@@ -7,7 +7,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700;800&family=Bebas+Neue&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root{--bg:#05060a;--card:#0d0f16;--card2:#141722;--border:#1a1d2e;--gold:#d4a843;--gold-dim:#b8922e;--green:#00ff88;--green-d:rgba(0,255,136,0.08);--red:#ff4466;--blue:#4488ff;--purple:#a78bfa;--cyan:#06b6d4;--orange:#ff9933;--t1:#eeeae2;--t2:#7a7e94;--t3:#454862;}
+:root{--bg:#05060a;--card:#0d0f16;--card2:#141722;--border:#1a1d2e;--gold:#d4a843;--gold-dim:#b8922e;--green:#00ff88;--green-d:rgba(0,255,136,0.08,{auth:{storage:_sa,autoRefreshToken:false,persistSession:false,detectSessionInUrl:false}});--red:#ff4466;--blue:#4488ff;--purple:#a78bfa;--cyan:#06b6d4;--orange:#ff9933;--t1:#eeeae2;--t2:#7a7e94;--t3:#454862;}
 *{margin:0;padding:0;box-sizing:border-box;}
 body{background:var(--bg);color:var(--t1);font-family:'Outfit',sans-serif;min-height:100vh;overflow-x:hidden;}
 
@@ -395,6 +395,10 @@ body{background:var(--bg);color:var(--t1);font-family:'Outfit',sans-serif;min-he
 </div>
 
 <script>
+// Memory storage adapter — prevents storage access errors
+const _ms={};const _memStorage={getItem:(k)=>_ms[k]||null,setItem:(k,v)=>{_ms[k]=v;},removeItem:(k)=>{delete _ms[k];}};
+let _sa=_memStorage;try{localStorage.setItem('_t','1');localStorage.removeItem('_t');_sa=localStorage;}catch(e){}
+
 const sb=supabase.createClient('https://anjlmooskwvjystmrhxr.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFuamxtb29za3d2anlzdG1yaHhyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU0NjYzNTUsImV4cCI6MjA4MTA0MjM1NX0.DVLjp9PzNIPNSp2HAGtKTaPVfKy3QLs4HTJsy96UsyM');
 
 let leader='',leaderData=null,members=[],allCodes=[];
