@@ -46,7 +46,20 @@ select:focus,input:focus{border-color:var(--gold);}
 <body>
 <div id="toast" class="toast"></div>
 
-<div class="container">
+<!-- Login Gate -->
+<div id="loginGate" style="display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px;">
+  <div style="width:340px;text-align:center;">
+    <div style="width:60px;height:60px;background:linear-gradient(135deg,var(--gold),#b8922e);border-radius:14px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:18px;color:var(--bg);margin:0 auto 16px;">SBA</div>
+    <h1 style="font-size:22px;margin-bottom:4px;">Code Dashboard</h1>
+    <div style="font-size:12px;color:var(--t2);margin-bottom:20px;">Admin Access Only</div>
+    <input type="text" id="adminUser" placeholder="Username" style="width:100%;padding:12px;background:var(--card);border:1px solid var(--border);border-radius:8px;color:var(--t1);font-family:Outfit;font-size:14px;margin-bottom:8px;" onkeypress="if(event.key==='Enter')document.getElementById('adminPass').focus()">
+    <input type="password" id="adminPass" placeholder="Password" style="width:100%;padding:12px;background:var(--card);border:1px solid var(--border);border-radius:8px;color:var(--t1);font-family:Outfit;font-size:14px;margin-bottom:12px;" onkeypress="if(event.key==='Enter')adminLogin()">
+    <button onclick="adminLogin()" style="width:100%;padding:14px;background:linear-gradient(135deg,var(--gold),#b8922e);border:none;border-radius:10px;color:var(--bg);font-weight:800;font-size:14px;cursor:pointer;">Enter Dashboard</button>
+    <div id="adminError" style="margin-top:8px;font-size:12px;color:var(--red);display:none;"></div>
+  </div>
+</div>
+
+<div class="container" id="dashContent" style="display:none;">
   <h1>🔑 <span>SBA</span> Code Dashboard</h1>
   <div class="sub">Keith Only — Generate activation codes, approve requests, track all payments</div>
 
@@ -194,6 +207,23 @@ const sb = supabase.createClient(
 
 const AMOUNTS = {basic:1000,plus:2000,elite:5000,pro:10000,vpn:1000};
 let allCodes = [];
+
+async function adminLogin(){
+  const user=document.getElementById('adminUser').value.trim().toLowerCase();
+  const pass=document.getElementById('adminPass').value;
+  const err=document.getElementById('adminError');
+  if(!user||!pass){err.textContent='Enter credentials';err.style.display='block';return;}
+  
+  const{data,error}=await sb.from('leaders').select('*').eq('username',user).eq('password',pass).eq('is_active',true).single();
+  if(error||!data){err.textContent='❌ Invalid credentials';err.style.display='block';return;}
+  
+  // Only keith can access codes dashboard
+  if(data.username!=='keith'){err.textContent='❌ Admin access only';err.style.display='block';return;}
+  
+  document.getElementById('loginGate').style.display='none';
+  document.getElementById('dashContent').style.display='block';
+  initDashboard();
+}
 
 function showToast(msg){
   const t=document.getElementById('toast');t.textContent=msg;t.style.display='block';
@@ -374,11 +404,13 @@ function copyBatchCodes(){
   showToast('📋 All codes copied!');
 }
 
-// Init
-loadCodes();
-loadRequests();
-// Poll for new requests every 15 seconds
-setInterval(loadRequests, 15000);
+// Init — only after login
+function initDashboard(){
+  loadCodes();
+  loadRequests();
+  setInterval(loadRequests, 15000);
+}
+
 </script>
 </body>
 </html>

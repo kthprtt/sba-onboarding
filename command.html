@@ -327,18 +327,35 @@ const ROLES={vegas:{name:'Vegas',title:'Master Builder',rank:'⚡ Master Builder
 
 function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.style.display='block';setTimeout(()=>t.style.display='none',3000);}
 
-function login(){
-  const v=document.getElementById('leaderSelect').value;
-  if(!v){showToast('Select your name');return;}
-  leader=v;localStorage.setItem('sba_cmd_leader',v);
+async function login(){
+  const user=document.getElementById('loginUser').value.trim().toLowerCase();
+  const pass=document.getElementById('loginPass').value;
+  const errEl=document.getElementById('loginError');
+  
+  if(!user||!pass){errEl.textContent='Enter username and password';errEl.style.display='block';return;}
+  
+  // Authenticate against leaders table
+  const{data,error}=await sb.from('leaders').select('*').eq('username',user).eq('password',pass).eq('is_active',true).single();
+  
+  if(error||!data){
+    errEl.textContent='❌ Invalid username or password';errEl.style.display='block';
+    document.getElementById('loginPass').value='';
+    return;
+  }
+  
+  // Authenticated!
+  leader=data.username;
+  leaderData=data;
+  localStorage.setItem('sba_cmd_leader',JSON.stringify({u:data.username,t:Date.now()}));
+  
   document.getElementById('loginScreen').style.display='none';
   document.getElementById('appView').style.display='grid';
-  const r=ROLES[v]||{name:v,title:'Leader',rank:'Leader',emoji:'👤'};
-  document.getElementById('sidebarName').textContent=r.name;
-  document.getElementById('sidebarRole').textContent=r.title;
-  document.getElementById('sidebarRank').textContent=r.rank;
+  document.getElementById('sidebarName').textContent=data.display_name;
+  document.getElementById('sidebarRole').textContent=data.role;
+  document.getElementById('sidebarRank').textContent=data.rank;
+  
   const hr=new Date().getHours();
-  document.getElementById('greeting').textContent=(hr<12?'Good morning':hr<17?'Good afternoon':'Good evening')+', '+r.name+' '+r.emoji;
+  document.getElementById('greeting').textContent=(hr<12?'Good morning':hr<17?'Good afternoon':'Good evening')+', '+data.display_name+' '+(data.emoji||'');
   loadAll();
 }
 
@@ -627,8 +644,14 @@ async function submitRequest(){
 }
 
 // Auto-login
-const saved=localStorage.getItem('sba_cmd_leader');
-if(saved){document.getElementById('leaderSelect').value=saved;login();}
+// Auto-login from session (expires after 12 hours)
+try{
+  const saved=JSON.parse(localStorage.getItem('sba_cmd_leader')||'{}');
+  if(saved.u && (Date.now()-saved.t)<43200000){
+    document.getElementById('loginUser').value=saved.u;
+    // Still need password — but auto-fill username
+  }
+}catch(e){}
 
 // Auto-refresh
 setInterval(async()=>{await loadCodes();renderDashboard();},10000);
