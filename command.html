@@ -1256,7 +1256,8 @@ async function loadPendingQueue(){
       </div>`;
     }).join('');
   } else {
-    queueEl.style.display = 'none';
+    queueEl.style.display = 'block';
+    listEl.innerHTML = '<div style="padding:12px;text-align:center;font-size:11px;color:var(--t3);border:1px dashed rgba(255,255,255,0.06);border-radius:8px;">No pending requests. Submit one below and it will appear here.</div>';
   }
   
   // Also show recently approved with green checkmark

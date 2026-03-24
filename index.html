@@ -697,6 +697,26 @@ body {
       </div>
     </div>
     <div class="table-scroll"><div id="membersTableBody"><div class="empty-state"><div class="empty-icon">👥</div><p>Loading members...</p></div></div></div>
+    
+    <!-- PAYMENT LEDGER -->
+    <div style="margin-top:24px;padding:20px;background:var(--bg-card);border:1px solid var(--border);border-radius:16px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+        <h3 style="font-size:18px;font-weight:800;">💰 Payment Ledger</h3>
+        <button class="action-btn" onclick="exportLedger()" style="padding:8px 16px;">📥 Export Ledger</button>
+      </div>
+      
+      <!-- Totals -->
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px;" id="ledgerTotals"></div>
+      
+      <!-- Ledger table -->
+      <div style="font-size:11px;color:var(--text-secondary);margin-bottom:8px;">Filter: 
+        <button onclick="filterLedger('all')" class="action-btn" style="padding:4px 10px;font-size:10px;" id="lf-all">All</button>
+        <button onclick="filterLedger('paid')" class="action-btn" style="padding:4px 10px;font-size:10px;" id="lf-paid">✅ Paid</button>
+        <button onclick="filterLedger('partial')" class="action-btn" style="padding:4px 10px;font-size:10px;" id="lf-partial">⚠️ Partial</button>
+        <button onclick="filterLedger('owed')" class="action-btn" style="padding:4px 10px;font-size:10px;" id="lf-owed">❌ Owed</button>
+      </div>
+      <div id="ledgerBody" style="max-height:400px;overflow-y:auto;"></div>
+    </div>
   </div>
 </div>
 
@@ -2536,8 +2556,135 @@ async function doActivatePhantom(id){
   showToast('🔓 '+(m?.name||'Member')+' activated! Welcome email ready.');
 }
 
+// ═══ PAYMENT LEDGER ═══
+let ledgerFilter = 'all';
 
-dbInit();
+function renderLedger(){
+  if(!members) return;
+  const real = members.filter(m=>!m.is_core_team && m.member_type!=='phantom');
+  
+  // Calculate totals
+  let totalExpected=0, totalCollected=0, totalOwed=0, totalFree=0;
+  
+  real.forEach(m=>{
+    const amt = parseFloat(m.package_amount)||0;
+    const pay = (m.payment||'').toLowerCase();
+    const notes = (m.member_name||m.name||'').toLowerCase();
+    
+    if(m.member_type==='affiliate_only' || m.pkg==='none'){
+      totalFree++;
+    } else if(pay==='paid' || pay==='stripe' || pay==='renewed'){
+      totalExpected += amt;
+      totalCollected += amt;
+    } else if(pay==='partial'){
+      totalExpected += amt;
+      // Estimate partial as 50% collected
+      totalCollected += amt * 0.5;
+      totalOwed += amt * 0.5;
+    } else {
+      totalExpected += amt;
+      totalOwed += amt;
+    }
+  });
+  
+  // Render totals
+  document.getElementById('ledgerTotals').innerHTML = `
+    <div style="padding:12px;background:var(--bg-primary);border:1px solid var(--border);border-radius:10px;text-align:center;">
+      <div style="font-size:10px;color:var(--text-secondary);">EXPECTED</div>
+      <div style="font-family:'JetBrains Mono';font-size:20px;font-weight:700;color:var(--gold);">$${totalExpected.toLocaleString()}</div>
+    </div>
+    <div style="padding:12px;background:var(--bg-primary);border:1px solid rgba(46,204,113,0.15);border-radius:10px;text-align:center;">
+      <div style="font-size:10px;color:var(--green);">COLLECTED</div>
+      <div style="font-family:'JetBrains Mono';font-size:20px;font-weight:700;color:var(--green);">$${totalCollected.toLocaleString()}</div>
+    </div>
+    <div style="padding:12px;background:var(--bg-primary);border:1px solid rgba(231,76,60,0.15);border-radius:10px;text-align:center;">
+      <div style="font-size:10px;color:var(--red);">STILL OWED</div>
+      <div style="font-family:'JetBrains Mono';font-size:20px;font-weight:700;color:var(--red);">$${totalOwed.toLocaleString()}</div>
+    </div>
+    <div style="padding:12px;background:var(--bg-primary);border:1px solid var(--border);border-radius:10px;text-align:center;">
+      <div style="font-size:10px;color:var(--text-secondary);">FREE AFFILIATES</div>
+      <div style="font-family:'JetBrains Mono';font-size:20px;font-weight:700;">${totalFree}</div>
+    </div>`;
+  
+  // Render rows
+  let filtered = real;
+  if(ledgerFilter==='paid') filtered = real.filter(m=>m.payment==='paid'||m.payment==='stripe'||m.payment==='renewed');
+  else if(ledgerFilter==='partial') filtered = real.filter(m=>m.payment==='partial');
+  else if(ledgerFilter==='owed') filtered = real.filter(m=>m.payment!=='paid'&&m.payment!=='stripe'&&m.payment!=='renewed'&&m.payment!=='partial'&&m.member_type!=='affiliate_only'&&m.pkg!=='none');
+  
+  if(!filtered.length){
+    document.getElementById('ledgerBody').innerHTML = '<div style="padding:16px;text-align:center;font-size:12px;color:var(--text-secondary);">No members in this filter.</div>';
+    return;
+  }
+  
+  document.getElementById('ledgerBody').innerHTML = `<table style="width:100%;border-collapse:collapse;font-size:12px;">
+    <tr style="border-bottom:1px solid var(--border);color:var(--text-secondary);font-size:10px;text-transform:uppercase;letter-spacing:1px;">
+      <td style="padding:8px;">Name</td>
+      <td style="padding:8px;">Package</td>
+      <td style="padding:8px;">Amount</td>
+      <td style="padding:8px;">Payment</td>
+      <td style="padding:8px;">Owed</td>
+      <td style="padding:8px;">Referred By</td>
+      <td style="padding:8px;">Action</td>
+    </tr>
+    ${filtered.map(m=>{
+      const amt = parseFloat(m.package_amount)||0;
+      const pay = (m.payment||'').toLowerCase();
+      const isFree = m.member_type==='affiliate_only'||m.pkg==='none';
+      const isPaid = pay==='paid'||pay==='stripe'||pay==='renewed';
+      const isPartial = pay==='partial';
+      const owed = isFree?0:isPaid?0:isPartial?Math.round(amt*0.5):amt;
+      const statusColor = isFree?'var(--text-secondary)':isPaid?'var(--green)':isPartial?'var(--orange)':'var(--red)';
+      const statusText = isFree?'FREE':isPaid?'✅ PAID':isPartial?'⚠️ PARTIAL':'❌ UNPAID';
+      const upline = members.find(x=>x.referral_code===m.referred_by_code);
+      
+      return `<tr style="border-bottom:1px solid rgba(255,255,255,0.03);">
+        <td style="padding:8px;font-weight:600;">${m.name||'—'}</td>
+        <td style="padding:8px;font-family:'JetBrains Mono';font-size:10px;">${(m.pkg||'—').toUpperCase()}</td>
+        <td style="padding:8px;font-family:'JetBrains Mono';">${isFree?'$0':'$'+amt.toLocaleString()}</td>
+        <td style="padding:8px;color:${statusColor};font-weight:600;font-size:10px;">${statusText}</td>
+        <td style="padding:8px;font-family:'JetBrains Mono';color:${owed>0?'var(--red)':'var(--green)'};">${owed>0?'$'+owed.toLocaleString():'—'}</td>
+        <td style="padding:8px;font-size:10px;color:var(--text-secondary);">${upline?.name||'—'}</td>
+        <td style="padding:8px;">${!isPaid&&!isFree?'<button onclick="markPaid(\''+m.id+'\')" style="padding:3px 8px;background:rgba(46,204,113,0.1);border:1px solid rgba(46,204,113,0.2);border-radius:4px;color:var(--green);font-size:9px;font-family:Outfit;font-weight:700;cursor:pointer;">Mark Paid</button>':''}</td>
+      </tr>`;
+    }).join('')}
+  </table>`;
+}
+
+function filterLedger(f){
+  ledgerFilter=f;
+  document.querySelectorAll('[id^=lf-]').forEach(b=>b.style.background='transparent');
+  document.getElementById('lf-'+f).style.background='rgba(212,168,67,0.1)';
+  renderLedger();
+}
+
+async function markPaid(id){
+  if(!confirm('Mark this member as PAID?')) return;
+  await updateMember(id, {payment:'paid'});
+  await loadMembers();
+  showToast('✅ Marked as paid');
+}
+
+function exportLedger(){
+  const real = members.filter(m=>!m.is_core_team && m.member_type!=='phantom');
+  let csv = 'Name,Email,Package,Amount,Payment Status,Owed,Referred By,Date\n';
+  real.forEach(m=>{
+    const amt = parseFloat(m.package_amount)||0;
+    const pay = (m.payment||'').toLowerCase();
+    const isFree = m.member_type==='affiliate_only'||m.pkg==='none';
+    const isPaid = pay==='paid'||pay==='stripe';
+    const isPartial = pay==='partial';
+    const owed = isFree?0:isPaid?0:isPartial?Math.round(amt*0.5):amt;
+    const upline = members.find(x=>x.referral_code===m.referred_by_code);
+    csv += `"${m.name||''}","${m.email||''}","${(m.pkg||'').toUpperCase()}","${amt}","${pay}","${owed}","${upline?.name||''}","${(m.created_at||'').split('T')[0]}"\n`;
+  });
+  const blob = new Blob([csv],{type:'text/csv'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href=url;a.download='sba-payment-ledger.csv';a.click();
+}
+
+
 
 // ═══════════════ EDIT MEMBER ═══════════════
 function editMember(id){
@@ -2603,6 +2750,7 @@ async function saveEdit(id){
   showToast('✅ '+u.name+' updated!');
 }
 
+dbInit();
 </script>
 </body>
 </html>
