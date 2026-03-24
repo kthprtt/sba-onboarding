@@ -3,490 +3,114 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SBA Betting Academy</title>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700;800&family=Bebas+Neue&display=swap" rel="stylesheet">
+<title>SBA Betting Academy — Master The Math</title>
 <style>
-:root{--bg:#05060a;--card:#0d0f16;--card2:#141722;--border:#1a1d2e;--gold:#d4a843;--gold-dim:#b8922e;--green:#00ff88;--red:#ff4466;--blue:#4488ff;--purple:#a78bfa;--cyan:#06b6d4;--orange:#ff9933;--t1:#eeeae2;--t2:#7a7e94;--t3:#454862;}
-*{margin:0;padding:0;box-sizing:border-box;}
-body{background:var(--bg);color:var(--t1);font-family:'Outfit',sans-serif;overflow-x:hidden;}
-
-/* Cinematic Background */
-.bg-grid{position:fixed;inset:0;background-image:linear-gradient(rgba(255,255,255,0.012) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.012) 1px,transparent 1px);background-size:80px 80px;pointer-events:none;z-index:0;}
-.bg-glow{position:fixed;width:800px;height:800px;border-radius:50%;filter:blur(150px);pointer-events:none;z-index:0;}
-.bg-g1{top:-400px;right:-200px;background:rgba(212,168,67,0.06);}
-.bg-g2{bottom:-300px;left:-200px;background:rgba(0,255,136,0.04);}
-.bg-g3{top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(68,136,255,0.03);}
-
-/* Film Grain */
-.grain{position:fixed;inset:0;pointer-events:none;z-index:9998;opacity:0.03;background:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
-
-.container{max-width:900px;margin:0 auto;padding:20px;position:relative;z-index:1;}
-
-/* Hero */
-.hero{text-align:center;padding:60px 20px 40px;position:relative;}
-.hero-badge{display:inline-block;padding:6px 20px;background:linear-gradient(135deg,rgba(212,168,67,0.15),rgba(212,168,67,0.05));border:1px solid rgba(212,168,67,0.3);border-radius:20px;font-size:11px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:3px;margin-bottom:16px;animation:fadeDown 0.8s ease;}
-.hero h1{font-family:'Bebas Neue';font-size:clamp(48px,8vw,72px);letter-spacing:2px;line-height:0.95;animation:fadeDown 1s ease;}
-.hero h1 span{background:linear-gradient(135deg,var(--gold),#f0d78c,var(--gold-dim));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-.hero-sub{font-size:16px;color:var(--t2);margin-top:12px;max-width:600px;margin-left:auto;margin-right:auto;line-height:1.6;animation:fadeDown 1.2s ease;}
-
-/* Level Selector */
-.levels{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:30px 0;animation:fadeUp 1s ease 0.3s both;}
-.level-card{padding:20px 14px;background:var(--card);border:2px solid var(--border);border-radius:14px;text-align:center;cursor:pointer;transition:all 0.3s;position:relative;overflow:hidden;}
-.level-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;transition:all 0.3s;}
-.level-card:hover{transform:translateY(-4px);}
-.level-card.active{border-color:var(--gold);}
-.level-card.active::before{height:3px;}
-.level-card .icon{font-size:28px;margin-bottom:8px;}
-.level-card .name{font-size:14px;font-weight:800;}
-.level-card .desc{font-size:10px;color:var(--t3);margin-top:4px;line-height:1.4;}
-.lv-beginner{--lc:var(--green);}.lv-beginner::before{background:var(--green);}
-.lv-inter{--lc:var(--blue);}.lv-inter::before{background:var(--blue);}
-.lv-advanced{--lc:var(--purple);}.lv-advanced::before{background:var(--purple);}
-.lv-elite{--lc:var(--gold);}.lv-elite::before{background:var(--gold);}
-.level-card.active .name{color:var(--lc);}
-
-/* Content sections */
-.track{display:none;animation:fadeIn 0.6s ease;}
-.track.active{display:block;}
-
-/* Strategy Cards */
-.strat-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:16px;position:relative;overflow:hidden;animation:slideUp 0.5s ease both;}
-.strat-card::before{content:'';position:absolute;top:0;left:0;bottom:0;width:4px;}
-.strat-card.green::before{background:var(--green);}
-.strat-card.blue::before{background:var(--blue);}
-.strat-card.purple::before{background:var(--purple);}
-.strat-card.gold::before{background:var(--gold);}
-.strat-card.orange::before{background:var(--orange);}
-.strat-card.cyan::before{background:var(--cyan);}
-.strat-card h3{font-size:18px;font-weight:900;margin-bottom:6px;display:flex;align-items:center;gap:10px;}
-.strat-card .tag{padding:3px 10px;border-radius:6px;font-size:10px;font-weight:700;}
-.strat-card p{font-size:13px;color:var(--t2);line-height:1.7;margin-top:8px;}
-
-/* Math Box */
-.math{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:16px;margin:12px 0;font-family:'JetBrains Mono';font-size:13px;line-height:1.8;}
-.math .label{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;}
-.math .profit{color:var(--green);font-weight:800;font-size:16px;}
-.math .loss{color:var(--red);}
-.math .highlight{color:var(--gold);font-weight:700;}
-
-/* Timeline */
-.timeline{position:relative;padding-left:30px;}
-.timeline::before{content:'';position:absolute;left:10px;top:0;bottom:0;width:2px;background:linear-gradient(180deg,var(--green),var(--blue),var(--purple),var(--gold));}
-.tl-item{position:relative;margin-bottom:20px;animation:slideUp 0.5s ease both;}
-.tl-item::before{content:'';position:absolute;left:-24px;top:6px;width:12px;height:12px;border-radius:50%;border:2px solid var(--gold);background:var(--bg);}
-.tl-item h4{font-size:14px;font-weight:800;}
-.tl-item p{font-size:12px;color:var(--t2);margin-top:4px;line-height:1.6;}
-
-/* Decision Tree */
-.decision{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;margin:16px 0;}
-.decision h3{font-size:16px;font-weight:900;margin-bottom:14px;text-align:center;}
-.decision-flow{display:flex;flex-direction:column;gap:10px;}
-.decision-q{padding:12px 16px;background:rgba(212,168,67,0.06);border:1px solid rgba(212,168,67,0.15);border-radius:10px;font-size:13px;font-weight:700;color:var(--gold);}
-.decision-a{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding-left:20px;}
-.decision-a div{padding:10px;border-radius:8px;font-size:12px;cursor:default;}
-.decision-a .yes{background:rgba(0,255,136,0.06);border:1px solid rgba(0,255,136,0.15);color:var(--green);}
-.decision-a .no{background:rgba(255,68,102,0.06);border:1px solid rgba(255,68,102,0.15);color:var(--red);}
-
-/* Risk meter */
-.risk{display:flex;align-items:center;gap:8px;margin:8px 0;}
-.risk-bar{flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden;}
-.risk-fill{height:100%;border-radius:3px;transition:width 0.5s;}
-
-/* Section headers */
-.section-h{font-family:'Bebas Neue';font-size:32px;letter-spacing:2px;margin:40px 0 16px;padding-bottom:8px;border-bottom:1px solid var(--border);}
-
-/* Comparison */
-.vs{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0;}
-.vs-card{padding:14px;border-radius:10px;font-size:12px;line-height:1.6;}
-.vs-us{background:rgba(0,255,136,0.04);border:1px solid rgba(0,255,136,0.15);}
-.vs-them{background:rgba(255,68,102,0.04);border:1px solid rgba(255,68,102,0.15);}
-
-/* Animations */
-@keyframes fadeDown{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
-@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
-@keyframes fadeIn{from{opacity:0}to{opacity:1}}
-@keyframes slideUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
-
-/* Back button */
-.back-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:rgba(212,168,67,0.1);border:1px solid rgba(212,168,67,0.2);border-radius:8px;color:var(--gold);font-family:'Outfit';font-size:12px;font-weight:600;text-decoration:none;margin-bottom:20px;}
-
-/* Responsive */
-@media(max-width:600px){.levels{grid-template-columns:repeat(2,1fr);}.vs{grid-template-columns:1fr;}.hero h1{font-size:40px;}}
+@import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700;9..40,800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#04060A;--b2:#0B1018;--b3:#111A2E;--b4:#1A2540;--gd:#EFA420;--gd2:#FFD06A;--gn:#00E676;--gn2:#69F0AE;--rd:#FF5252;--pp:#B388FF;--cy:#18FFFF;--wt:#ECF0F6;--gy:#5C6E8E;--gy2:#354668;--sl:#0E1322;--slB:#1C2B48;--slH:#141C32}
+html{scroll-behavior:smooth}body{background:var(--bg);color:var(--wt);font-family:'DM Sans',sans-serif;overflow-x:hidden}
+body::after{content:'';position:fixed;inset:0;background:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.02'/%3E%3C/svg%3E");pointer-events:none;z-index:9999}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:rgba(239,164,32,.12);border-radius:2px}
+nav{position:fixed;top:0;left:0;right:0;z-index:10000;background:rgba(4,6,10,.94);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.03);height:52px;display:flex;align-items:center;padding:0 16px;gap:8px}
+.nl{font-family:'Archivo Black';font-size:14px;color:var(--gd);white-space:nowrap}.nl small{font-family:'DM Sans';font-weight:300;font-size:9px;color:var(--gy);margin-left:5px}
+.nt{display:flex;gap:2px;margin-left:auto;overflow-x:auto;scrollbar-width:none}.nt::-webkit-scrollbar{display:none}
+.tb{padding:6px 12px;font-family:'JetBrains Mono';font-size:10px;letter-spacing:.8px;text-transform:uppercase;color:var(--gy);background:0;border:0;cursor:pointer;border-radius:4px;transition:.2s;white-space:nowrap}.tb:hover{color:var(--wt)}.tb.on{color:var(--gd);background:rgba(239,164,32,.06)}
+.V{display:none;padding:52px 16px 32px;animation:fu .35s ease}.V.on{display:block}
+@keyframes fu{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes bk{0%,100%{opacity:1}50%{opacity:.2}}
+@keyframes glow{0%,100%{box-shadow:0 0 6px var(--gd)}50%{box-shadow:0 0 20px var(--gd)}}
+@keyframes sc{0%{width:0;left:0}50%{width:100%;left:0}100%{width:0;left:100%}}
+.S{display:flex;flex-direction:column;align-items:center;padding:14px 0;text-align:center}
+.S .label{font-family:'JetBrains Mono';font-size:9px;letter-spacing:3px;color:var(--gd);text-transform:uppercase;margin-bottom:3px}
+.S .title{font-family:'Archivo Black';font-size:clamp(18px,3vw,30px);line-height:1.05;margin-bottom:4px}
+.S .explain{max-width:480px;font-size:13px;color:var(--gy);line-height:1.6;margin-bottom:12px}
+.gd{color:var(--gd)}.gn{color:var(--gn)}.pp{color:var(--pp)}.rd{color:var(--rd)}.cy{color:var(--cy)}
+.slip{width:min(700px,95vw);background:var(--sl);border:1px solid var(--slB);border-radius:14px;overflow:hidden;box-shadow:0 14px 40px rgba(0,0,0,.5);margin:12px auto}
+.slip-top{background:var(--slH);padding:8px 14px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--slB);font-size:10px}
+.slip-top .sp{font-family:'JetBrains Mono';color:var(--gd);letter-spacing:2px}
+.slip-top .lv{color:var(--gn);display:flex;align-items:center;gap:3px}.slip-top .lv::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--gn);animation:bk 1.5s infinite}
+.orow{display:flex;gap:6px;padding:8px 14px}
+.odd{flex:1;text-align:center;padding:10px 6px;border-radius:10px;border:1px solid var(--slB);transition:all .6s;position:relative}
+.odd.act{border-color:var(--gn);background:rgba(0,230,118,.03)}.odd.gact{border-color:var(--gd);background:rgba(239,164,32,.03)}
+.odd .ov{font-family:'JetBrains Mono';font-size:24px;font-weight:700}.odd .ov.pl{color:var(--gn2)}.odd .ov.mn{color:#FF8A80}
+.odd .ol{font-size:10px;color:var(--gy);margin-top:2px}.odd .ob{font-size:9px;color:var(--gy2);margin-top:2px;font-family:'JetBrains Mono';letter-spacing:1px}
+.odd .xtra{margin-top:5px;font-size:10px;color:var(--gy);line-height:1.5}.odd .xtra .sv{font-family:'JetBrains Mono';font-weight:600}.odd .xtra .pv{font-family:'JetBrains Mono';font-weight:700;color:var(--gn2)}
+.tot{padding:10px 14px;text-align:center;border-top:1px solid var(--slB)}.tot .big{font-family:'JetBrains Mono';font-size:24px;font-weight:700}.tot .ts{font-size:10px;color:var(--gy);margin-top:2px;font-family:'JetBrains Mono';letter-spacing:1px}
+.sbtn{display:block;width:calc(100% - 28px);margin:0 14px 10px;padding:12px;border-radius:10px;border:none;font-family:'DM Sans';font-weight:700;font-size:13px;letter-spacing:1px;cursor:pointer;transition:.3s;text-transform:uppercase;text-align:center}
+.sbtn.gl{background:linear-gradient(135deg,var(--gd),var(--gd2));color:var(--bg)}.sbtn.gn{background:linear-gradient(135deg,var(--gn),var(--gn2));color:var(--bg)}.sbtn.pp{background:linear-gradient(135deg,var(--pp),#D1A8FF);color:var(--bg)}
+.sbtn:hover{transform:translateY(-1px)}
+.formula{background:#080C14;border:1px solid rgba(255,255,255,.03);border-radius:8px;padding:12px 14px;margin:6px 0;font-family:'JetBrains Mono';font-size:12px;line-height:1.8;color:#6B7894}.formula .hl{color:var(--gn2);font-weight:600}.formula .gl{color:var(--gd2);font-weight:600}.formula .rl{color:#FF8A80}
+.plain{background:rgba(239,164,32,.02);border-left:3px solid var(--gd);padding:10px 14px;margin:6px 0;font-size:13px;color:var(--gy);line-height:1.65;border-radius:0 6px 6px 0}.plain strong{color:var(--gd2)}.plain .mint{color:var(--gn2)}
+.ex{background:var(--b2);border:1px solid rgba(255,255,255,.03);border-radius:12px;padding:18px;margin:12px auto;max-width:700px}.ex-t{font-family:'Archivo Black';font-size:17px;margin-bottom:6px}.ex-b{font-size:13px;color:var(--gy);line-height:1.7}.ex-b strong{color:var(--wt)}
+.bdg{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:12px;font-family:'JetBrains Mono';font-size:9px;letter-spacing:1px}
+.bdg.g{background:rgba(0,230,118,.04);border:1px solid rgba(0,230,118,.08);color:var(--gn)}.bdg.o{background:rgba(239,164,32,.04);border:1px solid rgba(239,164,32,.08);color:var(--gd)}
+.bdg .dt{width:4px;height:4px;border-radius:50%;background:currentColor;animation:bk 1s infinite}
+.math-viz{display:flex;align-items:center;justify-content:center;gap:16px;margin:20px auto;flex-wrap:wrap;max-width:900px}
+.mv-bx{background:var(--b3);border:2px solid var(--slB);border-radius:14px;padding:20px 30px;text-align:center;min-width:120px;transition:all .8s cubic-bezier(.22,1,.36,1)}.mv-bx .n{font-family:'JetBrains Mono';font-size:26px;font-weight:700}.mv-bx .l{font-size:11px;color:var(--gy);margin-top:4px}
+.mv-bx.lit{border-color:var(--gn);box-shadow:0 0 24px rgba(0,230,118,.12)}.mv-bx.glit{border-color:var(--gd);box-shadow:0 0 24px rgba(239,164,32,.12)}
+.mv-ar{font-size:22px;color:var(--gd);font-family:'JetBrains Mono';font-weight:700}
+.term{background:#080C14;border:1px solid rgba(255,255,255,.04);border-radius:12px;overflow:hidden;margin:16px auto;width:min(700px,95vw);box-shadow:0 12px 40px rgba(0,0,0,.5)}
+.term-bar{display:flex;gap:6px;padding:10px 14px;background:rgba(255,255,255,.015);border-bottom:1px solid rgba(255,255,255,.04);align-items:center}
+.dot{width:10px;height:10px;border-radius:50%}.dr{background:#FF5F57}.dy{background:#FEBC2E}.dg{background:#28C840}
+.term-title{font-family:'JetBrains Mono';font-size:11px;color:var(--gy);margin-left:10px}
+.term-body{padding:16px 20px;font-family:'JetBrains Mono';font-size:13px;line-height:2.1;max-height:360px;overflow-y:auto;color:#4A5568}
+.ucalc{background:var(--b2);border:1px solid var(--slB);border-radius:10px;padding:14px;max-width:600px;margin:10px auto}
+.ucalc input[type=range]{width:100%;accent-color:var(--gd);margin:4px 0}
+.tl{position:relative;padding-left:20px;max-width:600px;margin:12px auto}.tl::before{content:'';position:absolute;left:5px;top:0;bottom:0;width:2px;background:linear-gradient(to bottom,var(--gd),var(--gn))}
+.tl-i{position:relative;margin-bottom:16px;padding-left:14px;opacity:0;transform:translateX(-12px);transition:all .5s}.tl-i.show{opacity:1;transform:translateX(0)}.tl-i::before{content:'';position:absolute;left:-19px;top:3px;width:8px;height:8px;border-radius:50%;background:var(--gd)}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.nxt{text-align:center;margin-top:16px}
+.cr{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:0;border-bottom:1px solid rgba(255,255,255,.02)}.cr .c{padding:5px 6px;font-size:9px}.cr .c.x{color:var(--rd);opacity:.4}.cr .c.ch{color:var(--gn2);font-weight:700}.cr.hdr .c{font-family:'JetBrains Mono';font-size:6px;letter-spacing:1px;color:var(--gy);text-transform:uppercase}.cr.sba{background:rgba(239,164,32,.02);border:1px solid rgba(239,164,32,.05);border-radius:6px;margin-top:3px}.cr.sba .c{color:var(--gd);font-weight:700}
+.wt-bar{height:36px;border-radius:8px;display:flex;overflow:hidden;margin:12px auto;max-width:500px;border:1px solid rgba(255,255,255,.04)}
+.wt-seg{height:100%;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono';font-size:12px;font-weight:600;transition:width 1.2s cubic-bezier(.22,1,.36,1)}
+@media(max-width:768px){.g2,.g3{grid-template-columns:1fr}.slip{width:98vw}.orow{padding:8px 10px}.odd .ov{font-size:18px}.mv-bx{min-width:90px;padding:14px}.mv-bx .n{font-size:20px}.nt{display:none}}
 </style>
 </head>
 <body>
-<div class="bg-grid"></div>
-<div class="bg-glow bg-g1"></div>
-<div class="bg-glow bg-g2"></div>
-<div class="bg-glow bg-g3"></div>
-<div class="grain"></div>
-
-<div class="container">
-  <a href="https://affiliate.sportsbetarbitrage.com" class="back-btn">← Back to Portal</a>
-  
-  <div class="hero">
-    <div class="hero-badge">SBA Betting Academy</div>
-    <h1>MASTER THE <span>MATH</span></h1>
-    <div class="hero-sub">From your first Sure Bet to stacking 460% returns. Choose your level and let's build your edge.</div>
-  </div>
-
-  <!-- Level Selector -->
-  <div class="levels">
-    <div class="level-card lv-beginner active" onclick="showTrack('beginner')">
-      <div class="icon">🟢</div>
-      <div class="name">Beginner</div>
-      <div class="desc">New to arbing. Learn Sure Bets + place your first trade.</div>
-    </div>
-    <div class="level-card lv-inter" onclick="showTrack('intermediate')">
-      <div class="icon">🔵</div>
-      <div class="name">Intermediate</div>
-      <div class="desc">Comfortable with arbs. Learn Value Bets + DVB.</div>
-    </div>
-    <div class="level-card lv-advanced" onclick="showTrack('advanced')">
-      <div class="icon">🟣</div>
-      <div class="name">Advanced</div>
-      <div class="desc">Power Plays, middles, promo stacking.</div>
-    </div>
-    <div class="level-card lv-elite" onclick="showTrack('elite')">
-      <div class="icon">👑</div>
-      <div class="name">Elite</div>
-      <div class="desc">Full stack. 460% returns. Anti-detection mastery.</div>
-    </div>
-  </div>
-
-  <!-- ═══════════════════════════════════════════════════ -->
-  <!-- BEGINNER TRACK -->
-  <!-- ═══════════════════════════════════════════════════ -->
-  <div class="track active" id="track-beginner">
-    <div class="section-h" style="color:var(--green);">🟢 BEGINNER — YOUR FIRST WEEK</div>
-    
-    <div class="strat-card green" style="animation-delay:0.1s;">
-      <h3>🔒 Sure Bet — Guaranteed Profit <span class="tag" style="background:rgba(0,255,136,0.1);color:var(--green);">START HERE</span></h3>
-      <p>Two sportsbooks disagree on the odds for the same game. You bet BOTH sides on different books. One HAS to win. You profit either way. This is not gambling — it's math.</p>
-      
-      <div class="math">
-        <div class="label">Real Example — NBA: Lakers vs Celtics</div>
-        Side A: Lakers +150 on DraftKings → Bet <span class="highlight">$400</span><br>
-        Side B: Celtics -130 on FanDuel → Bet <span class="highlight">$600</span><br>
-        Total deployed: $1,000<br><br>
-        If Lakers win: $400 × 2.50 = $1,000 + $62 = <span class="profit">+$62 profit</span><br>
-        If Celtics win: $600 × 1.769 = $1,000 + $62 = <span class="profit">+$62 profit</span><br><br>
-        <span class="profit">✅ You make $62 NO MATTER WHO WINS. That's 6.2% in one bet.</span>
-      </div>
-      
-      <p><strong>When to use it:</strong> Always. This is your foundation. Every other strategy builds on top of Sure Bets.</p>
-      <div class="risk"><span style="font-size:11px;color:var(--t3);">Risk:</span><div class="risk-bar"><div class="risk-fill" style="width:5%;background:var(--green);"></div></div><span style="font-size:11px;color:var(--green);">Zero</span></div>
-    </div>
-
-    <div class="strat-card green" style="animation-delay:0.2s;">
-      <h3>📋 Your First Week Plan</h3>
-      <div class="timeline">
-        <div class="tl-item"><h4 style="color:var(--green);">Day 1 — Setup (30 min)</h4><p>Create accounts on DraftKings, FanDuel, BetMGM, Caesars. Fund each with $250-$500. Your portal's Get Started tab walks you through it step by step.</p></div>
-        <div class="tl-item"><h4 style="color:var(--green);">Day 2 — First Sure Bet</h4><p>Open SBA Genius. Find a Sure Bet with 3%+ ROI. Click the arb card → it shows you exactly where to bet and how much. Place both sides within 2 minutes. Congratulations — you just made guaranteed money.</p></div>
-        <div class="tl-item"><h4 style="color:var(--green);">Day 3 — Volume</h4><p>Place 3-5 Sure Bets. Each one takes 5 minutes. Focus on learning the flow: find arb → calculate → place Side A → place Side B → done. Speed comes with practice.</p></div>
-        <div class="tl-item"><h4 style="color:var(--blue);">Day 4-5 — Money Movement</h4><p>After bets settle, withdraw profits. Deposit into the next sportsbook that has an opportunity. <strong>Deposit → Bet → Withdraw → Repeat.</strong> Sportsbooks are NOT your bank.</p></div>
-        <div class="tl-item"><h4 style="color:var(--blue);">Day 6-7 — Scale Up</h4><p>You should have 5-10 bets under your belt. Increase your stakes. With $1,000 per bet at 3-5% ROI, that's $30-$50 per bet × 3-5 bets/day = $90-$250/day.</p></div>
-      </div>
-    </div>
-
-    <div class="strat-card green" style="animation-delay:0.3s;">
-      <h3>💰 The Math — What Sure Bets Can Make You</h3>
-      <div class="math">
-        <div class="label">Conservative Scenario (3% avg ROI, 3 bets/day)</div>
-        Per bet: $1,000 × 3% = <span class="highlight">$30</span><br>
-        Daily: $30 × 3 = <span class="highlight">$90</span><br>
-        Weekly: $90 × 7 = <span class="highlight">$630</span><br>
-        Monthly: $630 × 4 = <span class="profit">$2,520/month</span><br><br>
-        <div class="label">Aggressive Scenario (5% avg ROI, 5 bets/day)</div>
-        Per bet: $1,000 × 5% = <span class="highlight">$50</span><br>
-        Daily: $50 × 5 = <span class="highlight">$250</span><br>
-        Weekly: $250 × 7 = <span class="highlight">$1,750</span><br>
-        Monthly: $1,750 × 4 = <span class="profit">$7,000/month</span>
-      </div>
-    </div>
-
-    <div class="strat-card green" style="animation-delay:0.4s;">
-      <h3>🛡️ Anti-Detection Basics</h3>
-      <p><strong>Why this matters:</strong> Sportsbooks don't like arbers. If they detect you, they'll limit your bets. Here's how to stay under the radar from Day 1.</p>
-      <div class="math">
-        ✅ <strong>Round your stakes</strong> — $150, $200, $500. Never $147.32 or $487.65.<br>
-        ✅ <strong>Bet at peak times</strong> — when the public is betting (game day, prime time).<br>
-        ✅ <strong>Mix in small casual bets</strong> — throw $10-$20 on parlays occasionally.<br>
-        ✅ <strong>Don't withdraw immediately</strong> — wait 24-48 hours after winning.<br>
-        ✅ <strong>Use 4+ sportsbooks</strong> — spread your action. More books = harder to detect.<br>
-        ❌ <strong>Never bet the same amount on both sides</strong> — $500 and $500 screams arber.<br>
-        ❌ <strong>Never bet at the same time on both books</strong> — stagger by 30-60 seconds.
-      </div>
-    </div>
-
-    <div style="text-align:center;margin:30px 0;"><button onclick="showTrack('intermediate')" style="padding:14px 40px;background:linear-gradient(135deg,var(--blue),#3366dd);border:none;border-radius:12px;color:#fff;font-family:Outfit;font-weight:800;font-size:14px;cursor:pointer;">Ready for More? → Intermediate Track 🔵</button></div>
-  </div>
-
-  <!-- ═══════════════════════════════════════════════════ -->
-  <!-- INTERMEDIATE TRACK -->
-  <!-- ═══════════════════════════════════════════════════ -->
-  <div class="track" id="track-intermediate">
-    <div class="section-h" style="color:var(--blue);">🔵 INTERMEDIATE — VALUE BETS & DVB</div>
-    
-    <div class="strat-card blue" style="animation-delay:0.1s;">
-      <h3>📈 Value Bet (Favorite) <span class="tag" style="background:rgba(68,136,255,0.1);color:var(--blue);">LEVEL UP</span></h3>
-      <p>Same arb odds, but you <strong>load the likely winner</strong>. If the favorite wins (which it usually does), you make MORE than a Sure Bet. If the underdog wins, you break even. Zero risk, higher upside.</p>
-      
-      <div class="math">
-        <div class="label">Same odds: +190 / -110 with $1,000</div>
-        <strong>Sure Bet split:</strong> $396.98 / $603.02 → <span class="profit">+$151 either way</span><br><br>
-        <strong>Value Fav split:</strong> $344.83 / $655.17 (load the -110 side)<br>
-        If favorite wins: <span class="profit">+$250.72 (25% ROI)</span><br>
-        If underdog wins: <span class="highlight">$0 (break even)</span><br><br>
-        <span class="profit">Same odds. Same two books. 65% more profit when the favorite wins. Zero downside.</span>
-      </div>
-      
-      <p><strong>When to use it:</strong> When the favorite is heavily favored (-200 or more) and you're confident in the likely outcome. The math still protects you either way.</p>
-      <div class="risk"><span style="font-size:11px;color:var(--t3);">Risk:</span><div class="risk-bar"><div class="risk-fill" style="width:15%;background:var(--blue);"></div></div><span style="font-size:11px;color:var(--blue);">Low (break even worst case)</span></div>
-    </div>
-
-    <div class="strat-card blue" style="animation-delay:0.2s;">
-      <h3>🐕 Value Bet (Underdog)</h3>
-      <p>Flip it — load the underdog instead. If it hits, you get a MASSIVE payout. If the favorite wins, you break even. This is how you hit home runs.</p>
-      
-      <div class="math">
-        <div class="label">Monster odds: +4900 / -131 with $1,000</div>
-        <strong>Value Dog split:</strong> $434.78 on +4900 / $565.22 on -131 (break even)<br>
-        If underdog wins: <span class="profit">+$20,739!! (2,073% ROI)</span><br>
-        If favorite wins: <span class="highlight">$0 (break even)</span><br><br>
-        <span class="profit">The underdog hitting at +4900 turns $435 into $21,739. Break even if it doesn't. No downside.</span>
-      </div>
-      <div class="risk"><span style="font-size:11px;color:var(--t3);">Risk:</span><div class="risk-bar"><div class="risk-fill" style="width:15%;background:var(--blue);"></div></div><span style="font-size:11px;color:var(--blue);">Low (break even worst case)</span></div>
-    </div>
-
-    <div class="strat-card gold" style="animation-delay:0.3s;">
-      <h3>💎 Double Value Bet (DVB) <span class="tag" style="background:rgba(212,168,67,0.1);color:var(--gold);">SBA'S SECRET WEAPON</span></h3>
-      <p>This is what makes SBA different from everyone else. You run BOTH value bets simultaneously — Value Fav AND Value Dog on the same odds. 4 positions. <strong>Guaranteed minimum that BEATS the Sure Bet. Plus jackpot upside.</strong></p>
-      
-      <div class="math">
-        <div class="label">Same odds: +190 / -110 with $1,000</div>
-        <strong>Sure Bet:</strong> <span class="highlight">+$151 guaranteed</span><br><br>
-        <strong>DVB (4 positions):</strong><br>
-        If favorite wins: <span class="profit">+$251 (25%)</span><br>
-        If underdog wins: <span class="profit">+$381 (38%)</span><br><br>
-        <span class="profit">WORST case ($251) still beats Sure Bet ($151) by $100. That's $100 more for the same odds, same risk level.</span>
-      </div>
-      
-      <div class="vs">
-        <div class="vs-card vs-us"><strong style="color:var(--green);">SBA (DVB)</strong><br>Worst: +$251<br>Best: +$381<br>Floor beats Sure Bet ✅</div>
-        <div class="vs-card vs-them"><strong style="color:var(--red);">Everyone Else</strong><br>Sure Bet only: +$151<br>No upside<br>Leaving $100+ on the table ❌</div>
-      </div>
-      
-      <p><strong>When to use it:</strong> On every arb with 10%+ ROI. The wider the odds gap, the more DVB outperforms Sure Bet. This is your default strategy once you're comfortable.</p>
-      <div class="risk"><span style="font-size:11px;color:var(--t3);">Risk:</span><div class="risk-bar"><div class="risk-fill" style="width:5%;background:var(--green);"></div></div><span style="font-size:11px;color:var(--green);">Zero — guaranteed profit both ways</span></div>
-    </div>
-
-    <div class="decision">
-      <h3>🧭 Which Strategy Should I Use?</h3>
-      <div class="decision-flow">
-        <div class="decision-q">Is the ROI above 10%?</div>
-        <div class="decision-a">
-          <div class="yes">✅ YES → Use <strong>DVB</strong> (Double Value). Always outperforms Sure Bet at high ROI.</div>
-          <div class="no">❌ NO → Use <strong>Sure Bet</strong>. At low ROI, the DVB advantage is small.</div>
-        </div>
-        <div class="decision-q">Are the odds extreme (+500 or more)?</div>
-        <div class="decision-a">
-          <div class="yes">✅ YES → Consider <strong>Value Dog</strong>. The jackpot potential is enormous.</div>
-          <div class="no">❌ NO → Stick with <strong>DVB or Sure Bet</strong>.</div>
-        </div>
-        <div class="decision-q">Do you have guaranteed profit from a Sure Bet / DVB?</div>
-        <div class="decision-a">
-          <div class="yes">✅ YES → Use some for a <strong>Power Play</strong> (Advanced Track).</div>
-          <div class="no">❌ NO → Don't risk your own money on parlays.</div>
-        </div>
-      </div>
-    </div>
-
-    <div style="text-align:center;margin:30px 0;"><button onclick="showTrack('advanced')" style="padding:14px 40px;background:linear-gradient(135deg,var(--purple),#8b5cf6);border:none;border-radius:12px;color:#fff;font-family:Outfit;font-weight:800;font-size:14px;cursor:pointer;">Level Up → Advanced Track 🟣</button></div>
-  </div>
-
-  <!-- ═══════════════════════════════════════════════════ -->
-  <!-- ADVANCED TRACK -->
-  <!-- ═══════════════════════════════════════════════════ -->
-  <div class="track" id="track-advanced">
-    <div class="section-h" style="color:var(--purple);">🟣 ADVANCED — POWER PLAYS & MIDDLES</div>
-    
-    <div class="strat-card orange" style="animation-delay:0.1s;">
-      <h3>🔥 Power Play <span class="tag" style="background:rgba(255,153,51,0.1);color:var(--orange);">HOUSE MONEY</span></h3>
-      <p>Take your <strong>guaranteed profit</strong> from a Sure Bet or DVB and slide it into a parlay. You're playing with the HOUSE'S money — it never came from your pocket. If the parlay misses, you still keep most of your profit. If it hits, you multiply everything.</p>
-      
-      <div class="math">
-        <div class="label">Power Play from a Sure Bet (+$151 guaranteed)</div>
-        Guaranteed profit: $151<br>
-        Power Play stake: $53 (35% of profit — house money)<br>
-        Kept safe: $98 (your floor)<br><br>
-        <strong>3-leg parlay @ +657:</strong><br>
-        If parlay misses: You keep <span class="profit">+$98 profit</span> (still won!)<br>
-        If parlay HITS: $98 + $348 = <span class="profit">+$446 profit (3× your Sure Bet!)</span><br><br>
-        <span class="profit">Your floor is $98. Your ceiling is $446. The $53 you risked was never yours — it was the house's money.</span>
-      </div>
-      
-      <p><strong>Rules:</strong></p>
-      <div class="math">
-        ✅ Power Play ONLY from guaranteed profit (Sure Bet or DVB)<br>
-        ✅ Stack high-probability favorites (-300, -500, -1000+)<br>
-        ✅ Use 25-35% of your guaranteed profit as the stake<br>
-        ❌ NEVER Power Play from Value Bets (worst case = $0, no house money)<br>
-        ❌ NEVER use your own capital for the parlay
-      </div>
-      <div class="risk"><span style="font-size:11px;color:var(--t3);">Risk:</span><div class="risk-bar"><div class="risk-fill" style="width:25%;background:var(--orange);"></div></div><span style="font-size:11px;color:var(--orange);">Low (house money only, floor is still profitable)</span></div>
-    </div>
-
-    <div class="strat-card purple" style="animation-delay:0.2s;">
-      <h3>🎰 Middle Bets <span class="tag" style="background:rgba(167,139,250,0.1);color:var(--purple);">JACKPOT</span></h3>
-      <p>Two books have different lines on the same prop. You bet Over on one book, Under on the other. If the result lands IN THE MIDDLE, you win BOTH bets. Outside the middle, you still profit (it's still an arb).</p>
-      
-      <div class="math">
-        <div class="label">Steph Curry Points — Over/Under</div>
-        Book A: Over 28.5 @ -110 → Bet $500<br>
-        Book B: Under 30.5 @ -110 → Bet $520<br><br>
-        If Curry scores 27: Under wins → <span class="profit">small profit (arb)</span><br>
-        If Curry scores 29 or 30: <span class="profit">🎰 BOTH WIN! JACKPOT!</span><br>
-        If Curry scores 31: Over wins → <span class="profit">small profit (arb)</span><br><br>
-        <span class="profit">The middle window (29-30) is your jackpot zone. Outside it, you still profit from the arb.</span>
-      </div>
-      
-      <p><strong>Watch Score System:</strong> Genius monitors your middles in real-time. As the game score approaches your middle window, the Watch Score climbs. At 85+, consider hedging to lock in profit.</p>
-      <div class="risk"><span style="font-size:11px;color:var(--t3);">Risk:</span><div class="risk-bar"><div class="risk-fill" style="width:10%;background:var(--green);"></div></div><span style="font-size:11px;color:var(--green);">Very Low (still an arb outside the middle)</span></div>
-    </div>
-
-    <div class="strat-card cyan" style="animation-delay:0.3s;">
-      <h3>🛡️ Hedge Calculator — 3 Strategies</h3>
-      <p>When your middle position gets hot (Watch Score climbing), you have three options:</p>
-      <div class="math">
-        <strong style="color:var(--green);">🛡️ Eliminate Risk</strong> — Lock in guaranteed profit on all outcomes. Safest.<br><br>
-        <strong style="color:var(--blue);">⚖️ Minimize Loss</strong> — Reduce risk by 60%, keep some upside. Balanced.<br><br>
-        <strong style="color:var(--gold);">💎 Profit All Outcomes</strong> — Win on every outcome including the middle. Requires favorable hedge odds.
-      </div>
-    </div>
-
-    <div style="text-align:center;margin:30px 0;"><button onclick="showTrack('elite')" style="padding:14px 40px;background:linear-gradient(135deg,var(--gold),var(--gold-dim));border:none;border-radius:12px;color:var(--bg);font-family:Outfit;font-weight:800;font-size:14px;cursor:pointer;">Go Elite → The Full Stack 👑</button></div>
-  </div>
-
-  <!-- ═══════════════════════════════════════════════════ -->
-  <!-- ELITE TRACK -->
-  <!-- ═══════════════════════════════════════════════════ -->
-  <div class="track" id="track-elite">
-    <div class="section-h" style="color:var(--gold);">👑 ELITE — THE FULL STACK</div>
-    
-    <div class="strat-card gold" style="animation-delay:0.1s;">
-      <h3>🏆 The Full Stack — One Position, Maximum Extraction</h3>
-      <p>This is what separates SBA from everyone else. You take ONE arb opportunity and layer EVERY strategy on top of it. Same odds. Same two sportsbooks. But you extract 5-10× what anyone else would.</p>
-      
-      <div class="math">
-        <div class="label">The Stack: +265 / -110 arb with $2,000</div>
-        <strong>Layer 1 — Base Arb:</strong> <span class="profit">+$253 guaranteed (25.35%)</span><br>
-        <strong>Layer 2 — DVB:</strong> Worst +$251, Best +$2,650 → <span class="profit">floor beats Layer 1</span><br>
-        <strong>Layer 3 — Promo Boost:</strong> DraftKings 25% boost on +265 → <span class="profit">+$662 extra</span><br>
-        <strong>Layer 4 — Bonus Bet:</strong> FanDuel $100 free bet on hedge → <span class="profit">+$91 free</span><br>
-        <strong>Layer 5 — Power Play:</strong> $186 @ +657 parlay → <span class="profit">+$1,222 if hits</span><br><br>
-        <span class="profit">Total potential on ONE position: $4,109 (205% ROI)</span><br>
-        <span class="highlight">Expected value across all outcomes: $1,213 (60.7% ROI)</span>
-      </div>
-    </div>
-
-    <div class="strat-card gold" style="animation-delay:0.2s;">
-      <h3>🎯 Promo Stacking — 460% Returns</h3>
-      <p>Sportsbooks throw bonuses at new accounts: deposit matches, profit boosts, bonus bets, odds boosts. Most people waste these on random parlays. <strong>SBA members stack them on top of arbs for guaranteed extraction.</strong></p>
-      
-      <div class="math">
-        <div class="label">3-Bonus Stack Example</div>
-        <strong>Bonus 1:</strong> DraftKings deposit match $1,000 → bet both sides → extract $900<br>
-        <strong>Bonus 2:</strong> FanDuel 25% profit boost → apply to arb → extract $250<br>
-        <strong>Bonus 3:</strong> BetMGM $1,000 bonus bet → convert at 70% → extract $700<br><br>
-        Total deposited: $1,000<br>
-        Total extracted: <span class="profit">$1,850 → 185% return on deposit</span><br><br>
-        <span class="profit">Stack this across 10+ books with new account bonuses: $4,600+ from $1,000 seed capital. That's your 460%.</span>
-      </div>
-    </div>
-
-    <div class="strat-card gold" style="animation-delay:0.3s;">
-      <h3>🕵️ Anti-Detection Mastery</h3>
-      <p>At elite level, longevity is everything. One limited account costs you thousands in future profit. Here's the advanced playbook:</p>
-      <div class="math">
-        <strong style="color:var(--gold);">Stake Rounding Tiers:</strong><br>
-        Beginner: Round to $10 ($490, $510)<br>
-        Intermediate: Round to $5 ($495, $505)<br>
-        Elite: Psychological rounding ($499, $501) — looks natural<br><br>
-        <strong style="color:var(--gold);">Account Health:</strong><br>
-        ✅ Place 3-5 "recreational" bets per week ($5-$20 parlays)<br>
-        ✅ Bet popular markets (NFL, NBA) not obscure props<br>
-        ✅ Vary your bet timing — don't always bet at 2am<br>
-        ✅ Use deposit bonuses and promos (books love this)<br>
-        ✅ Keep a winning:losing bet ratio of ~55:45 on individual books<br><br>
-        <strong style="color:var(--gold);">Money Movement:</strong><br>
-        ✅ Deposit → Bet → Wait 24-48hrs → Withdraw<br>
-        ✅ Never withdraw more than you deposited on first cycle<br>
-        ✅ Build a withdrawal history before large cashouts<br>
-        ✅ Use different payment methods (card, PayPal, bank)
-      </div>
-    </div>
-
-    <div class="strat-card gold" style="animation-delay:0.4s;">
-      <h3>📊 Daily Session — Elite Workflow</h3>
-      <div class="math">
-        <div class="label">5 Stacked Positions Per Day ($10K Bankroll)</div>
-        Position 1: 25% base × stack = <span class="highlight">~$1,200</span><br>
-        Position 2: 18% base × stack = <span class="highlight">~$900</span><br>
-        Position 3: 22% base × stack = <span class="highlight">~$1,100</span><br>
-        Position 4: 15% base × stack = <span class="highlight">~$700</span><br>
-        Position 5: 20% base × stack = <span class="highlight">~$1,000</span><br><br>
-        <span class="profit">Daily potential: $4,900</span><br>
-        <span class="highlight">At 50% efficiency (real world): $2,450/day</span><br>
-        <span class="profit">Monthly: $73,500</span>
-      </div>
-      <p style="margin-top:12px;color:var(--gold);font-weight:600;">This is why SBA members make more money than anyone else. It's not one strategy — it's the STACK.</p>
-    </div>
-
-    <div class="vs" style="margin:20px 0;">
-      <div class="vs-card vs-us" style="padding:20px;">
-        <strong style="color:var(--green);font-size:16px;">SBA Genius</strong><br><br>
-        ✅ 5 strategies per arb<br>
-        ✅ DVB (no one else has this)<br>
-        ✅ Power Play from house money<br>
-        ✅ Promo stacking<br>
-        ✅ Anti-detection built in<br>
-        ✅ Watch Score + hedge calc<br>
-        ✅ 60+ leagues, 432 markets<br>
-        ✅ One-click bet execution<br>
-        <strong style="color:var(--green);">$1K-$7K+/month</strong>
-      </div>
-      <div class="vs-card vs-them" style="padding:20px;">
-        <strong style="color:var(--red);font-size:16px;">OddsJam / Others</strong><br><br>
-        ❌ Sure Bet only<br>
-        ❌ No DVB<br>
-        ❌ No Power Play<br>
-        ❌ No promo integration<br>
-        ❌ Basic stake rounding<br>
-        ❌ No hedge calculator<br>
-        ❌ Limited markets<br>
-        ❌ No strategy depth<br>
-        <strong style="color:var(--red);">$500-$1K/month (ceiling)</strong>
-      </div>
-    </div>
-  </div>
-
-  <div style="text-align:center;padding:40px 0;border-top:1px solid var(--border);margin-top:40px;">
-    <p style="font-size:14px;color:var(--t2);margin-bottom:16px;">The math doesn't lie. The tools are ready. The only question is how deep you want to go.</p>
-    <a href="https://affiliate.sportsbetarbitrage.com" style="display:inline-block;padding:16px 40px;background:linear-gradient(135deg,var(--gold),var(--gold-dim));color:var(--bg);font-weight:900;font-size:15px;border-radius:12px;text-decoration:none;letter-spacing:1px;">← BACK TO YOUR PORTAL</a>
-    <p style="font-size:11px;color:var(--t3);margin-top:12px;">Sports Bet Arbitrage LLC | SBA Genius | The Premier Choice</p>
-  </div>
-</div>
-
+<nav><div class="nl">SBA <small>Betting Academy</small></div><div class="nt" id="tabs"></div></nav>
+<div id="app"></div>
 <script>
-function showTrack(id){
-  document.querySelectorAll('.track').forEach(t=>t.classList.remove('active'));
-  document.querySelectorAll('.level-card').forEach(c=>c.classList.remove('active'));
-  document.getElementById('track-'+id)?.classList.add('active');
-  const lvMap={beginner:'lv-beginner',intermediate:'lv-inter',advanced:'lv-advanced',elite:'lv-elite'};
-  document.querySelector('.'+lvMap[id])?.classList.add('active');
-  window.scrollTo({top:document.querySelector('.levels').offsetTop-20,behavior:'smooth'});
-}
+const $=id=>document.getElementById(id);let cur='cover',TT=[];
+function clr(){TT.forEach(clearTimeout);TT=[]}
+function fmt(n){return'$'+n.toLocaleString()}
+function dl(ms){return new Promise(r=>{TT.push(setTimeout(r,ms))})}
+function aV(el,s,e,d){if(!el)return;const t0=performance.now();!function f(n){const p=Math.min((n-t0)/d,1);const v=Math.floor(s+(e-s)*(1-Math.pow(1-p,3)));el.textContent='$'+v.toLocaleString();if(p<1)requestAnimationFrame(f)}(t0)}
+const T=[{id:'cover',l:'Home'},{id:'sure',l:'Sure Bet'},{id:'value',l:'Value Bets'},{id:'dvb',l:'DVB'},{id:'power',l:'Power Play'},{id:'middle',l:'Middles'},{id:'stack',l:'Full Stack'},{id:'calc',l:'Calculator'},{id:'anti',l:'Stealth'},{id:'week1',l:'Week 1'}];
+function nav(){$('tabs').innerHTML=T.map(t=>`<button class="tb${t.id===cur?' on':''}" onclick="go('${t.id}')">${t.l}</button>`).join('')}
+function go(id){clr();cur=id;nav();ren();window.scrollTo({top:0})}
+function ren(){$('app').innerHTML=`<div class="V on">${(W[cur]||W.cover)()}</div>`;setTimeout(()=>{const h=H[cur];if(h)h()},100)}
+const H={};const W={};
+
+W.cover=()=>`<div style="min-height:90vh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;position:relative"><div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 40%,rgba(239,164,32,.04),transparent 60%);pointer-events:none"></div><div style="position:relative;z-index:1"><div style="margin-bottom:16px"><span class="bdg o"><span class="dt"></span> SBA BETTING ACADEMY</span></div><h1 style="font-family:'Archivo Black';font-size:clamp(36px,7vw,72px);line-height:.92">MASTER THE<br><span class="gd">MATH</span></h1><p style="font-size:15px;color:var(--gy);max-width:460px;margin:14px auto 0;line-height:1.7">5 strategies. Zero risk. One system.<br><strong style="color:var(--wt)">Your path to a million.</strong></p><div style="display:flex;gap:24px;justify-content:center;margin-top:28px;flex-wrap:wrap" id="cov-s"></div><div style="margin-top:28px"><button class="sbtn gl" style="width:auto;padding:14px 32px;display:inline-block" onclick="go('sure')">START LEARNING →</button></div><div style="margin-top:16px;font-size:11px;color:var(--gy)"><a href="https://affiliate.sportsbetarbitrage.com" style="color:var(--gd);text-decoration:none">← Back to Portal</a></div></div></div>`;
+H.cover=async()=>{const s=[['5','Strategies'],['0%','Risk'],['$7K+','Monthly'],['460%','Max Stack']];await dl(300);$('cov-s').innerHTML=s.map((x,i)=>`<div style="opacity:0;animation:fu .5s ease ${i*150}ms forwards"><div style="font-family:'JetBrains Mono';font-size:24px;font-weight:700;color:var(--gn)">${x[0]}</div><div style="font-family:'JetBrains Mono';font-size:8px;letter-spacing:2px;color:var(--gy)">${x[1].toUpperCase()}</div></div>`).join('')};
+
+W.sure=()=>`<div class="S"><div class="label">Strategy 1 · Zero Risk</div><div class="title">🔒 Sure Bet — <span class="gn">Guaranteed Profit</span></div><div class="explain">Two sportsbooks disagree on the odds. You bet BOTH sides. One has to win. You profit either way.</div></div><div class="slip" id="sb-slip"><div class="slip-top"><span class="sp">SBA GENIUS · SURE BET</span><span class="lv"><span class="dt"></span> LIVE</span></div><div style="padding:8px 14px;font-size:11px;color:var(--gy)">🏀 NBA — <strong style="color:var(--wt)">Lakers vs Celtics</strong> · Moneyline</div><div class="orow"><div class="odd" id="sb1"><div class="ov pl">+150</div><div class="ol">Lakers ML</div><div class="ob">DRAFTKINGS</div><div class="xtra" id="sbx1"></div></div><div class="odd" id="sb2"><div class="ov mn">-130</div><div class="ol">Celtics ML</div><div class="ob">FANDUEL</div><div class="xtra" id="sbx2"></div></div></div><div class="tot" id="sbt"></div><div id="sbb"><button class="sbtn gn" onclick="simSB()">▶ SIMULATE BET</button></div></div><div class="math-viz" id="sbv" style="display:none"></div><div id="sbe" style="display:none"></div><div class="nxt"><button class="sbtn gl" style="width:auto;margin:0 auto;padding:12px 28px" onclick="go('value')">NEXT: VALUE BETS →</button></div>`;
+H.sure=async()=>{await dl(500);$('sb1').classList.add('act');await dl(400);$('sb2').classList.add('act')};
+function simSB(){$('sbx1').innerHTML='<div class="sv">Stake: $400</div><div class="pv">Payout: $1,000</div>';$('sbx2').innerHTML='<div class="sv">Stake: $600</div><div class="pv">Payout: $1,062</div>';$('sb1').classList.add('gact');$('sb2').classList.add('gact');$('sbt').innerHTML='<div class="big" style="color:var(--gn)">+$62.00</div><div class="ts">GUARANTEED PROFIT · NO MATTER WHO WINS</div>';$('sbb').innerHTML='<div style="padding:8px 14px;text-align:center"><span class="bdg g"><span class="dt"></span> ZERO RISK</span></div>';$('sbv').style.display='flex';$('sbv').innerHTML=`<div class="mv-bx" id="sv1"><div class="n" style="color:var(--gy)">$400</div><div class="l">Side A · DK</div></div><div class="mv-ar">+</div><div class="mv-bx" id="sv2"><div class="n" style="color:var(--gy)">$600</div><div class="l">Side B · FD</div></div><div class="mv-ar">=</div><div class="mv-bx" id="sv3"><div class="n" style="color:var(--gn)">+$62</div><div class="l">GUARANTEED</div></div>`;setTimeout(()=>{$('sv1').classList.add('lit');$('sv2').classList.add('lit')},300);setTimeout(()=>{$('sv3').classList.add('glit')},800);$('sbe').style.display='block';$('sbe').innerHTML=`<div class="ex" style="animation:fu .5s ease"><div class="ex-t">Why This Works</div><div class="ex-b">DraftKings thinks Lakers have 40% chance. FanDuel thinks Celtics have 43%. Total: <strong>83% — less than 100%.</strong> The gap is your profit. SBA scans <strong>60+ leagues every 60 seconds</strong> finding these gaps.</div></div><div class="plain" style="animation:fu .5s ease .2s both"><strong>The math:</strong> If implied probabilities add up to <span class="mint">less than 100%</span>, guaranteed profit exists. SBA finds 3-15% margins across 432 markets.</div>`}
+
+W.value=()=>`<div class="S"><div class="label">Strategy 2 & 3 · Zero Risk</div><div class="title">📈 Value Bets — <span class="gn">Same Odds, Bigger Profit</span></div><div class="explain">Same arb. Same two books. Shift your money to one side. Bigger profit if it hits, break even if it doesn't. <strong style="color:var(--wt)">You never lose money.</strong></div></div><div class="slip"><div class="slip-top"><span class="sp">SBA GENIUS · VALUE BET</span><span class="lv"><span class="dt"></span> SAME ODDS</span></div><div style="padding:8px 14px;font-size:11px;color:var(--gy)">Same game: <strong style="color:var(--wt)">+190 / -110</strong> · $1,000</div><div class="orow"><div class="odd act"><div class="ov pl">+190</div><div class="ol">Underdog</div><div class="ob">BOOK A</div></div><div class="odd act"><div class="ov mn">-110</div><div class="ol">Favorite</div><div class="ob">BOOK B</div></div></div><div style="padding:4px 14px"><div class="g3"><button class="sbtn gl" style="margin:0;font-size:11px" onclick="showVB('sure')">🔒 SURE BET</button><button class="sbtn gn" style="margin:0;font-size:11px" onclick="showVB('fav')">📈 VALUE FAV</button><button class="sbtn pp" style="margin:0;font-size:11px" onclick="showVB('dog')">🐕 VALUE DOG</button></div></div><div id="vbr" style="padding:10px 14px"></div></div><div id="vbe"></div><div class="nxt"><button class="sbtn gl" style="width:auto;margin:0 auto;padding:12px 28px" onclick="go('dvb')">NEXT: DOUBLE VALUE →</button></div>`;
+function showVB(t){const r=$('vbr');if(t==='sure')r.innerHTML=`<div class="formula"><span class="gl">SURE BET:</span> $396.98 / $603.02<br>Either outcome: <span class="hl">+$151.23 (15.12%)</span></div>`;else if(t==='fav')r.innerHTML=`<div class="formula"><span class="gl">VALUE FAVORITE — Load -110</span><br>$344.83 on +190 (hedge) · <span class="gl">$655.17 on -110 (VALUE)</span><br><br>Fav wins: <span class="gl">+$250.72 (25.08%)</span><br>Dog wins: <span class="hl">$0 (break even)</span></div><div class="plain" style="border-color:var(--gn)"><strong style="color:var(--gn2)">Zero risk.</strong> Break even worst case. You never lose. Favorite wins ~65% of the time — most bets you make $251 instead of $151.</div>`;else r.innerHTML=`<div class="formula"><span class="gl">VALUE UNDERDOG — Load +190</span><br><span class="gl">$476.19 on +190 (VALUE)</span> · $523.81 on -110 (hedge)<br><br>Dog wins: <span class="gl">+$380.95 (38.10%)</span><br>Fav wins: <span class="hl">$0 (break even)</span></div><div class="plain" style="border-color:var(--pp)"><strong style="color:var(--pp)">Jackpot play.</strong> On +4900 odds: $435 → <span class="mint">$20,739</span>. Break even if it doesn't hit. Zero risk.</div>`}
+
+W.dvb=()=>`<div class="S"><div class="label">Strategy 4 · SBA Exclusive</div><div class="title">💎 Double Value — <span class="gd">The Secret Weapon</span></div><div class="explain">Both value bets simultaneously. 4 positions. Guaranteed minimum <strong style="color:var(--wt)">BEATS the Sure Bet</strong>. Plus jackpot upside. Nobody else has this.</div></div><div class="slip"><div class="slip-top"><span class="sp">SBA GENIUS · DVB ENGINE</span><span class="lv"><span class="dt"></span> EXCLUSIVE</span></div><div style="padding:8px 14px;font-size:11px;color:var(--gy)">+190 / -110 · $1,000 · <span class="gd">4 positions</span></div><div id="dvbs" style="padding:14px"></div><div id="dvbb"><button class="sbtn gl" onclick="simDVB()">▶ RUN DVB ANALYSIS</button></div></div><div id="dvbc" style="display:none"></div><div class="nxt"><button class="sbtn gl" style="width:auto;margin:0 auto;padding:12px 28px" onclick="go('power')">NEXT: POWER PLAY →</button></div>`;
+async function simDVB(){$('dvbb').innerHTML='<div style="padding:8px;text-align:center"><span class="bdg o"><span class="dt"></span> CALCULATING 4 POSITIONS</span></div>';await dl(800);$('dvbs').innerHTML=`<div class="g2" style="margin-bottom:8px"><div style="padding:10px;background:rgba(0,230,118,.03);border:1px solid rgba(0,230,118,.1);border-radius:8px"><div style="font-family:'JetBrains Mono';font-size:8px;color:var(--gn);letter-spacing:1px">IF FAVORITE WINS</div><div style="font-family:'JetBrains Mono';font-size:22px;font-weight:700;color:var(--gn2);margin-top:4px" id="da">$0</div><div style="font-size:10px;color:var(--gy)">25.08% ROI</div></div><div style="padding:10px;background:rgba(239,164,32,.03);border:1px solid rgba(239,164,32,.1);border-radius:8px"><div style="font-family:'JetBrains Mono';font-size:8px;color:var(--gd);letter-spacing:1px">IF UNDERDOG WINS</div><div style="font-family:'JetBrains Mono';font-size:22px;font-weight:700;color:var(--gd2);margin-top:4px" id="db">$0</div><div style="font-size:10px;color:var(--gy)">38.10% ROI</div></div></div><div style="text-align:center;padding:6px;background:rgba(0,230,118,.04);border:1px solid rgba(0,230,118,.1);border-radius:8px"><div style="font-family:'JetBrains Mono';font-size:8px;color:var(--gn);letter-spacing:1px">DVB FLOOR (WORST CASE)</div><div style="font-family:'JetBrains Mono';font-size:28px;font-weight:700;color:var(--gn2)" id="df">$0</div><div style="font-size:10px;color:var(--gn)">Beats Sure Bet by $100 🔥</div></div>`;aV($('da'),0,251,1200);aV($('db'),0,381,1200);aV($('df'),0,251,1500);await dl(1600);$('dvbc').style.display='block';$('dvbc').style.animation='fu .5s ease';$('dvbc').innerHTML=`<div class="ex" style="padding:20px"><div class="ex-t">DVB vs Sure Bet</div><div class="math-viz" style="margin:16px auto"><div class="mv-bx lit"><div class="n" style="color:var(--gn)">+$151</div><div class="l">Sure Bet</div></div><div class="mv-ar">vs</div><div class="mv-bx glit"><div class="n" style="color:var(--gd)">+$251</div><div class="l">DVB worst</div></div><div class="mv-ar">=</div><div class="mv-bx glit" style="box-shadow:0 0 30px rgba(239,164,32,.2)"><div class="n" style="color:var(--gd)">+$100</div><div class="l">EXTRA · FREE</div></div></div><div class="plain"><strong>$100 more per bet.</strong> Same odds. Zero risk. 3 bets/day = <span class="mint">+$300/day extra = $9,000/month</span> just from DVB.</div></div>`}
+
+W.power=()=>`<div class="S"><div class="label">Strategy 5 · House Money</div><div class="title">🔥 Power Play — <span class="gd">The Multiplier</span></div><div class="explain">Take guaranteed profit. Slide it into a parlay. You're playing with the <strong style="color:var(--wt)">house's money</strong>.</div></div><div class="slip"><div class="slip-top"><span class="sp">SBA GENIUS · POWER PLAY</span><span class="lv"><span class="dt"></span> HOUSE MONEY</span></div><div style="padding:12px 14px"><div class="formula"><span class="gl">SURE BET PROFIT: +$151</span></div><div style="display:flex;gap:8px;margin:8px 0"><div style="flex:1;padding:8px;background:rgba(0,230,118,.03);border:1px solid rgba(0,230,118,.1);border-radius:6px;text-align:center"><div style="font-family:'JetBrains Mono';font-size:7px;color:var(--gn);letter-spacing:1px">KEPT SAFE</div><div style="font-family:'JetBrains Mono';font-size:20px;font-weight:700;color:var(--gn2)">$98</div><div style="font-size:9px;color:var(--gy)">Your floor</div></div><div style="font-size:18px;color:var(--gd);display:flex;align-items:center">→</div><div style="flex:1;padding:8px;background:rgba(239,164,32,.03);border:1px solid rgba(239,164,32,.1);border-radius:6px;text-align:center"><div style="font-family:'JetBrains Mono';font-size:7px;color:var(--gd);letter-spacing:1px">POWER PLAY</div><div style="font-family:'JetBrains Mono';font-size:20px;font-weight:700;color:var(--gd2)">$53</div><div style="font-size:9px;color:var(--gy)">House money</div></div><div style="font-size:18px;color:var(--gd);display:flex;align-items:center">→</div><div style="flex:1;padding:8px;background:rgba(179,136,255,.03);border:1px solid rgba(179,136,255,.1);border-radius:6px;text-align:center"><div style="font-family:'JetBrains Mono';font-size:7px;color:var(--pp);letter-spacing:1px">3-LEG @ +657</div><div style="font-family:'JetBrains Mono';font-size:20px;font-weight:700;color:var(--pp)">$348</div><div style="font-size:9px;color:var(--gy)">If it hits</div></div></div></div><div style="padding:0 14px 10px"><div class="g2"><div style="padding:8px;background:var(--b3);border-radius:6px;text-align:center"><div style="font-size:8px;color:var(--gy)">PARLAY MISSES</div><div style="font-family:'JetBrains Mono';font-size:16px;color:var(--gn2)">+$98</div><div style="font-size:9px;color:var(--gn)">Still won ✅</div></div><div style="padding:8px;background:var(--b3);border-radius:6px;text-align:center"><div style="font-size:8px;color:var(--gy)">PARLAY HITS</div><div style="font-family:'JetBrains Mono';font-size:16px;color:var(--gd2)">+$446</div><div style="font-size:9px;color:var(--gd)">3× your Sure Bet 🔥</div></div></div></div></div><div class="ex"><div class="ex-t">The Rules</div><div class="ex-b">✅ ONLY from guaranteed profit (Sure Bet or DVB)<br>✅ Stack heavy favorites (-300, -500, -1000+)<br>✅ Use 25-35% of guaranteed profit<br>❌ NEVER from Value Bets (worst case=$0)<br>❌ NEVER use your own capital</div></div><div class="nxt"><button class="sbtn gl" style="width:auto;margin:0 auto;padding:12px 28px" onclick="go('middle')">NEXT: MIDDLES →</button></div>`;
+
+W.middle=()=>`<div class="S"><div class="label">Bonus · Jackpot</div><div class="title">🎰 Middle Bets — <span class="pp">Win Both Sides</span></div><div class="explain">Different lines on the same prop. If the result lands in the middle — you win BOTH bets.</div></div><div class="slip"><div class="slip-top"><span class="sp">SBA GENIUS · MIDDLE</span><span class="lv"><span class="dt"></span> SCANNING</span></div><div style="padding:8px 14px;font-size:11px;color:var(--gy)">🏀 Curry Points</div><div class="orow"><div class="odd act"><div class="ov pl">O 28.5</div><div class="ol">Over 28.5</div><div class="ob">DRAFTKINGS</div><div class="xtra"><div class="sv">Stake: $500</div></div></div><div class="odd act"><div class="ov mn">U 30.5</div><div class="ol">Under 30.5</div><div class="ob">FANDUEL</div><div class="xtra"><div class="sv">Stake: $520</div></div></div></div><div style="padding:10px 14px"><div style="position:relative;height:50px;background:linear-gradient(90deg,rgba(0,230,118,.06) 0%,rgba(0,230,118,.06) 35%,rgba(239,164,32,.12) 35%,rgba(239,164,32,.12) 65%,rgba(0,230,118,.06) 65%);border-radius:8px;border:1px solid rgba(255,255,255,.04)"><div style="position:absolute;top:4px;left:8px;font-family:'JetBrains Mono';font-size:8px;color:var(--gn)">✅ Under wins</div><div style="position:absolute;top:4px;left:50%;transform:translateX(-50%);font-family:'JetBrains Mono';font-size:8px;color:var(--gd)">🎰 BOTH WIN</div><div style="position:absolute;top:4px;right:8px;font-family:'JetBrains Mono';font-size:8px;color:var(--gn)">✅ Over wins</div><div style="position:absolute;bottom:4px;left:37%;font-family:'JetBrains Mono';font-size:10px;color:var(--gd)">29</div><div style="position:absolute;bottom:4px;left:61%;font-family:'JetBrains Mono';font-size:10px;color:var(--gd)">30</div></div></div><div class="tot"><div class="big" style="color:var(--pp)">JACKPOT: 29 or 30</div><div class="ts">OUTSIDE = STILL PROFIT (ARB)</div></div></div><div class="plain" style="border-color:var(--pp)"><strong style="color:var(--pp)">Watch Score:</strong> Genius monitors in real-time. Score approaches your window → Watch Score climbs. At 85+: hedge. Three strategies: <span class="mint">Eliminate Risk</span> · Minimize Loss · Profit All.</div><div class="nxt"><button class="sbtn gl" style="width:auto;margin:0 auto;padding:12px 28px" onclick="go('stack')">NEXT: FULL STACK →</button></div>`;
+
+W.stack=()=>`<div class="S"><div class="label">Elite · Max Extraction</div><div class="title">🏆 The Full Stack — <span class="gd">460% Returns</span></div><div class="explain">One arb. Five layers. Maximum extraction.</div></div><div class="term"><div class="term-bar"><div class="dot dr"></div><div class="dot dy"></div><div class="dot dg"></div><span class="term-title">sba-full-stack.js</span></div><div class="term-body" id="stc"></div></div><div class="math-viz" id="stv" style="display:none"></div><div id="stcp" style="display:none"></div><div class="nxt"><button class="sbtn gl" style="width:auto;margin:0 auto;padding:12px 28px" onclick="go('calc')">YOUR CALCULATOR →</button></div>`;
+H.stack=async()=>{const L=[{t:'<span style="color:var(--gy)">// THE FULL STACK</span>',d:100},{t:'<span style="color:var(--gd2)">odds</span> = <span style="color:var(--gn2)">+265</span> / <span style="color:#FF8A80">-110</span> · $2,000',d:80},{t:'',d:200},{t:'<span style="color:var(--gy)">// Layer 1: Base Arb</span>',d:100},{t:'profit = <span style="color:var(--gn2)">+$253</span> (25.35%)',d:80},{t:'',d:150},{t:'<span style="color:var(--gy)">// Layer 2: DVB</span>',d:100},{t:'worst = <span style="color:var(--gn2)">+$251</span> · best = <span style="color:var(--gd2)">+$2,650</span>',d:80},{t:'',d:150},{t:'<span style="color:var(--gy)">// Layer 3: Promo Boost</span>',d:100},{t:'DK 25% boost → <span style="color:var(--gd2)">+$662</span>',d:80},{t:'',d:150},{t:'<span style="color:var(--gy)">// Layer 4: Bonus Bet</span>',d:100},{t:'FD $100 free → <span style="color:var(--gn2)">+$91</span>',d:80},{t:'',d:150},{t:'<span style="color:var(--gy)">// Layer 5: Power Play</span>',d:100},{t:'$186 @ +657 → <span style="color:var(--gd2)">+$1,222</span>',d:80},{t:'',d:300},{t:'<span style="color:var(--gd2)">════════════════════════════</span>',d:100},{t:'<span style="color:var(--gn2);font-size:16px;font-weight:700">TOTAL: $4,109 (205% ROI)</span>',d:200},{t:'<span style="color:var(--gn2)">EV: $1,213 (60.7%)</span>',d:200}];const b=$('stc');b.innerHTML='';for(const l of L){await dl(l.d);b.innerHTML+=l.t+'<br>';b.scrollTop=b.scrollHeight}await dl(500);$('stv').style.display='flex';$('stv').innerHTML=`<div class="mv-bx"><div class="n" style="color:var(--gy)">$2,000</div><div class="l">Deployed</div></div><div class="mv-ar">→</div><div class="mv-bx glit"><div class="n" style="color:var(--gd)" id="stt">$0</div><div class="l">Potential</div></div><div class="mv-ar">=</div><div class="mv-bx" style="border-color:var(--gn);box-shadow:0 0 24px rgba(0,230,118,.12)"><div class="n" style="color:var(--gn)" id="str">0%</div><div class="l">ROI</div></div>`;aV($('stt'),0,4109,2000);setTimeout(()=>{$('str').textContent='205%'},2000);await dl(2500);$('stcp').style.display='block';$('stcp').style.animation='fu .5s ease';$('stcp').innerHTML=`<div class="ex" style="max-width:800px"><div class="ex-t">SBA vs Everyone Else</div><div style="margin-top:10px"><div class="cr hdr"><div class="c">FEATURE</div><div class="c">ODDSJAM</div><div class="c">OTHERS</div><div class="c">SBA</div></div>${[['Sure Bet','✓','✓','✓'],['DVB (4 pos)','—','—','✓'],['Power Play','—','—','✓'],['Promo Stack','—','—','✓'],['Watch Score','—','—','✓'],['Anti-Detection','Basic','—','Adv'],['ESPN AI','—','—','✓']].map(r=>`<div class="cr"><div class="c">${r[0]}</div><div class="c ${r[1]==='—'?'x':'ch'}">${r[1]}</div><div class="c ${r[2]==='—'?'x':'ch'}">${r[2]}</div><div class="c ch">${r[3]}</div></div>`).join('')}<div class="cr sba"><div class="c">MONTHLY</div><div class="c">$500-$1K</div><div class="c">$200-$500</div><div class="c" style="font-size:11px">$7,000+</div></div></div></div>`};
+
+W.calc=()=>`<div class="S"><div class="label">Interactive</div><div class="title">📊 Your Earnings <span class="gn">Calculator</span></div><div class="explain">Drag the sliders.</div></div><div class="ucalc" style="max-width:700px;padding:24px"><div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;font-size:11px"><span style="color:var(--gy)">Bankroll</span><span style="font-family:'JetBrains Mono';font-weight:600" id="ub">$5,000</span></div><input type="range" min="1000" max="50000" step="1000" value="5000" id="ubr" oninput="uc()"></div><div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;font-size:11px"><span style="color:var(--gy)">Bets/Day</span><span style="font-family:'JetBrains Mono';font-weight:600" id="ua">4</span></div><input type="range" min="1" max="10" step="1" value="4" id="uar" oninput="uc()"></div><div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;font-size:11px"><span style="color:var(--gy)">Avg ROI</span><span style="font-family:'JetBrains Mono';font-weight:600" id="ur">5%</span></div><input type="range" min="1" max="30" step="0.5" value="5" id="urr" oninput="uc()"></div><div class="g3" id="ucr"></div><div style="margin-top:12px;text-align:center"><div style="font-family:'Archivo Black';font-size:clamp(20px,4vw,36px);color:var(--gn)" id="ucy">$0</div><div style="font-family:'JetBrains Mono';font-size:10px;color:var(--gy);letter-spacing:2px">PER YEAR</div></div><div style="margin-top:8px;text-align:center;font-size:9px;color:var(--gd)" id="ucm"></div></div><div class="nxt"><button class="sbtn gl" style="width:auto;margin:0 auto;padding:12px 28px" onclick="go('anti')">STEALTH MODE →</button></div>`;
+H.calc=()=>{uc()};
+function uc(){const b=+($('ubr')||{}).value||5000,a=+($('uar')||{}).value||4,r=+($('urr')||{}).value||5;$('ub').textContent=fmt(b);$('ua').textContent=a;$('ur').textContent=r+'%';const d=b*(r/100)*a,m=d*30,y=d*365;$('ucr').innerHTML=`<div style="background:var(--b3);border-radius:8px;padding:8px;text-align:center"><div style="font-family:'JetBrains Mono';font-size:22px;font-weight:700;color:var(--gn2)">${fmt(Math.round(d))}</div><div style="font-family:'JetBrains Mono';font-size:7px;color:var(--gy)">DAILY</div></div><div style="background:var(--b3);border-radius:8px;padding:8px;text-align:center"><div style="font-family:'JetBrains Mono';font-size:22px;font-weight:700;color:var(--gn2)">${fmt(Math.round(m))}</div><div style="font-family:'JetBrains Mono';font-size:7px;color:var(--gy)">MONTHLY</div></div><div style="background:var(--b3);border-radius:8px;padding:8px;text-align:center"><div style="font-family:'JetBrains Mono';font-size:22px;font-weight:700;color:var(--gd2)">${fmt(Math.round(y))}</div><div style="font-family:'JetBrains Mono';font-size:7px;color:var(--gy)">YEARLY</div></div>`;$('ucy').textContent=fmt(Math.round(y));$('ucm').textContent=y>=1000000?'🎯 MILLIONAIRE STATUS':'💰 '+Math.ceil(1000000/y)+' year(s) to $1M'}
+
+W.anti=()=>`<div class="S"><div class="label">Longevity</div><div class="title">🕵️ Stealth Mode — <span class="cy">Stay Invisible</span></div><div class="explain">One limited account costs thousands. Master this from Day 1.</div></div><div class="ex" style="max-width:700px"><div class="ex-t">The Anti-Detection Playbook</div><div class="formula"><span style="color:var(--gd2)">STAKES</span><br>❌ $487.32 → <span class="rl">FLAGGED</span><br>✅ $490.00 → <span class="hl">Natural</span><br>✅ $500.00 → <span class="hl">Confident bettor</span><br><br><span style="color:var(--gd2)">TIMING</span><br>✅ Peak hours (game day, prime time)<br>✅ Stagger sides by 30-60 seconds<br>❌ Both at 2:47 AM Tuesday<br><br><span style="color:var(--gd2)">ACCOUNT HEALTH</span><br>✅ 3-5 fun bets/week ($5-$20 parlays)<br>✅ Popular markets (NFL, NBA)<br>✅ Use promos (books love promo users)<br>✅ Win:loss ~55:45 per book<br><br><span style="color:var(--gd2)">MONEY</span><br>✅ Deposit → Bet → Wait 24-48hrs → Withdraw<br>✅ Build history before large cashouts<br>❌ Never same amount on both sides<br>❌ Never withdraw > deposit first cycle</div></div><div class="nxt"><button class="sbtn gl" style="width:auto;margin:0 auto;padding:12px 28px" onclick="go('week1')">YOUR FIRST WEEK →</button></div>`;
+
+W.week1=()=>`<div class="S"><div class="label">Your Path</div><div class="title">📅 Week 1 to <span class="gn">$1 Million</span></div><div class="explain">Day by day. No overwhelm.</div></div><div class="tl" id="w1t"></div><div class="ex" style="max-width:600px"><div class="ex-t" style="color:var(--gd)">The Path to $1M</div><div class="ex-b">$500/day: <strong style="color:var(--gn)">$1M in 5.5 years</strong><br>$1,000/day: <strong style="color:var(--gn)">$1M in 2.7 years</strong><br>$2,500/day: <strong style="color:var(--gn)">$1M in 1.1 years</strong><br><br>Add <strong>Bookie Program</strong> commissions: 1 referral @ $2K = $600. 10 referrals = $6,000. Their referrals pay you too — 7 levels deep.</div></div><div style="text-align:center;padding:30px 0"><div style="font-family:'Archivo Black';font-size:clamp(20px,4vw,36px)">The Math Doesn't Lie.</div><div style="font-size:14px;color:var(--gy);margin:8px 0 20px">The tools are ready.</div><a href="https://affiliate.sportsbetarbitrage.com" class="sbtn gl" style="width:auto;display:inline-block;padding:16px 36px;text-decoration:none">← BACK TO PORTAL</a></div>`;
+H.week1=async()=>{const D=[{d:'DAY 1',t:'Setup',b:'DraftKings, FanDuel, BetMGM, Caesars. Fund $250-$500 each. 30 min.',c:'gn'},{d:'DAY 2',t:'First Sure Bet',b:'Open Genius. Find 3%+ ROI. Place both sides. Guaranteed money.',c:'gn'},{d:'DAY 3',t:'Volume',b:'3-5 Sure Bets. 5 min each. Learn the flow.',c:'gn'},{d:'DAY 4',t:'Money Movement',b:'Withdraw profits. Move to next book. Deposit → Bet → Withdraw → Repeat.',c:'gd'},{d:'DAY 5',t:'Value Bet',b:'Same arb, load one side. Break even worst case.',c:'gd'},{d:'DAY 6',t:'DVB',b:'4 positions. Watch your floor beat Sure Bet by $100.',c:'gd'},{d:'DAY 7',t:'Power Play',b:'House money parlay. Full SBA system running.',c:'pp'},{d:'WEEK 2+',t:'Build Empire',b:'More books. Refer people. Stack promos. Bet AND build.',c:'gd'}];$('w1t').innerHTML=D.map((d,i)=>`<div class="tl-i" style="transition-delay:${i*100}ms"><div style="font-family:'JetBrains Mono';font-size:8px;letter-spacing:2px;color:var(--${d.c})">${d.d}</div><div style="font-family:'Archivo Black';font-size:15px;margin:3px 0">${d.t}</div><div style="font-size:12px;color:var(--gy);line-height:1.6">${d.b}</div></div>`).join('');document.querySelectorAll('.tl-i').forEach((item,i)=>{const s=document.createElement('style');s.textContent=`.tl-i:nth-child(${i+1})::before{background:var(--${D[i].c});box-shadow:0 0 6px var(--${D[i].c})}`;document.head.appendChild(s);TT.push(setTimeout(()=>item.classList.add('show'),i*300+200))})};
+
+nav();ren();
 </script>
 </body>
 </html>
