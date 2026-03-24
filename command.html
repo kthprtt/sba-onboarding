@@ -330,13 +330,20 @@ body{background:var(--bg);color:var(--t1);font-family:'Outfit',sans-serif;min-he
       <h1 style="font-size:22px;font-weight:900;margin-bottom:4px;">🔑 My Codes</h1>
       <div style="font-size:13px;color:var(--t2);margin-bottom:20px;">Codes assigned to you by SBA HQ. Click to copy. Use in the Onboard tab.</div>
       <div id="codesAvail"></div>
+      
+      <!-- PENDING QUEUE -->
+      <div id="pendingQueue" style="display:none;margin-top:16px;">
+        <h3 style="font-size:14px;color:var(--orange);margin-bottom:10px;">⏳ Waiting for Approval</h3>
+        <div id="pendingList"></div>
+      </div>
+      
       <div style="margin-top:20px;">
         <h3 style="font-size:14px;color:var(--t3);margin-bottom:10px;">✅ Recently Used</h3>
         <div id="codesUsed"></div>
       </div>
       <div class="request-section">
         <h4>📩 Request Access for a New Person</h4>
-        <div style="font-size:11px;color:var(--t2);margin-bottom:10px;">Fill out everything about this person. SBA HQ will review and push codes and push codes when payment is confirmed.</div>
+        <div style="font-size:11px;color:var(--t2);margin-bottom:10px;">Fill out everything about this person. SBA HQ will review and push codes when payment is confirmed.</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
           <input class="form-input" id="reqName" placeholder="Full name (e.g. John Smith)">
           <select class="form-select" id="reqType">
@@ -366,7 +373,8 @@ body{background:var(--bg);color:var(--t1);font-family:'Outfit',sans-serif;min-he
           <input class="form-input" id="reqEmail" placeholder="Their email (for the account)">
           <input class="form-input" id="reqPhone" placeholder="Their phone (optional)">
         </div>
-        <button class="btn btn-gold" onclick="submitRequest()" style="width:100%;">📩 Submit to SBA HQ for Approval</button>
+        <button class="btn btn-gold" id="submitBtn" onclick="submitRequest()" style="width:100%;">📩 Submit to SBA HQ for Approval</button>
+        <div id="submitFeedback" style="display:none;margin-top:10px;padding:12px;border-radius:10px;text-align:center;animation:fadeIn 0.4s ease;"></div>
       </div>
     </div>
 
@@ -743,8 +751,12 @@ function renderDashboard(){
   renderActivity();
   renderTeam();
   renderPeople();
+  loadPendingQueue();
 
 }
+
+// Auto-refresh pending queue every 10 seconds
+setInterval(loadPendingQueue,10000);
 
 
 
@@ -1151,11 +1163,18 @@ async function submitRequest(){
   window._lastReqTime = Date.now();
   
   const statusEmoji={paid:'✅ PAID',partial:'⚠️ PARTIAL',unpaid:'❌ UNPAID',affiliate:'🆓 FREE'};
-  const pkgLabels={basic:'Basic $1K',plus:'Plus $2K',elite:'Elite $5K',pro:'Pro $10K'};
+  const pkgLabels={basic:'Basic $1K',plus:'Plus $2K',elite:'Elite $5K',pro:'Pro $10K',promo_launch:'🔥 Launch $1K'};
   const pkgAmounts={basic:1000,plus:2000,elite:5000,pro:10000,promo_launch:1000};
   const totalAmt = pkgAmounts[type] + (vpn==='yes'?1000:0);
   
-  const summary = name+' | '+pkgLabels[type]+(vpn==='yes'?' + VPN':'')+' | $'+totalAmt.toLocaleString()+' | '+(statusEmoji[payStatus]||'')+(payNote?' — '+payNote:'')+(email?' | '+email:'');
+  const summary = name+' | '+(pkgLabels[type]||type)+(vpn==='yes'?' + VPN':'')+' | $'+totalAmt.toLocaleString()+' | '+(statusEmoji[payStatus]||'')+(payNote?' — '+payNote:'')+(email?' | '+email:'');
+  
+  // Visual feedback — show processing
+  const btn = document.getElementById('submitBtn');
+  const fb = document.getElementById('submitFeedback');
+  btn.disabled = true;
+  btn.textContent = '⏳ Submitting...';
+  btn.style.opacity = '0.6';
   
   try{
     await sb.from('code_requests').insert([{
@@ -1164,15 +1183,116 @@ async function submitRequest(){
       code_type:type,
       status:'pending'
     }]);
-    showToast('📩 Request sent to SBA HQ for '+name);
+    
+    // Success feedback
+    btn.textContent = '✅ Submitted!';
+    btn.style.background = 'linear-gradient(135deg,#22c55e,#16a34a)';
+    fb.style.display = 'block';
+    fb.style.background = 'rgba(0,255,136,0.08)';
+    fb.style.border = '1px solid rgba(0,255,136,0.2)';
+    fb.style.color = '#22c55e';
+    fb.innerHTML = '✅ <strong>Request submitted for '+name+'!</strong><br><span style="font-size:11px;color:var(--t2);">SBA HQ will review and push your code. Watch the "⏳ Waiting for Approval" section above.</span>';
+    
+    // Clear form
     document.getElementById('reqName').value='';
     document.getElementById('reqPayNote').value='';
     if(document.getElementById('reqEmail'))document.getElementById('reqEmail').value='';
     if(document.getElementById('reqPhone'))document.getElementById('reqPhone').value='';
+    
+    // Reload pending queue
+    await loadPendingQueue();
+    
+    // Reset button after 3 seconds
+    setTimeout(()=>{
+      btn.disabled = false;
+      btn.textContent = '📩 Submit to SBA HQ for Approval';
+      btn.style.opacity = '1';
+      btn.style.background = 'linear-gradient(135deg,var(--gold),var(--gold-dim))';
+    },3000);
+    
+    // Hide feedback after 8 seconds
+    setTimeout(()=>{fb.style.display='none'},8000);
+    
   }catch(e){
-    showToast('⚠️ Request failed — contact SBA HQ directly');
+    btn.disabled = false;
+    btn.textContent = '📩 Submit to SBA HQ for Approval';
+    btn.style.opacity = '1';
+    fb.style.display = 'block';
+    fb.style.background = 'rgba(255,68,102,0.08)';
+    fb.style.border = '1px solid rgba(255,68,102,0.2)';
+    fb.style.color = '#ff4466';
+    fb.innerHTML = '❌ <strong>Request failed</strong> — contact SBA HQ directly.';
     console.error('Request error:',e);
   }
+}
+
+async function loadPendingQueue(){
+  const{data:requests}=await sb.from('code_requests').select('*').eq('requested_by',leader).order('created_at',{ascending:false}).limit(20);
+  if(!requests)return;
+  
+  const pending = requests.filter(r=>r.status==='pending');
+  const approved = requests.filter(r=>r.status==='approved');
+  
+  const queueEl = document.getElementById('pendingQueue');
+  const listEl = document.getElementById('pendingList');
+  
+  if(pending.length > 0){
+    queueEl.style.display = 'block';
+    listEl.innerHTML = pending.map(r=>{
+      const parts = (r.member_name||'').split(' | ');
+      const name = parts[0]||'Unknown';
+      const pkg = parts[1]||'';
+      const payment = parts[3]||'';
+      const timeAgo = getTimeAgo(r.created_at);
+      return `<div style="display:flex;align-items:center;gap:10px;padding:10px;background:rgba(245,158,11,0.04);border:1px dashed rgba(245,158,11,0.2);border-radius:8px;margin-bottom:6px;">
+        <div style="width:36px;height:36px;border-radius:8px;background:rgba(245,158,11,0.1);display:flex;align-items:center;justify-content:center;font-size:16px;">⏳</div>
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:700;">${name}</div>
+          <div style="font-size:10px;color:var(--t3);">${pkg} · ${payment} · ${timeAgo}</div>
+        </div>
+        <div style="padding:4px 10px;background:rgba(245,158,11,0.1);border-radius:6px;font-family:'JetBrains Mono';font-size:9px;color:var(--orange);font-weight:700;">PENDING</div>
+      </div>`;
+    }).join('');
+  } else {
+    queueEl.style.display = 'none';
+  }
+  
+  // Also show recently approved with green checkmark
+  if(approved.length > 0){
+    const approvedHtml = approved.slice(0,5).map(r=>{
+      const parts = (r.member_name||'').split(' | ');
+      const name = parts[0]||'Unknown';
+      return `<div style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:rgba(0,255,136,0.03);border:1px solid rgba(0,255,136,0.1);border-radius:6px;margin-bottom:4px;">
+        <span style="font-size:14px;">✅</span>
+        <span style="font-size:12px;font-weight:600;">${name}</span>
+        <span style="font-size:9px;color:var(--green);margin-left:auto;font-family:'JetBrains Mono';">APPROVED — code ready above</span>
+      </div>`;
+    }).join('');
+    
+    // Insert approved section if not exists
+    let approvedSection = document.getElementById('approvedQueue');
+    if(!approvedSection){
+      approvedSection = document.createElement('div');
+      approvedSection.id = 'approvedQueue';
+      approvedSection.style.marginTop = '12px';
+      queueEl.parentNode.insertBefore(approvedSection, queueEl.nextSibling);
+    }
+    if(approved.length > 0){
+      approvedSection.style.display = 'block';
+      approvedSection.innerHTML = '<h3 style="font-size:14px;color:var(--green);margin-bottom:8px;">✅ Recently Approved</h3>' + approvedHtml;
+    }
+  }
+}
+
+function getTimeAgo(dateStr){
+  const now = new Date();
+  const then = new Date(dateStr);
+  const mins = Math.floor((now-then)/60000);
+  if(mins<1) return 'Just now';
+  if(mins<60) return mins+'m ago';
+  const hrs = Math.floor(mins/60);
+  if(hrs<24) return hrs+'h ago';
+  return Math.floor(hrs/24)+'d ago';
 }
 
 
