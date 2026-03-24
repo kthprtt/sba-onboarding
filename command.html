@@ -148,9 +148,9 @@ body{background:var(--bg);color:var(--t1);font-family:'Outfit',sans-serif;min-he
     <h1>Command Center</h1>
     <div class="sub">SBA Leadership Portal — Onboarding & Code Management</div>
     <input type="text" id="loginUser" placeholder="Username" style="width:100%;padding:14px;background:var(--card);border:1px solid var(--border);border-radius:10px;color:var(--t1);font-family:Outfit;font-size:15px;margin-bottom:10px;outline:none;" onkeypress="if(event.key==='Enter')document.getElementById('loginPass').focus()">
-    <div style="position:relative;">
-      <input type="password" id="loginPass" placeholder="Password" style="width:100%;padding:14px;padding-right:50px;background:var(--card);border:1px solid var(--border);border-radius:10px;color:var(--t1);font-family:Outfit;font-size:15px;margin-bottom:12px;outline:none;" onkeypress="if(event.key==='Enter')login()">
-      <button onclick="const p=document.getElementById('loginPass');const t=p.type==='password'?'text':'password';p.type=t;this.textContent=t==='password'?'👁️':'🙈';" style="position:absolute;right:10px;top:12px;background:none;border:none;font-size:16px;cursor:pointer;color:var(--t3);">👁️</button>
+    <div style="position:relative;margin-bottom:12px;">
+      <input type="password" id="loginPass" placeholder="Password" style="width:100%;padding:14px;padding-right:50px;background:var(--card);border:1px solid var(--border);border-radius:10px;color:var(--t1);font-family:Outfit;font-size:15px;outline:none;" onkeypress="if(event.key==='Enter')login()">
+      <span onclick="const p=document.getElementById('loginPass');p.type=p.type==='password'?'text':'password';this.textContent=p.type==='password'?'👁️':'🙈';" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:18px;user-select:none;z-index:2;">👁️</span>
     </div>
     <button onclick="login()">Enter Command Center</button>
     <div id="loginError" style="margin-top:10px;font-size:12px;color:var(--red);display:none;"></div>
