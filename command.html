@@ -1153,11 +1153,12 @@ async function submitRequest(){
   const phone=document.getElementById('reqPhone')?.value?.trim()||'';
   if(!name){showToast("Enter the person's name");return;}
   
-  // Dedup check
+  // Dedup check — only prevents accidental double-clicks (30 sec)
   const lastReq = window._lastReqName;
   const lastTime = window._lastReqTime || 0;
-  if(lastReq === name.toLowerCase() && (Date.now() - lastTime) < 300000){
-    if(!confirm('You already submitted a request for "'+name+'" in the last 5 minutes. Submit again?')) return;
+  if(lastReq === name.toLowerCase() && (Date.now() - lastTime) < 30000){
+    showToast('⏳ You just submitted this — wait a moment');
+    return;
   }
   window._lastReqName = name.toLowerCase();
   window._lastReqTime = Date.now();
@@ -1250,6 +1251,7 @@ async function loadPendingQueue(){
           <div style="font-size:13px;font-weight:700;">${name}</div>
           <div style="font-size:10px;color:var(--t3);">${pkg} · ${payment} · ${timeAgo}</div>
         </div>
+        <button onclick="cancelRequest('${r.id}')" style="padding:4px 10px;background:rgba(255,68,102,0.08);border:1px solid rgba(255,68,102,0.15);border-radius:6px;font-family:'JetBrains Mono';font-size:9px;color:#ff4466;font-weight:700;cursor:pointer;">✕ Cancel</button>
         <div style="padding:4px 10px;background:rgba(245,158,11,0.1);border-radius:6px;font-family:'JetBrains Mono';font-size:9px;color:var(--orange);font-weight:700;">PENDING</div>
       </div>`;
     }).join('');
@@ -1293,6 +1295,13 @@ function getTimeAgo(dateStr){
   const hrs = Math.floor(mins/60);
   if(hrs<24) return hrs+'h ago';
   return Math.floor(hrs/24)+'d ago';
+}
+
+async function cancelRequest(id){
+  if(!confirm('Cancel this request?')) return;
+  await sb.from('code_requests').delete().eq('id',id);
+  showToast('🗑️ Request cancelled');
+  await loadPendingQueue();
 }
 
 
