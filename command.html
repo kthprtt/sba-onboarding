@@ -619,10 +619,20 @@ function renderPersonCards(containerId,byPerson){
     const codes=byPerson[name];
     const isNew=codes.some(c=>(Date.now()-new Date(c.created_at).getTime())<120000);
     const initials=name.split(' ').map(n=>n[0]).join('').toUpperCase().slice(0,2);
-    html+=`<div class="person-card ${isNew?'new':''}"><div class="person-header"><div class="person-avatar">${initials}</div><div class="person-name">${name}</div>${isNew?'<span class="person-badge">NEW!</span>':''}</div>`;
+    // Parse info from payment_notes (format: "For: Name | Pkg | $Amount | Status | email")
+    const firstNote = codes[0]?.payment_notes || '';
+    const parts = firstNote.replace('For: ','').split(' | ');
+    const parsedName = (parts[0]||name).trim();
+    const parsedEmail = (parts.find(p=>p.includes('@'))||'').trim();
+    const allCodes = codes.map(c=>c.code).join(',');
+    const escapedName = parsedName.replace(/'/g,"\\'");
+    const escapedEmail = parsedEmail.replace(/'/g,"\\'");
+    
+    html+=`<div class="person-card ${isNew?'new':''}"><div class="person-header"><div class="person-avatar">${initials}</div><div class="person-name">${parsedName}</div>${isNew?'<span class="person-badge">NEW!</span>':''}</div>`;
     codes.forEach(c=>{
       html+=`<div class="code-chip" onclick="copyCode('${c.code}')"><span style="font-size:13px;">${c.code_type==='vpn'?'🔒':'📦'}</span><span class="code">${c.code}</span><span class="tier ${TC[c.code_type]||''}">${TL[c.code_type]||''}</span><span class="hint">click to copy</span></div>`;
     });
+    html+=`<button onclick="prefillOnboard('${escapedName}','${escapedEmail}','${allCodes}')" style="width:100%;margin-top:8px;padding:10px;background:linear-gradient(135deg,rgba(0,255,136,0.1),rgba(0,255,136,0.05));border:1px solid rgba(0,255,136,0.2);border-radius:8px;color:var(--green);font-family:Outfit;font-weight:700;font-size:12px;cursor:pointer;">⚡ Onboard ${parsedName.split(' ')[0]}</button>`;
     html+='</div>';
   });
   el.innerHTML=html;
@@ -666,6 +676,34 @@ function renderTeam(){
 }
 
 function copyCode(code){navigator.clipboard.writeText(code);showToast('📋 Copied: '+code);}
+
+function prefillOnboard(name, email, codes){
+  // Switch to onboard page
+  showPage('onboard');
+  
+  // Fill in the info
+  if(document.getElementById('obName')) document.getElementById('obName').value = name;
+  if(document.getElementById('obEmail')) document.getElementById('obEmail').value = email;
+  
+  // Fill in the first non-VPN code
+  const codeList = codes.split(',');
+  const pkgCode = codeList.find(c => !c.startsWith('VPN-')) || codeList[0];
+  const vpnCode = codeList.find(c => c.startsWith('VPN-'));
+  
+  if(document.getElementById('obCode')) {
+    document.getElementById('obCode').value = pkgCode;
+    validateCode(pkgCode);
+  }
+  
+  // If there's a VPN code, fill that in too
+  if(vpnCode && document.getElementById('obVPNCode')){
+    document.getElementById('obVPN').value = 'yes';
+    document.getElementById('obVPNCode').parentElement.style.display = 'flex';
+    document.getElementById('obVPNCode').value = vpnCode;
+  }
+  
+  showToast('⚡ Pre-filled for ' + name.split(' ')[0] + ' — review and onboard!');
+}
 
 function populateRefDropdown(){
   const sel=document.getElementById('obRef');

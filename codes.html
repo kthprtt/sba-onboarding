@@ -373,35 +373,49 @@ async function loadRequests(){
 }
 
 async function approveRequest(reqId, requestedBy, codeType){
-  // Look up the full request
   const{data:req}=await sb.from('code_requests').select('*').eq('id',reqId).single();
   if(!req){showToast('❌ Request not found');return;}
   
-  // Generate the code assigned to the person who requested it
   const type = req.code_type || codeType || 'basic';
-  const code = genStr(type);
   const memberName = req.member_name || 'Unknown';
   const assignTo = req.requested_by || requestedBy;
+  const needsVPN = memberName.toLowerCase().includes('vpn') || type === 'promo_launch';
   
+  // Generate package code
+  const pkgCode = genStr(type);
   const{error}=await sb.from('activation_codes').insert([{
-    code, code_type:type, status:'unused',
+    code:pkgCode, code_type:type, status:'unused',
     payment_amount:AMOUNTS[type]||1000,
     payment_method:'approved_request',
     payment_notes:'For: '+memberName,
     generated_by:'keith',
     assigned_to:assignTo
   }]);
-  
   if(error){showToast('❌ '+error.message);return;}
   
+  // If VPN is included, generate VPN code too
+  let vpnCode = null;
+  if(needsVPN){
+    vpnCode = genStr('vpn');
+    await sb.from('activation_codes').insert([{
+      code:vpnCode, code_type:'vpn', status:'unused',
+      payment_amount:1000,
+      payment_method:'approved_request',
+      payment_notes:'For: '+memberName,
+      generated_by:'keith',
+      assigned_to:assignTo
+    }]);
+  }
+  
   // Mark request as approved
+  const approvedCodes = vpnCode ? pkgCode+' + '+vpnCode : pkgCode;
   await sb.from('code_requests').update({
     status:'approved',
-    approved_code:code,
+    approved_code:approvedCodes,
     approved_at:new Date().toISOString()
   }).eq('id',reqId);
   
-  showToast('✅ Code '+code+' pushed to '+assignTo+' for '+memberName);
+  showToast('✅ '+(vpnCode?'2 codes':'Code')+' pushed to '+assignTo+': '+approvedCodes);
   loadCodes();
   loadRequests();
 }
