@@ -254,6 +254,7 @@ async function generateCode(forRequest){
   const pay=document.getElementById('codePay').value;
   const ref=document.getElementById('codeRef').value.trim();
   const forName=forRequest?.member_name||document.getElementById('codeFor').value.trim();
+  const assignTo=forRequest?.requested_by||forRequest?.assigned_to||document.getElementById('codeAssign')?.value||null;
   const code=genStr(type);
   
   const{error}=await sb.from('activation_codes').insert([{
@@ -262,8 +263,7 @@ async function generateCode(forRequest){
     payment_method:pay,payment_ref:ref||null,
     payment_notes:forName?'For: '+forName:null,
     generated_by:'keith',
-      assigned_to:document.getElementById('batchAssign')?.value||null,
-    assigned_to:forRequest?.assigned_to||document.getElementById('codeAssign')?.value||null
+    assigned_to:assignTo
   }]);
   
   if(error){showToast('❌ '+error.message);return null;}
