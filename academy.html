@@ -110,44 +110,6 @@ body{background:var(--bg);color:var(--t1);font-family:'Outfit',sans-serif;overfl
 /* Back button */
 .back-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:rgba(212,168,67,0.1);border:1px solid rgba(212,168,67,0.2);border-radius:8px;color:var(--gold);font-family:'Outfit';font-size:12px;font-weight:600;text-decoration:none;margin-bottom:20px;}
 
-
-/* Scroll reveal */
-.strat-card,.decision{opacity:0;transform:translateY(40px);}
-.strat-card.revealed,.decision.revealed{opacity:1;transform:translateY(0);transition:all 0.6s cubic-bezier(0.16,1,0.3,1);}
-
-/* Cinematic hover on strategy cards */
-.strat-card:hover{transform:translateY(-3px) scale(1.005);box-shadow:0 8px 30px rgba(0,0,0,0.3);border-color:rgba(212,168,67,0.2);}
-.strat-card{transition:all 0.3s cubic-bezier(0.16,1,0.3,1);}
-
-/* Math box number reveal */
-.math .profit,.math .highlight{display:inline;transition:all 0.4s ease;}
-
-/* Pulsing risk meter for zero risk */
-.risk-fill[style*="width:0%"]{width:0%!important;box-shadow:0 0 8px var(--green);animation:riskPulse 2s infinite;}
-@keyframes riskPulse{0%,100%{box-shadow:0 0 4px var(--green)}50%{box-shadow:0 0 12px var(--green)}}
-
-/* Timeline dot animation */
-.tl-item::before{transition:all 0.3s;animation:dotPulse 3s ease infinite;}
-@keyframes dotPulse{0%,100%{box-shadow:0 0 0 rgba(212,168,67,0)}50%{box-shadow:0 0 8px rgba(212,168,67,0.4)}}
-
-/* Level card glow on active */
-.level-card.active{box-shadow:0 4px 20px rgba(212,168,67,0.15);}
-
-/* Strategy tag shimmer */
-.strat-card .tag{position:relative;overflow:hidden;}
-.strat-card .tag::after{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.1),transparent);animation:shimmer 3s infinite;}
-@keyframes shimmer{0%{left:-100%}100%{left:200%}}
-
-/* VS card hover */
-.vs-card{transition:all 0.3s;}
-.vs-card:hover{transform:translateY(-2px);}
-
-/* Hero text glow */
-.hero h1 span{text-shadow:0 0 40px rgba(212,168,67,0.2);}
-
-/* Button hover pulse */
-button:hover{box-shadow:0 6px 20px rgba(0,0,0,0.3);}
-
 /* Responsive */
 @media(max-width:600px){.levels{grid-template-columns:repeat(2,1fr);}.vs{grid-template-columns:1fr;}.hero h1{font-size:40px;}}
 </style>
@@ -280,7 +242,7 @@ button:hover{box-shadow:0 6px 20px rgba(0,0,0,0.3);}
       </div>
       
       <p><strong>When to use it:</strong> When the favorite is heavily favored (-200 or more) and you're confident in the likely outcome. The math still protects you either way.</p>
-      <div class="risk"><span style="font-size:11px;color:var(--t3);">Risk:</span><div class="risk-bar"><div class="risk-fill" style="width:0%;background:var(--green);"></div></div><span style="font-size:11px;color:var(--green);">Zero — break even is the worst outcome. You never lose money.</span></div>
+      <div class="risk"><span style="font-size:11px;color:var(--t3);">Risk:</span><div class="risk-bar"><div class="risk-fill" style="width:15%;background:var(--blue);"></div></div><span style="font-size:11px;color:var(--blue);">Low (break even worst case)</span></div>
     </div>
 
     <div class="strat-card blue" style="animation-delay:0.2s;">
@@ -294,7 +256,7 @@ button:hover{box-shadow:0 6px 20px rgba(0,0,0,0.3);}
         If favorite wins: <span class="highlight">$0 (break even)</span><br><br>
         <span class="profit">The underdog hitting at +4900 turns $435 into $21,739. Break even if it doesn't. No downside.</span>
       </div>
-      <div class="risk"><span style="font-size:11px;color:var(--t3);">Risk:</span><div class="risk-bar"><div class="risk-fill" style="width:0%;background:var(--green);"></div></div><span style="font-size:11px;color:var(--green);">Zero — break even is the worst outcome. You never lose money.</span></div>
+      <div class="risk"><span style="font-size:11px;color:var(--t3);">Risk:</span><div class="risk-bar"><div class="risk-fill" style="width:15%;background:var(--blue);"></div></div><span style="font-size:11px;color:var(--blue);">Low (break even worst case)</span></div>
     </div>
 
     <div class="strat-card gold" style="animation-delay:0.3s;">
@@ -516,7 +478,6 @@ button:hover{box-shadow:0 6px 20px rgba(0,0,0,0.3);}
   </div>
 </div>
 
-
 <script>
 function showTrack(id){
   document.querySelectorAll('.track').forEach(t=>t.classList.remove('active'));
@@ -525,46 +486,7 @@ function showTrack(id){
   const lvMap={beginner:'lv-beginner',intermediate:'lv-inter',advanced:'lv-advanced',elite:'lv-elite'};
   document.querySelector('.'+lvMap[id])?.classList.add('active');
   window.scrollTo({top:document.querySelector('.levels').offsetTop-20,behavior:'smooth'});
-  // Re-trigger animations on track switch
-  setTimeout(()=>{
-    document.querySelectorAll('.track.active .strat-card, .track.active .decision, .track.active .tl-item').forEach((el,i)=>{
-      el.style.opacity='0';el.style.transform='translateY(40px)';
-      setTimeout(()=>{el.style.transition='all 0.6s cubic-bezier(0.16,1,0.3,1)';el.style.opacity='1';el.style.transform='translateY(0)';},i*120);
-    });
-  },50);
 }
-
-// Scroll-triggered reveals
-const observer = new IntersectionObserver((entries)=>{
-  entries.forEach(entry=>{
-    if(entry.isIntersecting){
-      entry.target.classList.add('revealed');
-      // Animate math box numbers
-      entry.target.querySelectorAll('.profit,.highlight').forEach((el,i)=>{
-        el.style.opacity='0';el.style.transform='scale(0.8)';
-        setTimeout(()=>{el.style.transition='all 0.4s ease';el.style.opacity='1';el.style.transform='scale(1)';},300+i*100);
-      });
-    }
-  });
-},{threshold:0.2});
-
-document.addEventListener('DOMContentLoaded',()=>{
-  document.querySelectorAll('.strat-card,.decision,.math').forEach(el=>observer.observe(el));
-  // Stagger initial load
-  document.querySelectorAll('.track.active .strat-card').forEach((el,i)=>{
-    el.style.opacity='0';el.style.transform='translateY(40px)';
-    setTimeout(()=>{el.style.transition='all 0.6s cubic-bezier(0.16,1,0.3,1)';el.style.opacity='1';el.style.transform='translateY(0)';},300+i*150);
-  });
-});
-
-// Parallax on background glows
-document.addEventListener('scroll',()=>{
-  const s=window.scrollY;
-  document.querySelector('.bg-g1').style.transform='translate(0,'+(s*0.1)+'px)';
-  document.querySelector('.bg-g2').style.transform='translate(0,'+(-s*0.08)+'px)';
-  document.querySelector('.bg-g3').style.transform='translate(-50%,calc(-50% + '+(s*0.05)+'px))';
-});
 </script>
-
 </body>
 </html>
