@@ -1,16 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script>
+// MUST be first — shim localStorage before ANY library loads
+(function(){try{localStorage.setItem('_','1');localStorage.removeItem('_');}catch(e){
+var s={};window.localStorage={getItem:function(k){return s[k]||null;},setItem:function(k,v){s[k]=v;},removeItem:function(k){delete s[k];},clear:function(){s={};},get length(){return Object.keys(s).length;},key:function(i){return Object.keys(s)[i]||null;}};
+}})();
+</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SBA Command Center</title>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700;800&family=Bebas+Neue&display=swap" rel="stylesheet">
-<script>
-// Shim: prevent Supabase SDK storage errors
-try{localStorage.setItem('_','1');localStorage.removeItem('_');}catch(e){
-  Object.defineProperty(window,'localStorage',{value:{getItem:()=>null,setItem:()=>{},removeItem:()=>{},clear:()=>{},length:0,key:()=>null},writable:true});
-}
-</script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{--bg:#05060a;--card:#0d0f16;--card2:#141722;--border:#1a1d2e;--gold:#d4a843;--gold-dim:#b8922e;--green:#00ff88;--green-d:rgba(0,255,136,0.08,{auth:{storage:_sa,autoRefreshToken:false,persistSession:false,detectSessionInUrl:false}});--red:#ff4466;--blue:#4488ff;--purple:#a78bfa;--cyan:#06b6d4;--orange:#ff9933;--t1:#eeeae2;--t2:#7a7e94;--t3:#454862;}
