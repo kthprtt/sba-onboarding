@@ -357,9 +357,9 @@ async function loadRequests(){
           <div style="font-size:20px;">📩</div>
           <div style="flex:1;">
             <div style="font-weight:700;">${r.member_name||'Unknown'}</div>
-            <div style="font-size:11px;color:var(--t2);">${r.code_type?.toUpperCase()||'?'} code requested by ${r.requested_by||'team'} — ${time}</div>
+            <div style="font-size:11px;color:var(--t2);">${r.code_type?.toUpperCase()||'?'} code requested by <strong>${r.requested_by||'team'}</strong> — ${time}</div>
           </div>
-          <button class="btn-sm btn-green" style="cursor:pointer;" onclick="approveRequest(${JSON.stringify(r).replace(/"/g,'&quot;')})">✅ Approve</button>
+          <button class="btn-sm btn-green" style="cursor:pointer;" onclick="approveRequest('${r.id}','${(r.requested_by||'').replace(/'/g,'')}','${(r.code_type||'basic').replace(/'/g,'')}')">✅ Approve</button>
           <button class="btn-sm btn-red" style="cursor:pointer;" onclick="denyRequest('${r.id}')">❌ Deny</button>
         </div>`;
       });
@@ -372,10 +372,38 @@ async function loadRequests(){
   }
 }
 
-async function approveRequest(req){
-  document.getElementById('codeType').value=req.code_type||'basic';
-  await generateCode(req);
-  showToast('✅ Request approved for '+req.member_name);
+async function approveRequest(reqId, requestedBy, codeType){
+  // Look up the full request
+  const{data:req}=await sb.from('code_requests').select('*').eq('id',reqId).single();
+  if(!req){showToast('❌ Request not found');return;}
+  
+  // Generate the code assigned to the person who requested it
+  const type = req.code_type || codeType || 'basic';
+  const code = genStr(type);
+  const memberName = req.member_name || 'Unknown';
+  const assignTo = req.requested_by || requestedBy;
+  
+  const{error}=await sb.from('activation_codes').insert([{
+    code, code_type:type, status:'unused',
+    payment_amount:AMOUNTS[type]||1000,
+    payment_method:'approved_request',
+    payment_notes:'For: '+memberName,
+    generated_by:'keith',
+    assigned_to:assignTo
+  }]);
+  
+  if(error){showToast('❌ '+error.message);return;}
+  
+  // Mark request as approved
+  await sb.from('code_requests').update({
+    status:'approved',
+    approved_code:code,
+    approved_at:new Date().toISOString()
+  }).eq('id',reqId);
+  
+  showToast('✅ Code '+code+' pushed to '+assignTo+' for '+memberName);
+  loadCodes();
+  loadRequests();
 }
 
 async function denyRequest(id){
