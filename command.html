@@ -1343,52 +1343,7 @@ function renderPeople(){
 
 // Auto-login
 
-function renderPeople(){
-  const tank = members.filter(m=>!m.referred_by_code && !m.is_core_team && m.member_type!=='phantom');
-  const phantoms = members.filter(m=>m.member_type==='phantom');
-  const active = members.filter(m=>m.referred_by_code && m.member_type!=='phantom' && !m.is_core_team);
-  
-  document.getElementById('tankCount').textContent = tank.length;
-  document.getElementById('phantomCount').textContent = phantoms.length;
-  document.getElementById('activeCount').textContent = active.length;
-  
-  // Tank
-  if(tank.length){
-    let html='';
-    tank.forEach(m=>{
-      const status = m.member_type==='affiliate_only'?{l:'FREE',c:'var(--gold)'}:{l:m.pkg?.toUpperCase()||'ACTIVE',c:'var(--green)'};
-      html+='<div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--bg);border:1px solid rgba(59,130,246,0.1);border-radius:6px;margin-bottom:3px;"><span style="font-size:13px;font-weight:700;flex:1;">'+m.name+'</span><span style="font-size:10px;color:var(--t3);">'+m.email+'</span><span style="padding:2px 8px;border-radius:4px;font-size:9px;font-weight:700;background:'+status.c+'22;color:'+status.c+';">'+status.l+'</span></div>';
-    });
-    document.getElementById('tankList').innerHTML=html;
-  } else {
-    document.getElementById('tankList').innerHTML='<div style="text-align:center;padding:12px;color:var(--t3);font-size:11px;">No one in the holding tank</div>';
-  }
-  
-  // Phantoms
-  if(phantoms.length){
-    let html='';
-    phantoms.forEach(m=>{
-      const subs = members.filter(x=>x.referred_by_code===m.referral_code).length;
-      html+='<div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--bg);border:2px dashed rgba(245,158,11,0.15);border-radius:6px;margin-bottom:3px;"><span style="font-size:13px;font-weight:700;color:var(--orange);flex:1;">⏳ '+m.name+'</span><span style="font-size:10px;color:var(--t3);">'+subs+' people under</span><span style="padding:2px 8px;border-radius:4px;font-size:9px;font-weight:700;background:rgba(245,158,11,0.1);color:var(--orange);">PENDING</span></div>';
-    });
-    document.getElementById('phantomList').innerHTML=html;
-  } else {
-    document.getElementById('phantomList').innerHTML='<div style="text-align:center;padding:12px;color:var(--t3);font-size:11px;">No phantoms</div>';
-  }
-  
-  // Active
-  if(active.length){
-    let html='';
-    active.forEach(m=>{
-      const upline = members.find(x=>x.referral_code===m.referred_by_code);
-      const upName = upline?(upline.member_type==='phantom'?'⏳ '+upline.name:upline.name):'—';
-      html+='<div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--bg);border:1px solid rgba(0,255,136,0.1);border-radius:6px;margin-bottom:3px;"><span style="font-size:13px;font-weight:700;flex:1;">'+m.name+'</span><span style="font-size:10px;color:var(--t3);">under: '+upName+'</span><span style="padding:2px 8px;border-radius:4px;font-size:9px;font-weight:700;background:rgba(0,255,136,0.1);color:var(--green);">'+(m.pkg?.toUpperCase()||'ACTIVE')+'</span></div>';
-    });
-    document.getElementById('activeList').innerHTML=html;
-  } else {
-    document.getElementById('activeList').innerHTML='<div style="text-align:center;padding:12px;color:var(--t3);font-size:11px;">No active members yet</div>';
-  }
-}
+
 
 // Auto-login — just prefill username
 try{
