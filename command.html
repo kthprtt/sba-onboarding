@@ -266,6 +266,26 @@ body{background:var(--bg);color:var(--t1);font-family:'Outfit',sans-serif;min-he
         <div style="margin-top:12px;padding:10px;background:rgba(0,255,136,0.04);border:1px solid rgba(0,255,136,0.1);border-radius:8px;font-size:11px;color:var(--t2);text-align:center;line-height:1.6;">
           <strong style="color:var(--green);">Every person you onboard gets us closer to generational wealth.</strong> 100 by Mar 27 for JP Morgan. 250 triggers the $2M Mike Farr deal. 1,000 active bettors triggers a $50M–$160M company revaluation. We're not building a side hustle — we're building a billion-dollar empire. BMF. 🏆
         </div>
+        
+        <!-- Company Ledger -->
+        <div style="margin-top:12px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
+          <div style="padding:10px;background:var(--bg);border-radius:8px;text-align:center;border:1px solid rgba(59,130,246,0.15);">
+            <div style="font-family:'JetBrains Mono';font-size:16px;font-weight:900;color:var(--blue);" id="ledgerLeft">0</div>
+            <div style="font-size:9px;color:var(--t3);">🎯 WALEED'S SIDE</div>
+          </div>
+          <div style="padding:10px;background:var(--bg);border-radius:8px;text-align:center;border:1px solid rgba(0,255,136,0.15);">
+            <div style="font-family:'JetBrains Mono';font-size:16px;font-weight:900;color:var(--green);" id="ledgerTotal">0</div>
+            <div style="font-size:9px;color:var(--t3);">📊 TOTAL COMPANY</div>
+          </div>
+          <div style="padding:10px;background:var(--bg);border-radius:8px;text-align:center;border:1px solid rgba(168,85,247,0.15);">
+            <div style="font-family:'JetBrains Mono';font-size:16px;font-weight:900;color:var(--purple);" id="ledgerRight">0</div>
+            <div style="font-size:9px;color:var(--t3);">⚡ VEGAS'S SIDE</div>
+          </div>
+        </div>
+        
+        <div style="margin-top:8px;padding:8px;background:var(--bg);border-radius:6px;text-align:center;border:1px solid var(--border);">
+          <div style="font-size:10px;color:var(--t3);">📈 This ledger is shared with JP Morgan & Mike Farr — every signup counts toward our funding milestones</div>
+        </div>
       </div>
 
       <!-- Quick Actions -->
@@ -538,6 +558,25 @@ function renderDashboard(){
       }
     }
   });
+  
+  // Company ledger — count each side
+  function countDownline(refCode){
+    let count = 0;
+    const directs = members.filter(m=>m.referred_by_code===refCode && !m.is_core_team);
+    count += directs.length;
+    directs.forEach(d=>{ if(d.referral_code) count += countDownline(d.referral_code); });
+    return count;
+  }
+  const waleedSide = countDownline('waleed');
+  const vegasSide = countDownline('vegas5580');
+  const totalAll = members.filter(m=>!m.is_core_team).length;
+  
+  const lLeft = document.getElementById('ledgerLeft');
+  const lRight = document.getElementById('ledgerRight');
+  const lTotal = document.getElementById('ledgerTotal');
+  if(lLeft) lLeft.textContent = waleedSide;
+  if(lRight) lRight.textContent = vegasSide;
+  if(lTotal) lTotal.textContent = totalAll;
   
   // Render ready to onboard
   renderPersonCards('dashReadyCodes',byPerson);
