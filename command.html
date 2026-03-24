@@ -330,28 +330,37 @@ body{background:var(--bg);color:var(--t1);font-family:'Outfit',sans-serif;min-he
         <div id="codesUsed"></div>
       </div>
       <div class="request-section">
-        <h4>📩 Request Code from Keith</h4>
-        <div style="font-size:11px;color:var(--t2);margin-bottom:10px;">Tell Keith who needs a code, what package, and whether they've paid.</div>
+        <h4>📩 Request Access for a New Person</h4>
+        <div style="font-size:11px;color:var(--t2);margin-bottom:10px;">Fill out everything about this person. Keith will see the full picture and push codes when payment is confirmed.</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
-          <input class="form-input" id="reqName" placeholder="Member's full name">
+          <input class="form-input" id="reqName" placeholder="Full name (e.g. John Smith)">
           <select class="form-select" id="reqType">
             <option value="basic">📦 Basic — $1,000</option>
             <option value="plus">📦 Plus — $2,000</option>
             <option value="elite">📦 Elite — $5,000</option>
             <option value="pro">📦 Pro — $10,000</option>
-            <option value="vpn">🔒 VPN Add-On — $1,000</option>
           </select>
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
-          <select class="form-select" id="reqPayStatus">
-            <option value="paid">✅ Already Paid — Money Received</option>
-            <option value="partial">⚠️ Partial Payment — Owes Balance</option>
-            <option value="unpaid">❌ Not Paid Yet — Waiting on Payment</option>
-            <option value="affiliate">🆓 Free Affiliate — No Payment</option>
+          <select class="form-select" id="reqVPN">
+            <option value="no">No VPN</option>
+            <option value="yes">🔒 VPN Add-On — $1,000</option>
           </select>
-          <input class="form-input" id="reqPayNote" placeholder="Payment note (e.g. $1K via CashApp, owes $1K)">
+          <select class="form-select" id="reqPayStatus">
+            <option value="paid">✅ Paid in Full</option>
+            <option value="partial">⚠️ Partial — Owes Balance</option>
+            <option value="unpaid">❌ Not Paid Yet</option>
+            <option value="affiliate">🆓 Free Affiliate</option>
+          </select>
         </div>
-        <button class="btn btn-gold" onclick="submitRequest()" style="width:100%;">📩 Send Request to Keith</button>
+        <div style="margin-bottom:8px;">
+          <input class="form-input" id="reqPayNote" placeholder="Payment details (e.g. $2K CashApp confirmed, owes $1K VPN)">
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
+          <input class="form-input" id="reqEmail" placeholder="Their email (for the account)">
+          <input class="form-input" id="reqPhone" placeholder="Their phone (optional)">
+        </div>
+        <button class="btn btn-gold" onclick="submitRequest()" style="width:100%;">📩 Submit to Keith for Approval</button>
       </div>
     </div>
 
@@ -809,38 +818,35 @@ async function requestMore(){
 async function submitRequest(){
   const name=document.getElementById('reqName').value.trim();
   const type=document.getElementById('reqType').value;
+  const vpn=document.getElementById('reqVPN').value;
   const payStatus=document.getElementById('reqPayStatus').value;
   const payNote=document.getElementById('reqPayNote').value.trim();
-  if(!name){showToast('Enter the member name');return;}
+  const email=document.getElementById('reqEmail')?.value?.trim()||'';
+  const phone=document.getElementById('reqPhone')?.value?.trim()||'';
+  if(!name){showToast("Enter the person's name");return;}
   
   const statusEmoji={paid:'✅ PAID',partial:'⚠️ PARTIAL',unpaid:'❌ UNPAID',affiliate:'🆓 FREE'};
-  const notes = (statusEmoji[payStatus]||'') + (payNote?' — '+payNote:'');
+  const pkgLabels={basic:'Basic $1K',plus:'Plus $2K',elite:'Elite $5K',pro:'Pro $10K'};
+  const pkgAmounts={basic:1000,plus:2000,elite:5000,pro:10000};
+  const totalAmt = pkgAmounts[type] + (vpn==='yes'?1000:0);
+  
+  const summary = name+' | '+pkgLabels[type]+(vpn==='yes'?' + VPN':'')+' | $'+totalAmt.toLocaleString()+' | '+(statusEmoji[payStatus]||'')+(payNote?' — '+payNote:'')+(email?' | '+email:'');
   
   try{
     await sb.from('code_requests').insert([{
       requested_by:leader,
-      member_name:name,
+      member_name:summary,
       code_type:type,
-      status:'pending',
-      payment_status:payStatus,
-      payment_note:notes
+      status:'pending'
     }]);
-    showToast('📩 Request sent to Keith for '+name+' ('+type.toUpperCase()+')');
+    showToast('📩 Request sent to Keith for '+name);
     document.getElementById('reqName').value='';
     document.getElementById('reqPayNote').value='';
+    if(document.getElementById('reqEmail'))document.getElementById('reqEmail').value='';
+    if(document.getElementById('reqPhone'))document.getElementById('reqPhone').value='';
   }catch(e){
-    // payment_status column might not exist yet — send without it
-    try{
-      await sb.from('code_requests').insert([{
-        requested_by:leader,
-        member_name:name+' ['+notes+']',
-        code_type:type,
-        status:'pending'
-      }]);
-      showToast('📩 Request sent to Keith for '+name);
-      document.getElementById('reqName').value='';
-      document.getElementById('reqPayNote').value='';
-    }catch(e2){showToast('📩 Message Keith directly');}
+    showToast('⚠️ Request failed — message Keith directly');
+    console.error('Request error:',e);
   }
 }
 
