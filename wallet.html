@@ -69,7 +69,7 @@ h1{font-size:22px;font-weight:900;text-align:center;}h1 span{color:var(--gold);}
 
 <div class="container" id="walletView" style="display:none;">
   <h1>🔑 <span id="leaderName">—</span>'s Code Wallet</h1>
-  <div class="sub">Codes from Keith, grouped by person. Click a code to copy. <span style="color:var(--green);">Auto-refreshes every 10s.</span></div>
+  <div class="sub">Codes from SBA HQ, grouped by person. Click a code to copy. <span style="color:var(--green);">Auto-refreshes every 10s.</span></div>
   <div class="stats">
     <div class="stat"><div class="stat-val" style="color:var(--green);" id="wAvail">0</div><div class="stat-lab">People Ready</div></div>
     <div class="stat"><div class="stat-val" style="color:var(--purple);" id="wUsed">0</div><div class="stat-lab">Onboarded Today</div></div>
@@ -80,7 +80,7 @@ h1{font-size:22px;font-weight:900;text-align:center;}h1 span{color:var(--gold);}
   <a href="/index.html" target="_blank" class="onboard-link">🚀 Open Onboarding Form →</a>
   <div class="section-title" style="color:var(--t3);">✅ Recently Completed</div>
   <div id="usedSection"></div>
-  <button class="request-btn" onclick="requestMore()">📩 Request More Codes from Keith</button>
+  <button class="request-btn" onclick="requestMore()">📩 Request More Codes from SBA HQ</button>
   <div style="text-align:center;font-size:10px;color:var(--t3);margin-top:6px;">Page refreshes automatically</div>
 </div>
 
@@ -150,7 +150,7 @@ async function loadWallet(){
     });
     document.getElementById('availSection').innerHTML=html;
   }else{
-    document.getElementById('availSection').innerHTML='<div class="empty"><div style="font-size:32px;margin-bottom:8px;">📭</div><div style="font-size:14px;font-weight:700;">No people waiting</div><div style="font-size:11px;margin-top:4px;">When Keith confirms payment and pushes codes, they appear here with the person\'s name.</div></div>';
+    document.getElementById('availSection').innerHTML='<div class="empty"><div style="font-size:32px;margin-bottom:8px;">📭</div><div style="font-size:14px;font-weight:700;">No people waiting</div><div style="font-size:11px;margin-top:4px;">When SBA HQ confirms payment and pushes codes, they appear here with the person\'s name.</div></div>';
   }
   
   // Render used
