@@ -221,6 +221,53 @@ body{background:var(--bg);color:var(--t1);font-family:'Outfit',sans-serif;min-he
         <div id="dashReadyCodes"></div>
       </div>
       
+      <!-- GROWTH MISSION — THE EMPIRE -->
+      <div class="card" style="border-color:rgba(212,168,67,0.2);background:linear-gradient(135deg,rgba(212,168,67,0.04),rgba(0,255,136,0.02));margin-bottom:16px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+          <h3 style="margin:0;font-size:16px;">🚀 THE MISSION — Growth Tracker</h3>
+          <div style="font-family:'JetBrains Mono';font-size:20px;font-weight:900;color:var(--green);" id="missionTotal">0</div>
+        </div>
+        
+        <!-- Active users progress bar -->
+        <div style="margin-bottom:16px;">
+          <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px;">
+            <span style="color:var(--t2);">Active Members</span>
+            <span style="color:var(--green);font-weight:700;" id="missionPct">0%</span>
+          </div>
+          <div style="height:12px;background:var(--bg);border-radius:6px;overflow:hidden;border:1px solid var(--border);position:relative;">
+            <div id="missionBar" style="height:100%;background:linear-gradient(90deg,var(--green),var(--gold));border-radius:6px;transition:width 1s ease;width:0%;"></div>
+          </div>
+        </div>
+        
+        <!-- Milestones -->
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;">
+          <div style="padding:10px;background:var(--bg);border-radius:8px;text-align:center;border:1px solid var(--border);" id="ms1">
+            <div style="font-family:'JetBrains Mono';font-size:18px;font-weight:900;color:var(--gold);">100</div>
+            <div style="font-size:9px;color:var(--t3);margin-top:2px;">JP MORGAN</div>
+            <div style="font-size:8px;color:var(--gold);margin-top:2px;">Mar 27</div>
+          </div>
+          <div style="padding:10px;background:var(--bg);border-radius:8px;text-align:center;border:1px solid var(--border);" id="ms2">
+            <div style="font-family:'JetBrains Mono';font-size:18px;font-weight:900;color:var(--blue);">250</div>
+            <div style="font-size:9px;color:var(--t3);margin-top:2px;">PHASE 1</div>
+            <div style="font-size:8px;color:var(--blue);margin-top:2px;">Week 2</div>
+          </div>
+          <div style="padding:10px;background:var(--bg);border-radius:8px;text-align:center;border:1px solid var(--border);" id="ms3">
+            <div style="font-family:'JetBrains Mono';font-size:18px;font-weight:900;color:var(--purple);">500</div>
+            <div style="font-size:9px;color:var(--t3);margin-top:2px;">PHASE 2</div>
+            <div style="font-size:8px;color:var(--purple);margin-top:2px;">Week 3</div>
+          </div>
+          <div style="padding:10px;background:var(--bg);border-radius:8px;text-align:center;border:1px solid var(--border);" id="ms4">
+            <div style="font-family:'JetBrains Mono';font-size:18px;font-weight:900;color:var(--green);">1,000</div>
+            <div style="font-size:9px;color:var(--t3);margin-top:2px;">MIKE FARR</div>
+            <div style="font-size:8px;color:var(--green);margin-top:2px;">$2M Deal</div>
+          </div>
+        </div>
+        
+        <div style="margin-top:12px;padding:10px;background:rgba(0,255,136,0.04);border:1px solid rgba(0,255,136,0.1);border-radius:8px;font-size:11px;color:var(--t2);text-align:center;line-height:1.6;">
+          <strong style="color:var(--green);">Every person you onboard tonight gets us closer.</strong> 100 by Mar 27 for JP Morgan. 1,000 for the $2M deal with Mike Farr. We're not building a side hustle — we're building an empire. BMF. Billionaire Mindset Forever. Let's run it up. 🏆
+        </div>
+      </div>
+
       <!-- Quick Actions -->
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px;">
         <div class="card" style="cursor:pointer;text-align:center;padding:24px 16px;border-color:rgba(0,255,136,0.15);transition:all 0.2s;position:relative;overflow:hidden;" onclick="showPage('onboard')" onmouseover="this.style.borderColor='var(--green)';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='rgba(0,255,136,0.15)';this.style.transform=''">
@@ -446,6 +493,29 @@ function renderDashboard(){
   }
   document.getElementById('dLiveCount').textContent=members.filter(m=>m.member_type==='active').length;
   
+  // Mission tracker
+  const activeCount = members.filter(m=>m.member_type==='active'&&!m.is_core_team).length;
+  const target = 1000;
+  const pct = Math.min(Math.round((activeCount/target)*100),100);
+  document.getElementById('missionTotal').textContent = activeCount;
+  document.getElementById('missionPct').textContent = pct+'% to 1,000';
+  document.getElementById('missionBar').style.width = Math.max(pct,1)+'%';
+  
+  // Milestone highlights
+  const milestones = [{id:'ms1',val:100},{id:'ms2',val:250},{id:'ms3',val:500},{id:'ms4',val:1000}];
+  milestones.forEach(ms=>{
+    const el = document.getElementById(ms.id);
+    if(el){
+      if(activeCount >= ms.val){
+        el.style.borderColor = 'var(--green)';
+        el.style.background = 'rgba(0,255,136,0.06)';
+      } else {
+        el.style.borderColor = 'var(--border)';
+        el.style.background = 'var(--bg)';
+      }
+    }
+  });
+  
   // Render ready to onboard
   renderPersonCards('dashReadyCodes',byPerson);
   document.getElementById('readyCount').textContent=Object.keys(byPerson).length;
@@ -649,7 +719,7 @@ async function calcCommissions(newMember,pkgAmt,actCode){
     if(!up)break;
     const rates=COMM_RATES[up.affiliate_type||'standard']||COMM_RATES.standard;
     const rate=rates[level-1]||0;
-    if(rate>0){
+    if(rate>0 && !up.commission_hold){
       const amt=Math.round(pkgAmt*rate*100)/100;
       const st=up.member_type==='affiliate_only'?'held':'active';
       comms.push({member_id:newMember.id,member_name:newMember.name,member_email:newMember.email,package_amount:pkgAmt,recipient_id:up.id,recipient_name:up.name,recipient_email:up.email,level,rate:rate*100,amount:amt,status:st,activation_code:actCode});
