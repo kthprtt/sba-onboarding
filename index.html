@@ -1522,6 +1522,11 @@ async function onboardMember() {
   const typeLabel = memberType === 'legacy' ? ' (Legacy)' : memberType === 'affiliate_only' ? ' (Affiliate)' : '';
   showToast(`✅ ${name} onboarded${typeLabel}! Code: ${refCode}`);
   
+  // CALCULATE COMMISSIONS — walk up the tree 7 levels
+  if(memberType !== 'legacy' && memberType !== 'affiliate_only' && packageAmount > 0 && referredBy){
+    await calculateCommissions(result, packageAmount, activationCode);
+  }
+  
   if(memberType !== 'legacy') showWelcomeEmail(result);
 }
 
@@ -1530,6 +1535,105 @@ function generateTempPassword() {
   let pw = 'SBA-';
   for (let i = 0; i < 8; i++) pw += chars[Math.floor(Math.random() * chars.length)];
   return pw;
+}
+
+// ═══════════════ COMMISSION ENGINE ═══════════════
+const COMM_RATES = {
+  standard:     [0.20, 0.10, 0.05, 0.03, 0.03, 0.02, 0.02], // 45%
+  grandfathered: [0.25, 0.10, 0.05, 0.05, 0.05, 0.03, 0.02], // 55%
+  ambassador:   [0.30, 0.10, 0.05, 0.05, 0.05, 0.03, 0.02]  // 60%
+};
+
+async function calculateCommissions(newMember, packageAmount, activationCode){
+  const commissions = [];
+  let currentCode = newMember.referred_by_code;
+  let level = 1;
+  let safety = 0;
+  
+  while(currentCode && level <= 7 && safety < 10){
+    safety++;
+    
+    // Find the upline member
+    const{data:upline} = await sb.from('onboarding_members')
+      .select('*')
+      .eq('referral_code', currentCode)
+      .single();
+    
+    if(!upline) break;
+    
+    // Determine their commission rate based on affiliate_type
+    const affType = upline.affiliate_type || 'standard';
+    const rates = COMM_RATES[affType] || COMM_RATES.standard;
+    const rate = rates[level - 1] || 0;
+    
+    if(rate > 0){
+      const amount = Math.round(packageAmount * rate * 100) / 100;
+      
+      // Determine commission status based on upline's member_type
+      let commStatus = 'active';
+      if(upline.member_type === 'affiliate_only') commStatus = 'held';
+      
+      // Create commission record
+      const commission = {
+        member_id: newMember.id,
+        member_name: newMember.name,
+        member_email: newMember.email,
+        package_amount: packageAmount,
+        recipient_id: upline.id,
+        recipient_name: upline.name,
+        recipient_email: upline.email,
+        level: level,
+        rate: rate * 100,
+        amount: amount,
+        status: commStatus,
+        activation_code: activationCode || null,
+        payment_method: newMember.payment || null,
+        notes: `L${level} commission from ${newMember.name} (${newMember.pkg}) → ${upline.name}`
+      };
+      
+      commissions.push(commission);
+      
+      // Update upline's balance
+      if(commStatus === 'active'){
+        await sb.from('onboarding_members').update({
+          total_earned: (parseFloat(upline.total_earned||0) + amount),
+          current_cycle_earned: (parseFloat(upline.current_cycle_earned||0) + amount),
+          available_balance: (parseFloat(upline.available_balance||0) + amount)
+        }).eq('id', upline.id);
+      } else if(commStatus === 'held'){
+        await sb.from('onboarding_members').update({
+          held_commissions: (parseFloat(upline.held_commissions||0) + amount)
+        }).eq('id', upline.id);
+      }
+      
+      // Update referral count for L1 only
+      if(level === 1){
+        await sb.from('onboarding_members').update({
+          total_referrals: (parseInt(upline.total_referrals||0) + 1)
+        }).eq('id', upline.id);
+      }
+    }
+    
+    // Walk up to next level
+    currentCode = upline.referred_by_code;
+    level++;
+  }
+  
+  // Insert all commission records
+  if(commissions.length){
+    const{error} = await sb.from('commissions').insert(commissions);
+    if(error){
+      console.error('Commission insert error:', error);
+      showToast('⚠️ Commissions calculated but failed to save: ' + error.message, '#e74c3c');
+    } else {
+      const totalComm = commissions.reduce((s,c)=>s+c.amount, 0);
+      const breakdown = commissions.map(c=>`L${c.level} ${c.recipient_name}: $${c.amount}`).join(' | ');
+      showToast(`💰 Commissions: $${totalComm} across ${commissions.length} levels`);
+      console.log('Commission breakdown:', breakdown);
+    }
+  }
+  
+  return commissions;
 }
 
 // ═══════════════ ACTIVATION CODES ═══════════════
