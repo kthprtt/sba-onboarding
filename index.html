@@ -1904,8 +1904,12 @@ function showWelcomeEmail(member) {
   const pkgAmounts = {basic:'$1,000',plus:'$2,000',elite:'$5,000',pro:'$10,000',promo_launch:'$1,000 (Launch Special — $3K value)'};
   const pkgAmt = pkgAmounts[member.pkg] || '';
   
+  const isPromo = member.pkg === 'promo_launch' || member.promo_code === 'LAUNCH-SPECIAL';
+  const cycleStart = 'March 25, 2026';
+  const cycleEnd = 'May 4, 2026';
+  
   document.getElementById('emailPreviewContent').innerHTML = `
-    <div class="email-subject">🎯 You're In, ${firstName}. Welcome to the SBA Family.</div>
+    <div class="email-subject">${isPromo ? '🔥 LAUNCH SPECIAL — You Just Got $3K in Value for $1K, '+firstName+'!' : '🎯 You're In, '+firstName+'. Welcome to the SBA Family.'}</div>
     
     <p>Hey <strong>${firstName}</strong>,</p>
     
@@ -1921,6 +1925,23 @@ function showWelcomeEmail(member) {
       ${!isAffiliate ? '<strong>🚀 SBA Genius:</strong> <a href="https://app.sportsbetarbitrage.com" style="color:#22c55e;font-weight:700;">app.sportsbetarbitrage.com</a> <em>(same login!)</em><br>' : ''}
       <br>
       <em style="font-size:12px;color:#8b8fa3;">⚠️ Change your password after first login (Settings tab in your portal)</em>
+    </p>
+
+    ${isPromo ? `<p style="background:linear-gradient(135deg,rgba(0,255,136,0.08),rgba(212,168,67,0.06));padding:18px;border-radius:12px;border:1px solid rgba(0,255,136,0.2);margin:16px 0;">
+      <strong style="color:#22c55e;font-size:15px;">🔥 YOUR LAUNCH SPECIAL INCLUDES:</strong><br><br>
+      <span style="font-size:13px;line-height:2;">
+      ✅ <strong>Plus Package</strong> — $2,000 value (full access to SBA Genius + all 5 strategies)<br>
+      ✅ <strong>VPN Access</strong> — $1,000 value (unlocks 20+ offshore sportsbooks for more arb opportunities)<br>
+      ✅ <strong>7-Level Bookie Program</strong> — earn commissions on everyone you refer<br>
+      ✅ <strong>AI Closing Machine</strong> — AI writes your recruiting messages<br>
+      </span><br>
+      <span style="font-size:12px;color:#8b8fa3;">Total value: <strong>$3,000+</strong>. You paid: <strong>$1,000</strong>. This promo ends <strong>April 7, 2026</strong>. After that, the Plus + VPN package goes back to $3,000. You got in at the right time.</span>
+    </p>` : ''}
+
+    <p style="background:rgba(6,182,212,0.06);padding:14px;border-radius:10px;border:1px solid rgba(6,182,212,0.15);margin:16px 0;text-align:center;">
+      <strong style="color:#06b6d4;font-size:13px;">📅 YOUR 40-DAY CYCLE</strong><br>
+      <span style="font-family:JetBrains Mono,monospace;font-size:14px;font-weight:700;">Cycle 1: ${cycleStart} → ${cycleEnd}</span><br>
+      <span style="font-size:11px;color:#8b8fa3;">Your cycle starts when SBA Genius launches. After 40 days, a new cycle begins automatically. Commissions reset each cycle. VPN included free through April 7.</span>
     </p>
 
     <p style="background:rgba(34,197,94,0.06);padding:18px;border-radius:12px;border:1px solid rgba(34,197,94,0.2);margin:16px 0;">
@@ -1945,6 +1966,7 @@ function showWelcomeEmail(member) {
       <strong style="color:#a78bfa;font-size:13px;">🔒 VPN ACCESS — UNLOCKED</strong><br><br>
       ${member.vpn_username ? '<span style="font-family:JetBrains Mono,monospace;font-size:13px;"><strong>Username:</strong> '+member.vpn_username+'<br><strong>Password:</strong> '+member.vpn_password+'</span><br><br>' : 'Your VPN credentials are being set up and will appear in your portal under Get Started → VPN Setup.<br><br>'}
       <span style="font-size:11px;color:#8b8fa3;">With VPN, you unlock 20+ offshore sportsbooks that most people can't access. More books = more arb opportunities = more profit. Download the VPN app from your portal and connect before opening any offshore sportsbook apps.</span>
+      <br><br><span style="font-size:11px;color:#22c55e;font-weight:700;">🎁 VPN is included FREE with all packages through April 7, 2026.</span>
     </p>` : ''}
     
     ${member.referral_code ? `<p style="background:rgba(212,168,67,0.08);padding:16px;border-radius:10px;border:1px solid rgba(212,168,67,0.2);margin:16px 0;">
