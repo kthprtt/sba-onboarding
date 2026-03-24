@@ -1357,6 +1357,7 @@ function startAutoRefresh(){
   if(refreshInterval)clearInterval(refreshInterval);
   refreshInterval=setInterval(async()=>{if(leader){await loadCodes();renderDashboard();}},10000);
 }
+}
 
 // Auto-refresh pending queue every 10 seconds
 setInterval(function(){if(typeof loadPendingQueue==="function")loadPendingQueue()},10000);
