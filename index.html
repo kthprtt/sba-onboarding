@@ -1901,7 +1901,7 @@ function showWelcomeEmail(member) {
   const firstName = member.name.split(' ')[0];
   const hasVPN = member.vpn;
   const isAffiliate = member.member_type === 'affiliate_only';
-  const pkgAmounts = {basic:'$1,000',plus:'$2,000',elite:'$5,000',pro:'$10,000'};
+  const pkgAmounts = {basic:'$1,000',plus:'$2,000',elite:'$5,000',pro:'$10,000',promo_launch:'$1,000 (Launch Special — $3K value)'};
   const pkgAmt = pkgAmounts[member.pkg] || '';
   
   document.getElementById('emailPreviewContent').innerHTML = `

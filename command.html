@@ -339,6 +339,7 @@ body{background:var(--bg);color:var(--t1);font-family:'Outfit',sans-serif;min-he
             <option value="plus">📦 Plus — $2,000</option>
             <option value="elite">📦 Elite — $5,000</option>
             <option value="pro">📦 Pro — $10,000</option>
+            <option value="promo_launch" style="color:#22c55e;">🔥 LAUNCH SPECIAL — $3K value for $1K</option>
           </select>
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
@@ -727,7 +728,7 @@ async function onboardMember(){
   let password=pw;for(let i=0;i<8;i++)password+=chars[Math.floor(Math.random()*chars.length)];
   const firstName=name.split(' ')[0].toLowerCase().replace(/[^a-z]/g,'');
   const refCode=firstName+Math.floor(1000+Math.random()*9000);
-  const pkgAmounts={basic:1000,plus:2000,elite:5000,pro:10000};
+  const pkgAmounts={basic:1000,plus:2000,elite:5000,pro:10000,promo_launch:1000};
   const now=new Date();const cycleEnd=new Date(now);cycleEnd.setDate(cycleEnd.getDate()+40);
   
   // VPN auto-create
@@ -745,7 +746,9 @@ async function onboardMember(){
   btn.textContent='Saving member...';
   const member={
     name,email:email.toLowerCase(),phone,discord,pkg,
-    vpn:vpn==='yes',payment:pay,
+    vpn:vpn==='yes'||(pkg==='promo_launch'),payment:pay,
+    promo_code:pkg==='promo_launch'?'LAUNCH-SPECIAL':null,
+    promo_value:pkg==='promo_launch'?3000:0,
     vpn_username:vpnUser,vpn_password:vpnPass,
     vpn_status:vpn==='yes'?(vpnUser?'provisioned':'pending'):null,
     referral_code:refCode,referred_by_code:ref||null,
@@ -827,7 +830,7 @@ async function submitRequest(){
   
   const statusEmoji={paid:'✅ PAID',partial:'⚠️ PARTIAL',unpaid:'❌ UNPAID',affiliate:'🆓 FREE'};
   const pkgLabels={basic:'Basic $1K',plus:'Plus $2K',elite:'Elite $5K',pro:'Pro $10K'};
-  const pkgAmounts={basic:1000,plus:2000,elite:5000,pro:10000};
+  const pkgAmounts={basic:1000,plus:2000,elite:5000,pro:10000,promo_launch:1000};
   const totalAmt = pkgAmounts[type] + (vpn==='yes'?1000:0);
   
   const summary = name+' | '+pkgLabels[type]+(vpn==='yes'?' + VPN':'')+' | $'+totalAmt.toLocaleString()+' | '+(statusEmoji[payStatus]||'')+(payNote?' — '+payNote:'')+(email?' | '+email:'');
