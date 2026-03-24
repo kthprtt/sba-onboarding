@@ -147,12 +147,10 @@ body{background:var(--bg);color:var(--t1);font-family:'Outfit',sans-serif;min-he
     <div class="login-logo">SBA</div>
     <h1>Command Center</h1>
     <div class="sub">SBA Leadership Portal — Onboarding & Code Management</div>
-    <select id="leaderSelect">
-      <option value="">Select your name...</option>
-      <option value="vegas">⚡ Vegas — Master Builder</option>
-      <option value="waleed">🎯 Waleed — Master Bettor</option>
-    </select>
+    <input type="text" id="loginUser" placeholder="Username" style="width:100%;padding:14px;background:var(--card);border:1px solid var(--border);border-radius:10px;color:var(--t1);font-family:Outfit;font-size:15px;margin-bottom:10px;outline:none;" onkeypress="if(event.key==='Enter')document.getElementById('loginPass').focus()">
+    <input type="password" id="loginPass" placeholder="Password" style="width:100%;padding:14px;background:var(--card);border:1px solid var(--border);border-radius:10px;color:var(--t1);font-family:Outfit;font-size:15px;margin-bottom:12px;outline:none;" onkeypress="if(event.key==='Enter')login()">
     <button onclick="login()">Enter Command Center</button>
+    <div id="loginError" style="margin-top:10px;font-size:12px;color:var(--red);display:none;"></div>
   </div>
 </div>
 
@@ -357,6 +355,7 @@ async function login(){
   const hr=new Date().getHours();
   document.getElementById('greeting').textContent=(hr<12?'Good morning':hr<17?'Good afternoon':'Good evening')+', '+data.display_name+' '+(data.emoji||'');
   loadAll();
+  startAutoRefresh();
 }
 
 function logout(){localStorage.removeItem('sba_cmd_leader');location.reload();}
@@ -644,17 +643,18 @@ async function submitRequest(){
 }
 
 // Auto-login
-// Auto-login from session (expires after 12 hours)
+// Auto-login — just prefill username
 try{
   const saved=JSON.parse(localStorage.getItem('sba_cmd_leader')||'{}');
-  if(saved.u && (Date.now()-saved.t)<43200000){
-    document.getElementById('loginUser').value=saved.u;
-    // Still need password — but auto-fill username
-  }
+  if(saved.u){document.getElementById('loginUser').value=saved.u;}
 }catch(e){}
 
-// Auto-refresh
-setInterval(async()=>{await loadCodes();renderDashboard();},10000);
+// Auto-refresh — only starts after successful login
+let refreshInterval=null;
+function startAutoRefresh(){
+  if(refreshInterval)clearInterval(refreshInterval);
+  refreshInterval=setInterval(async()=>{if(leader){await loadCodes();renderDashboard();}},10000);
+}
 </script>
 </body>
 </html>

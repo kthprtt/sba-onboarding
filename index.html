@@ -1998,6 +1998,7 @@ function renderMembersTable() {
           <button class="action-btn activate" onclick="activateMember('${m.id}')">✓</button>
         ` : '<span style="color:var(--green);font-size:11px;font-weight:700;">LIVE</span>'}
         <button class="action-btn" onclick="showWelcomeEmailById('${m.id}')">📧</button>
+        <button class="action-btn" onclick="editMember('${m.id}')" style="color:var(--blue);">✏️</button>
         <button class="action-btn" onclick="removeMember('${m.id}')" style="color:var(--red);">✕</button>
       </td>
     </tr>`;
@@ -2392,6 +2393,68 @@ function initHub(member) {
 const _originalShowMemberContent = typeof showMemberContent === 'function' ? showMemberContent : null;
 
 dbInit();
+
+// ═══════════════ EDIT MEMBER ═══════════════
+function editMember(id){
+  const m = members.find(x=>x.id===id);
+  if(!m) return;
+  
+  const modal = document.createElement('div');
+  modal.id = 'editModal';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;';
+  
+  const pkgOpts = ['basic','plus','elite','pro'].map(p=>`<option value="${p}" ${m.pkg===p?'selected':''}>${p.charAt(0).toUpperCase()+p.slice(1)}</option>`).join('');
+  const typeOpts = ['active','affiliate_only','legacy'].map(t=>`<option value="${t}" ${m.member_type===t?'selected':''}>${t}</option>`).join('');
+  const affOpts = ['standard','grandfathered','ambassador'].map(t=>`<option value="${t}" ${m.affiliate_type===t?'selected':''}>${t}</option>`).join('');
+  const lbl = 'style="font-size:10px;color:#8b8fa3;display:block;margin-bottom:3px;"';
+  const inp = 'style="width:100%;padding:8px;background:#05060a;border:1px solid #1e2130;border-radius:6px;color:#eeeae2;font-family:Outfit;font-size:13px;"';
+  const mono = 'style="width:100%;padding:8px;background:#05060a;border:1px solid #1e2130;border-radius:6px;color:#eeeae2;font-family:JetBrains Mono;font-size:12px;"';
+  
+  modal.innerHTML = `<div style="background:#12141c;border:1px solid #1e2130;border-radius:16px;padding:24px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;"><h3 style="font-size:18px;font-weight:900;">✏️ Edit ${m.name}</h3><button onclick="document.getElementById('editModal').remove()" style="background:none;border:none;color:#8b8fa3;font-size:20px;cursor:pointer;">✕</button></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <div><label ${lbl}>NAME</label><input id="editName" value="${m.name||''}" ${inp}></div>
+      <div><label ${lbl}>EMAIL</label><input id="editEmail" value="${m.email||''}" ${inp}></div>
+      <div><label ${lbl}>PACKAGE</label><select id="editPkg" ${inp}>${pkgOpts}</select></div>
+      <div><label ${lbl}>AMOUNT ($)</label><input id="editAmt" type="number" value="${m.package_amount||0}" ${mono}></div>
+      <div><label ${lbl}>MEMBER TYPE</label><select id="editType" ${inp}>${typeOpts}</select></div>
+      <div><label ${lbl}>AFFILIATE TYPE</label><select id="editAff" ${inp}>${affOpts}</select></div>
+      <div><label ${lbl}>VPN</label><select id="editVPN" ${inp}><option value="true" ${m.vpn?'selected':''}>Yes</option><option value="false" ${!m.vpn?'selected':''}>No</option></select></div>
+      <div><label ${lbl}>VPN USERNAME</label><input id="editVU" value="${m.vpn_username||''}" ${mono}></div>
+      <div><label ${lbl}>VPN PASSWORD</label><input id="editVP" value="${m.vpn_password||''}" ${mono}></div>
+      <div><label ${lbl}>REFERRAL CODE</label><input id="editRC" value="${m.referral_code||''}" ${mono}></div>
+      <div><label ${lbl}>REFERRED BY</label><input id="editRB" value="${m.referred_by_code||''}" ${mono}></div>
+      <div><label ${lbl}>PASSWORD</label><input id="editPW" value="${m.password||''}" ${mono}></div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:16px;">
+      <button onclick="saveEdit('${m.id}')" style="flex:1;padding:12px;background:linear-gradient(135deg,#d4a843,#b8922e);border:none;border-radius:8px;color:#05060a;font-weight:800;cursor:pointer;">💾 Save Changes</button>
+      <button onclick="document.getElementById('editModal').remove()" style="padding:12px 20px;background:transparent;border:1px solid #1e2130;border-radius:8px;color:#8b8fa3;cursor:pointer;">Cancel</button>
+    </div></div>`;
+  document.body.appendChild(modal);
+}
+
+async function saveEdit(id){
+  const u={
+    name:document.getElementById('editName').value.trim(),
+    email:document.getElementById('editEmail').value.trim().toLowerCase(),
+    pkg:document.getElementById('editPkg').value,
+    package_amount:parseFloat(document.getElementById('editAmt').value)||0,
+    member_type:document.getElementById('editType').value,
+    affiliate_type:document.getElementById('editAff').value,
+    vpn:document.getElementById('editVPN').value==='true',
+    vpn_username:document.getElementById('editVU').value.trim()||null,
+    vpn_password:document.getElementById('editVP').value.trim()||null,
+    vpn_status:document.getElementById('editVU').value.trim()?'provisioned':null,
+    referral_code:document.getElementById('editRC').value.trim()||null,
+    referred_by_code:document.getElementById('editRB').value.trim()||null,
+    password:document.getElementById('editPW').value.trim(),
+    commission_status:document.getElementById('editType').value==='affiliate_only'?'held':document.getElementById('editType').value==='legacy'?'legacy_paid':'active'
+  };
+  await updateMember(id,u);
+  document.getElementById('editModal').remove();
+  await loadMembers();
+  showToast('✅ '+u.name+' updated!');
+}
 
 </script>
 </body>
