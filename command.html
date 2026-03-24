@@ -155,7 +155,7 @@ body{background:var(--bg);color:var(--t1);font-family:'Outfit',sans-serif;min-he
 <div class="login-screen" id="loginScreen">
   <div class="login-card">
     <div class="login-logo">SBA</div>
-    <h1>Command Center <span style="margin-left:8px;padding:2px 8px;background:rgba(0,255,136,0.08);border:1px solid rgba(0,255,136,0.2);border-radius:10px;font-family:JetBrains Mono;font-size:9px;color:#00ff88;font-weight:700;letter-spacing:1px;">v30</span></h1>
+    <h1>Command Center <span style="margin-left:8px;padding:2px 8px;background:rgba(0,255,136,0.08);border:1px solid rgba(0,255,136,0.2);border-radius:10px;font-family:JetBrains Mono;font-size:9px;color:#00ff88;font-weight:700;letter-spacing:1px;">v31</span></h1>
     <div class="sub">SBA Leadership Portal — Onboarding & Code Management</div>
     <input type="text" id="loginUser" placeholder="Username" style="width:100%;padding:14px;background:var(--card);border:1px solid var(--border);border-radius:10px;color:var(--t1);font-family:Outfit;font-size:15px;margin-bottom:10px;outline:none;" onkeypress="if(event.key==='Enter')document.getElementById('loginPass').focus()">
     <div style="position:relative;margin-bottom:12px;">
@@ -581,9 +581,8 @@ body{background:var(--bg);color:var(--t1);font-family:'Outfit',sans-serif;min-he
 <script>
 // Memory storage adapter — prevents storage access errors
 const _ms={};const _memStorage={getItem:(k)=>_ms[k]||null,setItem:(k,v)=>{_ms[k]=v;},removeItem:(k)=>{delete _ms[k];}};
-let _sa=_memStorage;try{localStorage.setItem('_t','1');localStorage.removeItem('_t');_sa=localStorage;}catch(e){}
 
-const sb=supabase.createClient('https://anjlmooskwvjystmrhxr.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFuamxtb29za3d2anlzdG1yaHhyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU0NjYzNTUsImV4cCI6MjA4MTA0MjM1NX0.DVLjp9PzNIPNSp2HAGtKTaPVfKy3QLs4HTJsy96UsyM',{auth:{storage:_sa,autoRefreshToken:false,persistSession:false,detectSessionInUrl:false}});
+const sb=supabase.createClient('https://anjlmooskwvjystmrhxr.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFuamxtb29za3d2anlzdG1yaHhyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU0NjYzNTUsImV4cCI6MjA4MTA0MjM1NX0.DVLjp9PzNIPNSp2HAGtKTaPVfKy3QLs4HTJsy96UsyM',{auth:{storage:_memStorage,autoRefreshToken:false,persistSession:false,detectSessionInUrl:false},global:{headers:{'X-Client-Info':'sba-command-center'}}});
 
 let leader='',leaderData=null,members=[],allCodes=[];
 const TL={basic:'BASIC $1K',plus:'PLUS $2K',elite:'ELITE $5K',pro:'PRO $10K',vpn:'VPN $1K'};
