@@ -727,7 +727,7 @@ function renderTeam(){
   if(!team.length){el.innerHTML='<div class="card" style="text-align:center;padding:30px;"><div style="font-size:32px;margin-bottom:8px;">👥</div><div style="font-size:14px;font-weight:700;">No team members yet</div><div style="font-size:11px;color:var(--t3);margin-top:4px;">Onboard your first referral and they\'ll appear here</div></div>';return;}
   let html='<div class="card">';
   team.forEach(m=>{
-    const status=m.member_type==='legacy'?{l:'LEGACY',c:'var(--purple)'}:m.member_type==='affiliate_only'?{l:'AFFILIATE',c:'var(--gold)'}:{l:'ACTIVE',c:'var(--green)'};
+    const status=m.member_type==='phantom'?{l:'PENDING',c:'var(--orange)'}:m.member_type==='suspended'||m.status==='suspended'?{l:'SUSPENDED',c:'var(--red)'}:m.status==='past_due'?{l:'PAST DUE',c:'var(--red)'}:m.member_type==='legacy'?{l:'LEGACY',c:'var(--purple)'}:m.member_type==='affiliate_only'?{l:'AFFILIATE',c:'var(--gold)'}:{l:'ACTIVE',c:'var(--green)'};
     const init=m.name?.split(' ').map(n=>n[0]).join('').toUpperCase().slice(0,2)||'?';
     html+=`<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.04);"><div style="width:34px;height:34px;border-radius:8px;background:var(--card2);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:11px;color:var(--t2);">${init}</div><div style="flex:1;"><div style="font-size:13px;font-weight:700;">${m.name}</div><div style="font-size:10px;color:var(--t3);">${m.pkg||'—'} · ${new Date(m.created_at).toLocaleDateString()}</div></div><span style="padding:2px 8px;border-radius:4px;font-size:9px;font-weight:700;background:${status.c}22;color:${status.c};">${status.l}</span></div>`;
   });
@@ -860,7 +860,7 @@ async function onboardMember(){
   const firstName=name.split(' ')[0].toLowerCase().replace(/[^a-z]/g,'');
   const refCode=firstName+Math.floor(1000+Math.random()*9000);
   const pkgAmounts={basic:1000,plus:2000,elite:5000,pro:10000,promo_launch:1000};
-  const now=new Date();const cycleEnd=new Date(now);cycleEnd.setDate(cycleEnd.getDate()+40);
+  const now=new Date();const cycleStart=new Date('2026-03-25T21:00:00-04:00');const cycleEnd=new Date('2026-05-03T21:00:00-04:00');
   
   // VPN auto-create
   let vpnUser=null,vpnPass=null;
@@ -892,7 +892,7 @@ async function onboardMember(){
     cycle_start:now.toISOString(),
     cycle_end:type==='legacy'?null:cycleEnd.toISOString(),
     affiliate_rank:'starter',affiliate_type:'standard',
-    total_referrals:0,held_commissions:0,
+    total_referrals:0,held_commissions:0,genius_access:type!=="affiliate_only",cycle_number:1,
     activation_code:code||null,vpn_activation_code:vpnCode||null,
     pending_upline:document.getElementById('obPendingUpline')?.value?.trim()||null
   };
@@ -931,7 +931,7 @@ async function calcCommissions(newMember,pkgAmt,actCode){
     if(!up)break;
     
     // SKIP phantom nodes — don't count as a level, don't earn
-    if(up.member_type==='phantom' || up.commission_status==='phantom'){
+    if(up.member_type==='phantom' || up.commission_status==='phantom' || up.status==='past_due' || up.status==='suspended' || up.member_type==='suspended'){
       cur=up.referred_by_code;
       continue; // skip without incrementing level
     }
