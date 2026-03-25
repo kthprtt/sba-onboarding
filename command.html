@@ -178,7 +178,7 @@ body{background:var(--bg);color:var(--t1);font-family:'Outfit',sans-serif;min-he
 <div class="login-screen" id="loginScreen">
   <div class="login-card">
     <div class="login-logo">SBA</div>
-    <h1>Command Center <span style="margin-left:8px;padding:2px 8px;background:rgba(0,255,136,0.08);border:1px solid rgba(0,255,136,0.2);border-radius:10px;font-family:JetBrains Mono;font-size:9px;color:#00ff88;font-weight:700;letter-spacing:1px;">v53</span></h1>
+    <h1>Command Center <span style="margin-left:8px;padding:2px 8px;background:rgba(0,255,136,0.08);border:1px solid rgba(0,255,136,0.2);border-radius:10px;font-family:JetBrains Mono;font-size:9px;color:#00ff88;font-weight:700;letter-spacing:1px;">v54</span></h1>
     <div class="sub">SBA Leadership Portal — Onboarding & Code Management</div>
     <input type="text" id="loginUser" placeholder="Username" style="width:100%;padding:14px;background:var(--card);border:1px solid var(--border);border-radius:10px;color:var(--t1);font-family:Outfit;font-size:15px;margin-bottom:10px;outline:none;" onkeypress="if(event.key==='Enter')document.getElementById('loginPass').focus()">
     <div style="position:relative;margin-bottom:12px;">
@@ -714,6 +714,27 @@ function showPage(id){
   document.getElementById('mb-'+id)?.classList.add('active');
   // Scroll to top on page switch
   window.scrollTo({top:0});
+  // Clear onboard form when navigating to it fresh (not from prefill)
+  if(id==='onboard' && !window._prefilling){
+    clearOnboardForm();
+  }
+  window._prefilling=false;
+}
+
+function clearOnboardForm(){
+  ['obCode','obName','obEmail','obPhone','obDiscord','obVPNCode'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  const cs=document.getElementById('obCodeStatus');if(cs){cs.textContent='Paste the activation code from your Code Wallet';cs.style.color='var(--t2)';}
+  const vp=document.getElementById('obVPNCode');if(vp&&vp.parentElement)vp.parentElement.style.display='none';
+  const tp=document.getElementById('obTreePreview');if(tp)tp.style.display='none';
+  const pkg=document.getElementById('obPkg');if(pkg)pkg.value='basic';
+  const vpn=document.getElementById('obVPN');if(vpn)vpn.value='no';
+  const pay=document.getElementById('obPay');if(pay)pay.value='paid';
+  const typ=document.getElementById('obType');if(typ)typ.value='active';
+  const pp=document.getElementById('obPaidPkg');if(pp)pp.value='';
+  const inn=document.getElementById('incentiveNote');if(inn)inn.style.display='none';
+  const search=document.getElementById('obRefSearch');if(search)search.value='';
+  document.getElementById('obCode')?.parentElement&&(document.getElementById('obCode').parentElement.style.opacity='1');
+  populateRefDropdown();
 }
 
 async function loadAll(){
@@ -1084,7 +1105,8 @@ function prefillOnboard(data){
     name=arguments[0]||'';email=arguments[1]||'';codes=arguments[2]||'';
   }
   
-  // Switch to onboard page
+  // Switch to onboard page (flag prevents form clearing)
+  window._prefilling=true;
   showPage('onboard');
   
   // Small delay to ensure DOM is ready after page switch
