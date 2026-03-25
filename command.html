@@ -178,7 +178,7 @@ body{background:var(--bg);color:var(--t1);font-family:'Outfit',sans-serif;min-he
 <div class="login-screen" id="loginScreen">
   <div class="login-card">
     <div class="login-logo">SBA</div>
-    <h1>Command Center <span style="margin-left:8px;padding:2px 8px;background:rgba(0,255,136,0.08);border:1px solid rgba(0,255,136,0.2);border-radius:10px;font-family:JetBrains Mono;font-size:9px;color:#00ff88;font-weight:700;letter-spacing:1px;">v52</span></h1>
+    <h1>Command Center <span style="margin-left:8px;padding:2px 8px;background:rgba(0,255,136,0.08);border:1px solid rgba(0,255,136,0.2);border-radius:10px;font-family:JetBrains Mono;font-size:9px;color:#00ff88;font-weight:700;letter-spacing:1px;">v53</span></h1>
     <div class="sub">SBA Leadership Portal — Onboarding & Code Management</div>
     <input type="text" id="loginUser" placeholder="Username" style="width:100%;padding:14px;background:var(--card);border:1px solid var(--border);border-radius:10px;color:var(--t1);font-family:Outfit;font-size:15px;margin-bottom:10px;outline:none;" onkeypress="if(event.key==='Enter')document.getElementById('loginPass').focus()">
     <div style="position:relative;margin-bottom:12px;">
@@ -823,7 +823,7 @@ function renderDashboard(){
 }
 
 function renderMoneyTracker(){
-  const leaderMember = members.find(m=>(m.referral_code||'')===(leader)||((m.name||'').toLowerCase().includes(leader)));
+  const leaderMember = members.find(m=>(m.referral_code||'').startsWith(leader)||(m.name||'').toLowerCase().includes(leader)) || members.find(m=>m.is_core_team&&(m.referral_code||'').startsWith(leader));
   const leaderRefCode = leaderMember?.referral_code || leader;
   function getDown(rc){let r=[];members.filter(m=>m.referred_by_code===rc&&!m.is_core_team).forEach(d=>{r.push(d);if(d.referral_code)r=r.concat(getDown(d.referral_code));});return r;}
   const myPeople = getDown(leaderRefCode);
@@ -940,7 +940,7 @@ async function batchCreatePhantoms(){
     
     const firstName = name.split(' ')[0].toLowerCase().replace(/[^a-z]/g,'');
     const refCode = 'pending_'+firstName+Math.floor(1000+Math.random()*9000);
-    const leaderMember = members.find(m=>m.referral_code===leader||m.name?.toLowerCase().includes(leader));
+    const leaderMember = members.find(m=>(m.referral_code||'').startsWith(leader)||(m.name||'').toLowerCase().includes(leader)) || members.find(m=>m.is_core_team&&(m.referral_code||'').startsWith(leader));
     
     await sb.from('onboarding_members').insert([{
       name: name,
@@ -1033,13 +1033,16 @@ function renderActivity(){
 
 function renderTeam(){
   const el=document.getElementById('teamList');
-  // Find the leader's member record by multiple fields
+  // Find the leader's member record by multiple methods
   const leaderMember=members.find(m=>
     m.referral_code===leader || 
-    m.referral_code===leader+'5580' ||
+    (m.referral_code||'').startsWith(leader) ||
     (m.name||'').toLowerCase()===leader ||
     (m.name||'').toLowerCase().includes(leader)
-  ) || members.find(m=>m.is_core_team && (m.name||'').toLowerCase().includes(leader));
+  ) || members.find(m=>m.is_core_team && (
+    (m.referral_code||'').startsWith(leader) ||
+    (m.name||'').toLowerCase().includes(leader)
+  ));
   
   if(!leaderMember||!leaderMember.referral_code){
     // Fallback: show ALL members this leader onboarded (from activation codes)
