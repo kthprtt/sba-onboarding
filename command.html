@@ -155,7 +155,7 @@ body{background:var(--bg);color:var(--t1);font-family:'Outfit',sans-serif;min-he
 <div class="login-screen" id="loginScreen">
   <div class="login-card">
     <div class="login-logo">SBA</div>
-    <h1>Command Center <span style="margin-left:8px;padding:2px 8px;background:rgba(0,255,136,0.08);border:1px solid rgba(0,255,136,0.2);border-radius:10px;font-family:JetBrains Mono;font-size:9px;color:#00ff88;font-weight:700;letter-spacing:1px;">v43</span></h1>
+    <h1>Command Center <span style="margin-left:8px;padding:2px 8px;background:rgba(0,255,136,0.08);border:1px solid rgba(0,255,136,0.2);border-radius:10px;font-family:JetBrains Mono;font-size:9px;color:#00ff88;font-weight:700;letter-spacing:1px;">v44</span></h1>
     <div class="sub">SBA Leadership Portal — Onboarding & Code Management</div>
     <input type="text" id="loginUser" placeholder="Username" style="width:100%;padding:14px;background:var(--card);border:1px solid var(--border);border-radius:10px;color:var(--t1);font-family:Outfit;font-size:15px;margin-bottom:10px;outline:none;" onkeypress="if(event.key==='Enter')document.getElementById('loginPass').focus()">
     <div style="position:relative;margin-bottom:12px;">
@@ -1203,6 +1203,7 @@ async function onboardMember(){
   const firstName=name.split(' ')[0].toLowerCase().replace(/[^a-z]/g,'');
   const refCode=firstName+Math.floor(1000+Math.random()*9000);
   const pkgAmounts={basic:1000,plus:2000,elite:5000,pro:10000,promo_launch:1000};
+  const dbPkg = pkg==='promo_launch'?'plus':pkg; // DB constraint only allows basic/plus/elite/pro
   const now=new Date();const cycleStart=new Date('2026-03-26T21:00:00-04:00');const cycleEnd=new Date('2026-05-04T21:00:00-04:00');
   
   // VPN auto-create
@@ -1219,7 +1220,7 @@ async function onboardMember(){
   
   btn.textContent='Saving member...';
   const member={
-    name,email:email.toLowerCase(),phone,discord,pkg,
+    name,email:email.toLowerCase(),phone,discord,pkg:dbPkg,
     vpn:vpn||(pkg==='promo_launch'),payment:pay,
     promo_code:pkg==='promo_launch'?'LAUNCH-SPECIAL':null,
     promo_value:pkg==='promo_launch'?3000:0,
