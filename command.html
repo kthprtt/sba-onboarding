@@ -178,7 +178,7 @@ body{background:var(--bg);color:var(--t1);font-family:'Outfit',sans-serif;min-he
 <div class="login-screen" id="loginScreen">
   <div class="login-card">
     <div class="login-logo">SBA</div>
-    <h1>Command Center <span style="margin-left:8px;padding:2px 8px;background:rgba(0,255,136,0.08);border:1px solid rgba(0,255,136,0.2);border-radius:10px;font-family:JetBrains Mono;font-size:9px;color:#00ff88;font-weight:700;letter-spacing:1px;">v55</span></h1>
+    <h1>Command Center <span style="margin-left:8px;padding:2px 8px;background:rgba(0,255,136,0.08);border:1px solid rgba(0,255,136,0.2);border-radius:10px;font-family:JetBrains Mono;font-size:9px;color:#00ff88;font-weight:700;letter-spacing:1px;">v56</span></h1>
     <div class="sub">SBA Leadership Portal — Onboarding & Code Management</div>
     <input type="text" id="loginUser" placeholder="Username" style="width:100%;padding:14px;background:var(--card);border:1px solid var(--border);border-radius:10px;color:var(--t1);font-family:Outfit;font-size:15px;margin-bottom:10px;outline:none;" onkeypress="if(event.key==='Enter')document.getElementById('loginPass').focus()">
     <div style="position:relative;margin-bottom:12px;">
@@ -1303,8 +1303,11 @@ async function onboardMember(){
     const vp=password;
     try{
       const r=await fetch('/api/create-vpn',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:vu,password:vp})});
-      if(r.ok){vpnUser=vu;vpnPass=vp;}
-    }catch(e){}
+      const vpnResult=await r.json().catch(()=>({}));
+      console.log('VPN result:',r.status,vpnResult);
+      if(r.ok&&vpnResult.success){vpnUser=vpnResult.username||vu;vpnPass=vpnResult.password||vp;}
+      else{console.warn('VPN auto-create failed:',vpnResult.error||'unknown');showToast('⚠️ VPN account not auto-created — set manually later');}
+    }catch(e){console.error('VPN error:',e);}
   }
   
   btn.textContent='Saving member...';
