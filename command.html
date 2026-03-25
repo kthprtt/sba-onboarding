@@ -155,7 +155,7 @@ body{background:var(--bg);color:var(--t1);font-family:'Outfit',sans-serif;min-he
 <div class="login-screen" id="loginScreen">
   <div class="login-card">
     <div class="login-logo">SBA</div>
-    <h1>Command Center <span style="margin-left:8px;padding:2px 8px;background:rgba(0,255,136,0.08);border:1px solid rgba(0,255,136,0.2);border-radius:10px;font-family:JetBrains Mono;font-size:9px;color:#00ff88;font-weight:700;letter-spacing:1px;">v47</span></h1>
+    <h1>Command Center <span style="margin-left:8px;padding:2px 8px;background:rgba(0,255,136,0.08);border:1px solid rgba(0,255,136,0.2);border-radius:10px;font-family:JetBrains Mono;font-size:9px;color:#00ff88;font-weight:700;letter-spacing:1px;">v48</span></h1>
     <div class="sub">SBA Leadership Portal — Onboarding & Code Management</div>
     <input type="text" id="loginUser" placeholder="Username" style="width:100%;padding:14px;background:var(--card);border:1px solid var(--border);border-radius:10px;color:var(--t1);font-family:Outfit;font-size:15px;margin-bottom:10px;outline:none;" onkeypress="if(event.key==='Enter')document.getElementById('loginPass').focus()">
     <div style="position:relative;margin-bottom:12px;">
@@ -427,8 +427,13 @@ body{background:var(--bg);color:var(--t1);font-family:'Outfit',sans-serif;min-he
           <div class="form-group"><div class="form-label">Phone</div><input class="form-input" id="obPhone" placeholder="(555) 123-4567"></div>
           <div class="form-group"><div class="form-label">Discord</div><input class="form-input" id="obDiscord" placeholder="john#1234"></div>
           <div class="form-group">
-            <div class="form-label">Package</div>
+            <div class="form-label">Access Package <span style="font-size:9px;color:var(--t3);">(what they USE)</span></div>
             <select class="form-select" id="obPkg"><option value="basic">Basic $1K</option><option value="plus">Plus $2K</option><option value="elite">Elite $5K</option><option value="pro">Pro $10K</option><option value="none" style="color:#6b7086;">No Package (Free Affiliate)</option></select>
+          </div>
+          <div class="form-group">
+            <div class="form-label">Paid For <span style="font-size:9px;color:var(--t3);">(commissions based on this)</span></div>
+            <select class="form-select" id="obPaidPkg" onchange="document.getElementById('incentiveNote').style.display=this.value?'block':'none'"><option value="">Same as Access Package</option><option value="basic">Basic $1K</option><option value="plus">Plus $2K</option><option value="elite">Elite $5K</option><option value="pro">Pro $10K</option></select>
+            <div id="incentiveNote" style="display:none;margin-top:4px;padding:8px;background:rgba(212,168,67,0.06);border:1px solid rgba(212,168,67,0.12);border-radius:6px;font-size:10px;color:var(--gold);">⭐ Incentivized — commissions calculate on what they paid, not what they access.</div>
           </div>
           <div class="form-group">
             <div class="form-label">Member Type</div>
@@ -1168,6 +1173,7 @@ async function onboardMember(){
   const phone=document.getElementById('obPhone').value.trim();
   const discord=document.getElementById('obDiscord').value.trim();
   let pkg=document.getElementById('obPkg').value;
+  const paidPkg=document.getElementById('obPaidPkg')?.value||'';
   const type=document.getElementById('obType').value;
   const vpnVal=document.getElementById('obVPN').value;
   const vpn=type!=='affiliate_only' && (vpnVal==='yes'||vpnVal==='free');
@@ -1226,6 +1232,8 @@ async function onboardMember(){
   btn.textContent='Saving member...';
   const member={
     name,email:email.toLowerCase(),phone,discord,pkg:dbPkg,
+    paid_pkg:paidPkg||null,
+    incentive_note:paidPkg?'Incentivized — access '+dbPkg+' but paid for '+paidPkg:null,
     vpn:vpn||(pkg==='promo_launch'),payment:pay,
     promo_code:pkg==='promo_launch'?'LAUNCH-SPECIAL':null,
     promo_value:pkg==='promo_launch'?3000:0,
@@ -1254,9 +1262,10 @@ async function onboardMember(){
   if(vpnCode)await sb.from('activation_codes').update({status:'used',used_by_email:email,used_by_name:name,used_at:new Date().toISOString()}).eq('code',vpnCode);
   
   // Commissions
-  if(type!=='legacy'&&type!=='affiliate_only'&&pkgAmounts[pkg]>0&&ref){
+  const commissionAmt = paidPkg ? pkgAmounts[paidPkg]||pkgAmounts[pkg]||0 : pkgAmounts[pkg]||0;
+  if(type!=='legacy'&&type!=='affiliate_only'&&commissionAmt>0&&ref){
     btn.textContent='Calculating commissions...';
-    await calcCommissions(result[0],pkgAmounts[pkg],code);
+    await calcCommissions(result[0],commissionAmt,code);
   }
   
   btn.disabled=false;btn.textContent='⚡ Onboard Member';
