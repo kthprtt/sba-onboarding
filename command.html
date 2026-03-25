@@ -155,7 +155,7 @@ body{background:var(--bg);color:var(--t1);font-family:'Outfit',sans-serif;min-he
 <div class="login-screen" id="loginScreen">
   <div class="login-card">
     <div class="login-logo">SBA</div>
-    <h1>Command Center <span style="margin-left:8px;padding:2px 8px;background:rgba(0,255,136,0.08);border:1px solid rgba(0,255,136,0.2);border-radius:10px;font-family:JetBrains Mono;font-size:9px;color:#00ff88;font-weight:700;letter-spacing:1px;">v31</span></h1>
+    <h1>Command Center <span style="margin-left:8px;padding:2px 8px;background:rgba(0,255,136,0.08);border:1px solid rgba(0,255,136,0.2);border-radius:10px;font-family:JetBrains Mono;font-size:9px;color:#00ff88;font-weight:700;letter-spacing:1px;">v32</span></h1>
     <div class="sub">SBA Leadership Portal — Onboarding & Code Management</div>
     <input type="text" id="loginUser" placeholder="Username" style="width:100%;padding:14px;background:var(--card);border:1px solid var(--border);border-radius:10px;color:var(--t1);font-family:Outfit;font-size:15px;margin-bottom:10px;outline:none;" onkeypress="if(event.key==='Enter')document.getElementById('loginPass').focus()">
     <div style="position:relative;margin-bottom:12px;">
@@ -298,6 +298,30 @@ body{background:var(--bg);color:var(--t1);font-family:'Outfit',sans-serif;min-he
         <div style="margin-top:8px;padding:8px;background:var(--bg);border-radius:6px;text-align:center;border:1px solid var(--border);">
           <div style="font-size:10px;color:var(--t3);">📈 This ledger is shared with JP Morgan & Mike Farr — every signup counts toward our funding milestones</div>
         </div>
+      </div>
+
+      <!-- Money Tracker -->
+      <div class="card">
+        <h3 style="font-size:16px;font-weight:900;margin-bottom:10px;">💰 Money Tracker</h3>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px;">
+          <div style="padding:10px;background:var(--bg);border-radius:8px;text-align:center;border:1px solid rgba(212,168,67,0.15);">
+            <div style="font-family:'JetBrains Mono';font-size:16px;font-weight:900;color:var(--gold);" id="mtExpected">$0</div>
+            <div style="font-size:9px;color:var(--t3);">EXPECTED</div>
+          </div>
+          <div style="padding:10px;background:var(--bg);border-radius:8px;text-align:center;border:1px solid rgba(0,255,136,0.15);">
+            <div style="font-family:'JetBrains Mono';font-size:16px;font-weight:900;color:var(--green);" id="mtCollected">$0</div>
+            <div style="font-size:9px;color:var(--t3);">COLLECTED</div>
+          </div>
+          <div style="padding:10px;background:var(--bg);border-radius:8px;text-align:center;border:1px solid rgba(255,68,102,0.15);">
+            <div style="font-family:'JetBrains Mono';font-size:16px;font-weight:900;color:var(--red);" id="mtOwed">$0</div>
+            <div style="font-size:9px;color:var(--t3);">STILL OWED</div>
+          </div>
+          <div style="padding:10px;background:var(--bg);border-radius:8px;text-align:center;border:1px solid rgba(139,92,246,0.15);">
+            <div style="font-family:'JetBrains Mono';font-size:16px;font-weight:900;color:var(--purple);" id="mtCommissions">$0</div>
+            <div style="font-size:9px;color:var(--t3);">YOUR COMMISSIONS</div>
+          </div>
+        </div>
+        <div id="mtDetails" style="max-height:200px;overflow-y:auto;"></div>
       </div>
 
       <!-- Quick Actions -->
@@ -754,7 +778,36 @@ function renderDashboard(){
   renderTeam();
   renderPeople();
   loadPendingQueue();
+  renderMoneyTracker();
 
+}
+
+function renderMoneyTracker(){
+  const leaderMember = members.find(m=>(m.referral_code||'')===(leader)||((m.name||'').toLowerCase().includes(leader)));
+  const leaderRefCode = leaderMember?.referral_code || leader;
+  function getDown(rc){let r=[];members.filter(m=>m.referred_by_code===rc&&!m.is_core_team).forEach(d=>{r.push(d);if(d.referral_code)r=r.concat(getDown(d.referral_code));});return r;}
+  const myPeople = getDown(leaderRefCode);
+  let expected=0,collected=0,owed=0;
+  let rows=[];
+  myPeople.forEach(m=>{
+    if(m.member_type==='phantom')return;
+    const amt=parseFloat(m.package_amount)||0;
+    const pay=(m.payment||'').toLowerCase();
+    const isFree=m.member_type==='affiliate_only'||m.pkg==='none'||amt===0;
+    const isPaid=pay==='paid'||pay==='stripe'||pay==='renewed';
+    const isPartial=pay==='partial';
+    if(!isFree){expected+=amt;if(isPaid)collected+=amt;else if(isPartial){collected+=Math.round(amt*0.5);owed+=Math.round(amt*0.5);}else owed+=amt;}
+    const st=isFree?'🆓 FREE':isPaid?'✅ PAID':isPartial?'⚠️ PARTIAL':'❌ OWED';
+    const sc=isFree?'var(--t3)':isPaid?'var(--green)':isPartial?'var(--orange)':'var(--red)';
+    rows.push({name:m.name,pkg:m.pkg,amt,st,sc,ow:isFree?0:isPaid?0:isPartial?Math.round(amt*0.5):amt});
+  });
+  const comm=parseFloat(leaderMember?.total_earned||0);
+  const s=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent='$'+v.toLocaleString();};
+  s('mtExpected',expected);s('mtCollected',collected);s('mtOwed',owed);s('mtCommissions',Math.round(comm));
+  const d=document.getElementById('mtDetails');
+  if(d&&rows.length){
+    d.innerHTML=rows.map(r=>`<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.03);font-size:11px;"><span style="flex:1;font-weight:600;">${r.name||'—'}</span><span style="color:var(--t3);font-family:'JetBrains Mono';font-size:10px;">${(r.pkg||'—').toUpperCase()}</span><span style="font-family:'JetBrains Mono';font-size:10px;">$${r.amt.toLocaleString()}</span><span style="color:${r.sc};font-size:10px;font-weight:700;min-width:65px;text-align:right;">${r.st}</span>${r.ow>0?'<span style="font-family:JetBrains Mono;font-size:10px;color:var(--red);">owes $'+r.ow.toLocaleString()+'</span>':''}</div>`).join('');
+  }else if(d){d.innerHTML='<div style="text-align:center;padding:12px;font-size:11px;color:var(--t3);">No members on your side yet</div>';}
 }
 
 
