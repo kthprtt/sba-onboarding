@@ -374,9 +374,8 @@ async function loadRequests(){
     }
     
     // Show cancelled requests
-    // Remove any existing cancelled section first
-    const existingCancelled = document.getElementById('cancelledSection');
-    if(existingCancelled) existingCancelled.remove();
+    // Remove ALL existing cancelled sections first
+    document.querySelectorAll('#cancelledSection').forEach(el=>el.remove());
     
     if(cancelled.length){
       let cHtml='<div id="cancelledSection" style="margin-top:16px;padding:12px;background:rgba(255,68,102,0.03);border:1px solid rgba(255,68,102,0.1);border-radius:10px;"><h4 style="font-size:13px;color:#ff4466;margin-bottom:8px;">🗑️ Recently Cancelled by Team ('+cancelled.length+')</h4>';
