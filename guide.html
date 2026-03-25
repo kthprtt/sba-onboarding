@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<title>SBA Command Center — Complete Guide</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0a0b10;color:#e8e6e0;font-family:'Outfit',sans-serif;padding:20px;max-width:800px;margin:0 auto}
+h1{font-size:32px;font-weight:900;text-align:center;margin:30px 0 6px}
+.sub{text-align:center;color:#6b7086;font-size:14px;margin-bottom:32px}
+.gold{color:#d4a843}
+.green{color:#00e676}
+.blue{color:#4488ff}
+.orange{color:#f59e0b}
+.purple{color:#b388ff}
+.red{color:#ff5252}
+
+/* Section */
+.section{margin-bottom:32px}
+.section-title{font-size:20px;font-weight:900;margin-bottom:4px;display:flex;align-items:center;gap:8px}
+.section-desc{font-size:12px;color:#6b7086;margin-bottom:14px}
+
+/* Decision tree */
+.tree{position:relative;padding-left:24px}
+.tree::before{content:'';position:absolute;left:8px;top:0;bottom:0;width:2px;background:linear-gradient(to bottom,#d4a843,#00e676,#4488ff,#b388ff)}
+.node{position:relative;margin-bottom:12px;padding:14px 16px;background:#12141c;border:1px solid #252839;border-radius:12px}
+.node::before{content:'';position:absolute;left:-20px;top:18px;width:12px;height:12px;border-radius:50%;border:2px solid #d4a843;background:#0a0b10}
+.node.green-dot::before{border-color:#00e676}
+.node.blue-dot::before{border-color:#4488ff}
+.node.orange-dot::before{border-color:#f59e0b}
+.node.purple-dot::before{border-color:#b388ff}
+.node-q{font-size:14px;font-weight:800;margin-bottom:4px}
+.node-a{font-size:12px;color:#6b7086;line-height:1.6}
+.node-action{margin-top:6px;padding:8px 12px;background:rgba(212,168,67,0.06);border:1px solid rgba(212,168,67,0.12);border-radius:8px;font-size:11px;font-weight:700;color:#d4a843}
+.node-action.green-action{background:rgba(0,230,118,0.06);border-color:rgba(0,230,118,0.12);color:#00e676}
+.node-action.blue-action{background:rgba(68,136,255,0.06);border-color:rgba(68,136,255,0.12);color:#4488ff}
+.node-action.orange-action{background:rgba(245,158,11,0.06);border-color:rgba(245,158,11,0.12);color:#f59e0b}
+
+/* Flow */
+.flow{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:10px 0}
+.flow-step{padding:6px 12px;background:#12141c;border:1px solid #252839;border-radius:8px;font-size:11px;font-weight:700}
+.flow-arrow{color:#d4a843;font-size:14px}
+
+/* Comparison */
+.compare{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:14px 0}
+.compare-card{padding:14px;background:#12141c;border:1px solid #252839;border-radius:12px;text-align:center}
+.compare-card h4{font-size:13px;font-weight:900;margin-bottom:4px}
+.compare-card .emoji{font-size:28px;margin-bottom:6px}
+.compare-card ul{text-align:left;font-size:10px;color:#6b7086;line-height:1.8;list-style:none;padding:0}
+.compare-card li::before{content:'• ';color:#d4a843}
+
+/* Step by step */
+.steps{counter-reset:step}
+.step{position:relative;padding:12px 16px 12px 48px;background:#12141c;border:1px solid #252839;border-radius:10px;margin-bottom:6px;font-size:12px;line-height:1.6}
+.step::before{counter-increment:step;content:counter(step);position:absolute;left:14px;top:12px;width:24px;height:24px;background:rgba(212,168,67,0.1);border:1px solid rgba(212,168,67,0.2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono';font-size:11px;font-weight:700;color:#d4a843}
+.step strong{color:#e8e6e0}
+.step .hint{color:#6b7086;font-size:10px}
+
+/* Money flow */
+.money-flow{display:flex;flex-direction:column;gap:4px;margin:10px 0}
+.mf-row{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:8px;font-size:12px;font-weight:700}
+.mf-row .icon{font-size:16px;width:24px;text-align:center}
+
+/* Quick ref */
+.qr{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:11px;padding:12px;background:#12141c;border:1px solid #252839;border-radius:10px;margin:10px 0}
+.qr .label{color:#6b7086;font-weight:600}
+.qr .val{font-family:'JetBrains Mono';font-weight:700}
+
+/* Divider */
+hr{border:none;border-top:1px solid #252839;margin:28px 0}
+
+@media(max-width:600px){.compare{grid-template-columns:1fr}.flow{flex-direction:column;align-items:flex-start}.flow-arrow{transform:rotate(90deg)}}
+</style>
+</head>
+<body>
+
+<div style="text-align:center;margin-bottom:8px"><span style="padding:4px 12px;background:rgba(212,168,67,0.08);border:1px solid rgba(212,168,67,0.15);border-radius:20px;font-family:'JetBrains Mono';font-size:10px;color:#d4a843;font-weight:700;">SBA COMMAND CENTER GUIDE</span></div>
+<h1>The Complete <span class="gold">Playbook</span></h1>
+<p class="sub">Everything Vegas & Waleed need to onboard, manage, and track members.</p>
+
+<hr>
+
+<!-- THREE TYPES -->
+<div class="section">
+<div class="section-title">👤 Three Types of People</div>
+<div class="section-desc">Every person falls into one of these categories. Know which one before you start.</div>
+
+<div class="compare">
+  <div class="compare-card" style="border-color:rgba(245,158,11,0.2)">
+    <div class="emoji">⏳</div>
+    <h4 class="orange">Phantom</h4>
+    <ul>
+      <li>Just a NAME</li>
+      <li>No account</li>
+      <li>No login</li>
+      <li>No payment</li>
+      <li>Placeholder in tree</li>
+      <li>"They're coming eventually"</li>
+    </ul>
+  </div>
+  <div class="compare-card" style="border-color:rgba(212,168,67,0.2)">
+    <div class="emoji">🆓</div>
+    <h4 class="gold">Free Affiliate</h4>
+    <ul>
+      <li>Real person</li>
+      <li>Has account + login</li>
+      <li>No package (free)</li>
+      <li>Can build a team</li>
+      <li>Earns commissions</li>
+      <li>"Building first, buying later"</li>
+    </ul>
+  </div>
+  <div class="compare-card" style="border-color:rgba(0,230,118,0.2)">
+    <div class="emoji">💎</div>
+    <h4 class="green">Paid Member</h4>
+    <ul>
+      <li>Real person</li>
+      <li>Has account + login</li>
+      <li>Paid package ($1K-$10K)</li>
+      <li>Full Genius access</li>
+      <li>Earns commissions</li>
+      <li>"In the game"</li>
+    </ul>
+  </div>
+</div>
+</div>
+
+<hr>
+
+<!-- DECISION TREE -->
+<div class="section">
+<div class="section-title">🧠 The Decision Tree</div>
+<div class="section-desc">Ask yourself these questions for every person.</div>
+
+<div class="tree">
+  <div class="node">
+    <div class="node-q">"Is this a real person or just a name?"</div>
+    <div class="node-a">If you only have a name and they haven't signed up or paid...</div>
+    <div class="node-action orange-action">⏳ CREATE PHANTOM → Onboard tab → type name → "+ Add as Pending"</div>
+  </div>
+  
+  <div class="node green-dot">
+    <div class="node-q">"Did they pay?"</div>
+    <div class="node-a">They're a real person ready to join. They paid or they want to build for free.</div>
+    <div class="node-action green-action">YES → Submit request on My Codes → Keith approves → ⚡ Onboard</div>
+    <div class="node-action" style="margin-top:4px">NO but wants to build → Onboard as "Affiliate Only — Unpaid" (no code needed)</div>
+  </div>
+  
+  <div class="node blue-dot">
+    <div class="node-q">"Do we know where they go in the tree?"</div>
+    <div class="node-a">If you know their upline, place them directly. If not, hold them.</div>
+    <div class="node-action green-action">YES → Select the person in the 🔍 Referrer dropdown → direct placement</div>
+    <div class="node-action blue-action" style="margin-top:4px">NO → Select "📦 Holding Tank" → Keith places them later</div>
+  </div>
+  
+  <div class="node purple-dot">
+    <div class="node-q">"Their upline hasn't signed up yet?"</div>
+    <div class="node-a">The person they go under isn't in the system yet.</div>
+    <div class="node-action orange-action">Create the upline as PHANTOM first → then select that phantom in the dropdown</div>
+  </div>
+</div>
+</div>
+
+<hr>
+
+<!-- FULL FLOW: PAID MEMBER -->
+<div class="section">
+<div class="section-title">💎 Flow: Onboarding a Paid Member</div>
+<div class="section-desc">The most common flow. Someone paid, you onboard them.</div>
+
+<div class="steps">
+  <div class="step"><strong>My Codes tab</strong> → fill in name, email, package, VPN, payment status → <strong>Submit to SBA HQ</strong> <div class="hint">Button animates → green success card → appears in ⏳ Waiting queue</div></div>
+  <div class="step"><strong>Keith approves</strong> → codes push to your wallet (📦 package + 🔒 VPN) <div class="hint">Cards appear at top of My Codes with info summary</div></div>
+  <div class="step">Click <strong class="green">⚡ Onboard</strong> → form auto-fills name, email, codes, package, VPN, payment <div class="hint">Only thing left: pick the referrer</div></div>
+  <div class="step"><strong>🔍 Search</strong> the referrer dropdown → find the right person → select them <div class="hint">Or Holding Tank if unsure. Or create a phantom if upline isn't here yet.</div></div>
+  <div class="step">Click <strong class="green">⚡ Onboard Member</strong> → system creates account, burns codes, calculates commissions</div>
+  <div class="step"><strong>Welcome email popup</strong> → click 📋 Copy or 📨 Auto-Send → member gets login + Discord link + instructions</div>
+</div>
+</div>
+
+<hr>
+
+<!-- FLOW: FREE AFFILIATE -->
+<div class="section">
+<div class="section-title">🆓 Flow: Free Affiliate (No Package)</div>
+<div class="section-desc">They want to build a team but haven't bought yet.</div>
+
+<div class="steps">
+  <div class="step">Go to <strong>Onboard tab</strong> directly (no code request needed)</div>
+  <div class="step">Fill in name and email</div>
+  <div class="step">Member Type: <strong class="gold">Affiliate Only — Unpaid</strong></div>
+  <div class="step">No activation code needed — leave it blank</div>
+  <div class="step">Pick referrer (or Holding Tank) → <strong class="green">Onboard</strong></div>
+  <div class="step">They get a portal login, referral link, AI Closer — but no Genius betting tools</div>
+</div>
+</div>
+
+<hr>
+
+<!-- FLOW: PHANTOM -->
+<div class="section">
+<div class="section-title">⏳ Flow: Creating Phantoms</div>
+<div class="section-desc">Placeholder names for people who haven't signed up yet.</div>
+
+<div class="steps">
+  <div class="step"><strong>Single phantom:</strong> Onboard tab → type name in "Upline not in system yet?" field → <strong class="orange">+ Add as Pending</strong></div>
+  <div class="step"><strong>Batch phantoms:</strong> Playbook tab → Batch Add Phantoms → type names (one per line) → <strong class="orange">Create All as Pending</strong></div>
+  <div class="step">Phantoms appear in the referrer dropdown as <strong class="orange">⏳ Name (pending)</strong></div>
+  <div class="step">Place real people under phantoms using the dropdown</div>
+  <div class="step">When the phantom person pays → submit request → Keith approves → onboard them → phantom becomes real, tree stays intact</div>
+</div>
+</div>
+
+<hr>
+
+<!-- PLACEMENT -->
+<div class="section">
+<div class="section-title">📍 Managing Placement</div>
+<div class="section-desc">Moving people around in the tree.</div>
+
+<div style="padding:14px;background:#12141c;border:1px solid #252839;border-radius:12px;margin-bottom:8px">
+  <div style="font-size:14px;font-weight:800;margin-bottom:6px">👥 All People tab</div>
+  <div style="font-size:12px;color:#6b7086;line-height:1.7">
+    Every person in Holding Tank or Phantoms has a <strong class="purple">📍 Place</strong> button.<br>
+    Click it → modal shows all members → pick who they go under → sends suggestion to Keith.<br>
+    Keith approves → system moves them.<br><br>
+    <strong>You suggest. Keith approves. Nobody gets placed wrong.</strong>
+  </div>
+</div>
+
+<div style="padding:14px;background:#12141c;border:1px solid rgba(139,92,246,0.15);border-radius:12px">
+  <div style="font-size:14px;font-weight:800;color:#b388ff;margin-bottom:6px">📍 Pending Placement Suggestions</div>
+  <div style="font-size:12px;color:#6b7086;line-height:1.7">
+    After you suggest, a purple section appears showing:<br>
+    <span class="purple">Sarah Miller → under Waleed · WAITING FOR HQ</span><br>
+    Keith sees this and approves/adjusts on his admin.
+  </div>
+</div>
+</div>
+
+<hr>
+
+<!-- MONEY -->
+<div class="section">
+<div class="section-title">💰 Money Tracking</div>
+<div class="section-desc">Every dollar tracked from collection to Keith.</div>
+
+<div class="money-flow">
+  <div class="mf-row" style="background:rgba(255,82,82,0.06);border:1px solid rgba(255,82,82,0.1)"><span class="icon">❌</span> <span class="red">OWED</span> <span style="color:#6b7086;margin-left:auto;font-size:10px">Member hasn't paid</span></div>
+  <div style="text-align:center;color:#d4a843;font-size:10px">↓ You click "💰 I Collected" (enter amount)</div>
+  <div class="mf-row" style="background:rgba(212,168,67,0.06);border:1px solid rgba(212,168,67,0.1)"><span class="icon">💰</span> <span class="gold">PARTIAL ($X)</span> <span style="color:#6b7086;margin-left:auto;font-size:10px">Click "+ More $" when they pay rest</span></div>
+  <div style="text-align:center;color:#d4a843;font-size:10px">↓ Full amount collected</div>
+  <div class="mf-row" style="background:rgba(212,168,67,0.06);border:1px solid rgba(212,168,67,0.1)"><span class="icon">💰</span> <span class="gold">COLLECTED</span> <span style="color:#6b7086;margin-left:auto;font-size:10px">Ready to send to Keith</span></div>
+  <div style="text-align:center;color:#4488ff;font-size:10px">↓ You click "✅ I Sent This to SBA HQ"</div>
+  <div class="mf-row" style="background:rgba(68,136,255,0.06);border:1px solid rgba(68,136,255,0.1)"><span class="icon">📨</span> <span class="blue">SENT TO HQ</span> <span style="color:#6b7086;margin-left:auto;font-size:10px">Keith confirms receipt</span></div>
+  <div style="text-align:center;color:#00e676;font-size:10px">↓ Keith clicks "Mark Paid"</div>
+  <div class="mf-row" style="background:rgba(0,230,118,0.06);border:1px solid rgba(0,230,118,0.1)"><span class="icon">✅</span> <span class="green">PAID</span> <span style="color:#6b7086;margin-left:auto;font-size:10px">Done. Books are clean.</span></div>
+</div>
+</div>
+
+<hr>
+
+<!-- VPN -->
+<div class="section">
+<div class="section-title">🔒 VPN Options</div>
+<div class="section-desc">Three choices on every request and onboard form.</div>
+
+<div class="qr">
+  <div class="label">No VPN</div><div class="val">Person doesn't want/need VPN</div>
+  <div class="label green">VPN — FREE</div><div class="val green">Launch promo through April 7 · no extra cost · still gets VPN</div>
+  <div class="label">VPN — $1K</div><div class="val">After April 7 · adds $1K to total</div>
+</div>
+<div style="font-size:11px;color:#6b7086;padding:8px;background:#12141c;border-radius:8px;margin-top:6px">Free VPN generates a VPN code (🔒) alongside the package code (📦). Both appear on the person's card. Both prefill on onboard.</div>
+</div>
+
+<hr>
+
+<!-- PACKAGES -->
+<div class="section">
+<div class="section-title">📦 Packages</div>
+
+<div class="qr">
+  <div class="label">Basic</div><div class="val">$1,000</div>
+  <div class="label">Plus</div><div class="val">$2,000</div>
+  <div class="label">Elite</div><div class="val">$5,000</div>
+  <div class="label">Pro</div><div class="val">$10,000</div>
+  <div class="label gold">🔥 Launch Special</div><div class="val gold">$3K value for $1K (Plus + VPN FREE)</div>
+</div>
+</div>
+
+<hr>
+
+<!-- QUICK REF -->
+<div class="section">
+<div class="section-title">⚡ Quick Reference</div>
+
+<div class="qr">
+  <div class="label">Login (Vegas)</div><div class="val">vegas / MasterBuild3r</div>
+  <div class="label">Login (Waleed)</div><div class="val">waleed / B3ttorKing</div>
+  <div class="label">URL</div><div class="val">onboarding.sportsbetarbitrage.com/command.html</div>
+  <div class="label">Keith's Admin</div><div class="val">onboarding.sportsbetarbitrage.com</div>
+  <div class="label">Keith's Codes</div><div class="val">onboarding.sportsbetarbitrage.com/codes.html</div>
+  <div class="label">Affiliate Portal</div><div class="val">affiliate.sportsbetarbitrage.com</div>
+  <div class="label">Discord</div><div class="val">discord.gg/hZXxJMgHb3</div>
+  <div class="label">Launch</div><div class="val gold">Thursday March 26, 9PM ET</div>
+  <div class="label">Cycle 1</div><div class="val">March 26 → May 4 (40 days)</div>
+</div>
+</div>
+
+<hr>
+
+<!-- CHEAT SHEET -->
+<div class="section">
+<div class="section-title">🎯 The Cheat Sheet</div>
+
+<div style="padding:16px;background:#12141c;border:1px solid rgba(212,168,67,0.15);border-radius:12px;font-size:13px;line-height:2.2">
+  <strong>Someone paid, I know where they go</strong> → My Codes → submit → Keith approves → ⚡ Onboard → pick referrer → done<br>
+  <strong>Someone paid, don't know placement</strong> → Same flow but pick 📦 Holding Tank → figure out later<br>
+  <strong>Free affiliate, wants to build</strong> → Onboard tab → Affiliate Only → no code needed<br>
+  <strong>Name only, hasn't paid</strong> → Onboard tab → type name → + Add as Pending (phantom)<br>
+  <strong>Batch of names</strong> → Playbook → Batch Add Phantoms<br>
+  <strong>Need to place someone</strong> → All People → 📍 Place → suggest to Keith<br>
+  <strong>Collected money</strong> → Dashboard → 💰 I Collected → enter amount<br>
+  <strong>Sending money to Keith</strong> → Dashboard → ✅ I Sent This to SBA HQ<br>
+  <strong>Can't find someone in dropdown</strong> → 🔍 Search box above the referrer list<br>
+  <strong>Cache issue / wrong version</strong> → Ctrl+Shift+R → check version badge
+</div>
+</div>
+
+<div style="text-align:center;padding:30px 0;font-size:12px;color:#6b7086">
+  Sports Bet Arbitrage LLC · Command Center Guide · v43<br>
+  <a href="https://onboarding.sportsbetarbitrage.com/command.html" style="color:#d4a843;text-decoration:none;">Open Command Center →</a>
+</div>
+
+</body>
+</html>
