@@ -155,7 +155,7 @@ body{background:var(--bg);color:var(--t1);font-family:'Outfit',sans-serif;min-he
 <div class="login-screen" id="loginScreen">
   <div class="login-card">
     <div class="login-logo">SBA</div>
-    <h1>Command Center <span style="margin-left:8px;padding:2px 8px;background:rgba(0,255,136,0.08);border:1px solid rgba(0,255,136,0.2);border-radius:10px;font-family:JetBrains Mono;font-size:9px;color:#00ff88;font-weight:700;letter-spacing:1px;">v46</span></h1>
+    <h1>Command Center <span style="margin-left:8px;padding:2px 8px;background:rgba(0,255,136,0.08);border:1px solid rgba(0,255,136,0.2);border-radius:10px;font-family:JetBrains Mono;font-size:9px;color:#00ff88;font-weight:700;letter-spacing:1px;">v47</span></h1>
     <div class="sub">SBA Leadership Portal — Onboarding & Code Management</div>
     <input type="text" id="loginUser" placeholder="Username" style="width:100%;padding:14px;background:var(--card);border:1px solid var(--border);border-radius:10px;color:var(--t1);font-family:Outfit;font-size:15px;margin-bottom:10px;outline:none;" onkeypress="if(event.key==='Enter')document.getElementById('loginPass').focus()">
     <div style="position:relative;margin-bottom:12px;">
@@ -428,11 +428,11 @@ body{background:var(--bg);color:var(--t1);font-family:'Outfit',sans-serif;min-he
           <div class="form-group"><div class="form-label">Discord</div><input class="form-input" id="obDiscord" placeholder="john#1234"></div>
           <div class="form-group">
             <div class="form-label">Package</div>
-            <select class="form-select" id="obPkg"><option value="basic">Basic $1K</option><option value="plus">Plus $2K</option><option value="elite">Elite $5K</option><option value="pro">Pro $10K</option></select>
+            <select class="form-select" id="obPkg"><option value="basic">Basic $1K</option><option value="plus">Plus $2K</option><option value="elite">Elite $5K</option><option value="pro">Pro $10K</option><option value="none" style="color:#6b7086;">No Package (Free Affiliate)</option></select>
           </div>
           <div class="form-group">
             <div class="form-label">Member Type</div>
-            <select class="form-select" id="obType"><option value="active">Active — Paid</option><option value="affiliate_only">Affiliate Only — Unpaid</option><option value="legacy">Legacy — Already Paid Out</option></select>
+            <select class="form-select" id="obType" onchange="if(this.value==='affiliate_only'){document.getElementById('obPkg').value='none';document.getElementById('obCode').parentElement.style.opacity='0.3';document.getElementById('obVPN').value='no';document.getElementById('obVPNCode').parentElement.style.display='none';document.getElementById('obPay').value='affiliate';}else{document.getElementById('obCode').parentElement.style.opacity='1';}"><option value="active">Active — Paid</option><option value="affiliate_only">Affiliate Only — Free</option><option value="legacy">Legacy — Already Paid Out</option></select>
           </div>
           <div class="form-group">
             <div class="form-label">VPN Add-On</div>
@@ -1167,19 +1167,24 @@ async function onboardMember(){
   const email=document.getElementById('obEmail').value.trim();
   const phone=document.getElementById('obPhone').value.trim();
   const discord=document.getElementById('obDiscord').value.trim();
-  const pkg=document.getElementById('obPkg').value;
+  let pkg=document.getElementById('obPkg').value;
   const type=document.getElementById('obType').value;
   const vpnVal=document.getElementById('obVPN').value;
-  const vpn=vpnVal==='yes'||vpnVal==='free';
+  const vpn=type!=='affiliate_only' && (vpnVal==='yes'||vpnVal==='free');
   const vpnCode=document.getElementById('obVPNCode').value.trim().toUpperCase();
   const ref=document.getElementById('obRef').value;
   const pay=document.getElementById('obPay').value;
   
+  // Free affiliates don't need package, code, or VPN
+  if(type==='affiliate_only'){
+    pkg='none';
+  }
+  
   if(!name||!email){showToast('⚠️ Name and email required');return;}
   if(type!=='affiliate_only'&&!code){showToast('⚠️ Activation code required');return;}
   
-  // If VPN is selected and paid, require VPN code
-  if(vpnVal==='yes' && !vpnCode && pkg!=='promo_launch' && type!=='affiliate_only'){
+  // If VPN is selected and paid, require VPN code (not for affiliates)
+  if(type!=='affiliate_only' && vpnVal==='yes' && !vpnCode && pkg!=='promo_launch'){
     showToast('⚠️ VPN code required — get one from SBA HQ or select No VPN');return;
   }
   
@@ -1202,8 +1207,8 @@ async function onboardMember(){
   let password=pw;for(let i=0;i<8;i++)password+=chars[Math.floor(Math.random()*chars.length)];
   const firstName=name.split(' ')[0].toLowerCase().replace(/[^a-z]/g,'');
   const refCode=firstName+Math.floor(1000+Math.random()*9000);
-  const pkgAmounts={basic:1000,plus:2000,elite:5000,pro:10000,promo_launch:1000};
-  const dbPkg = pkg==='promo_launch'?'plus':pkg; // DB constraint only allows basic/plus/elite/pro
+  const pkgAmounts={basic:1000,plus:2000,elite:5000,pro:10000,promo_launch:1000,none:0};
+  const dbPkg = pkg==='promo_launch'?'plus':pkg; // DB allows basic/plus/elite/pro/none
   const now=new Date();const cycleStart=new Date('2026-03-26T21:00:00-04:00');const cycleEnd=new Date('2026-05-04T21:00:00-04:00');
   
   // VPN auto-create
