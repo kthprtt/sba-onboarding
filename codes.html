@@ -403,7 +403,7 @@ async function approveRequest(reqId, requestedBy, codeType){
   const{error}=await sb.from('activation_codes').insert([{
     code:pkgCode, code_type:type, status:'unused',
     payment_amount:AMOUNTS[type]||1000,
-    payment_method:'approved_request',
+    payment_method:'manual',
     payment_notes:'For: '+memberName,
     generated_by:'keith',
     assigned_to:assignTo
@@ -417,7 +417,7 @@ async function approveRequest(reqId, requestedBy, codeType){
     await sb.from('activation_codes').insert([{
       code:vpnCode, code_type:'vpn', status:'unused',
       payment_amount:1000,
-      payment_method:'approved_request',
+      payment_method:'manual',
       payment_notes:'For: '+memberName,
       generated_by:'keith',
       assigned_to:assignTo
