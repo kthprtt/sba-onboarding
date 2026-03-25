@@ -155,7 +155,7 @@ body{background:var(--bg);color:var(--t1);font-family:'Outfit',sans-serif;min-he
 <div class="login-screen" id="loginScreen">
   <div class="login-card">
     <div class="login-logo">SBA</div>
-    <h1>Command Center <span style="margin-left:8px;padding:2px 8px;background:rgba(0,255,136,0.08);border:1px solid rgba(0,255,136,0.2);border-radius:10px;font-family:JetBrains Mono;font-size:9px;color:#00ff88;font-weight:700;letter-spacing:1px;">v35</span></h1>
+    <h1>Command Center <span style="margin-left:8px;padding:2px 8px;background:rgba(0,255,136,0.08);border:1px solid rgba(0,255,136,0.2);border-radius:10px;font-family:JetBrains Mono;font-size:9px;color:#00ff88;font-weight:700;letter-spacing:1px;">v36</span></h1>
     <div class="sub">SBA Leadership Portal — Onboarding & Code Management</div>
     <input type="text" id="loginUser" placeholder="Username" style="width:100%;padding:14px;background:var(--card);border:1px solid var(--border);border-radius:10px;color:var(--t1);font-family:Outfit;font-size:15px;margin-bottom:10px;outline:none;" onkeypress="if(event.key==='Enter')document.getElementById('loginPass').focus()">
     <div style="position:relative;margin-bottom:12px;">
@@ -1005,28 +1005,43 @@ function prefillOnboard(name, email, codes){
   // Switch to onboard page
   showPage('onboard');
   
-  // Fill in the info
-  if(document.getElementById('obName')) document.getElementById('obName').value = name;
-  if(document.getElementById('obEmail')) document.getElementById('obEmail').value = email;
-  
-  // Fill in the first non-VPN code
-  const codeList = codes.split(',');
-  const pkgCode = codeList.find(c => !c.startsWith('VPN-')) || codeList[0];
-  const vpnCode = codeList.find(c => c.startsWith('VPN-'));
-  
-  if(document.getElementById('obCode')) {
-    document.getElementById('obCode').value = pkgCode;
-    validateCode(pkgCode);
-  }
-  
-  // If there's a VPN code, fill that in too
-  if(vpnCode && document.getElementById('obVPNCode')){
-    document.getElementById('obVPN').value = 'free'; // Default to free during launch promo
-    document.getElementById('obVPNCode').parentElement.style.display = 'flex';
-    document.getElementById('obVPNCode').value = vpnCode;
-  }
-  
-  showToast('⚡ Pre-filled for ' + name.split(' ')[0] + ' — review and onboard!');
+  // Small delay to ensure DOM is ready after page switch
+  setTimeout(()=>{
+    // Fill in the info
+    const nameEl = document.getElementById('obName');
+    const emailEl = document.getElementById('obEmail');
+    const codeEl = document.getElementById('obCode');
+    
+    if(nameEl) nameEl.value = name || '';
+    if(emailEl) emailEl.value = email || '';
+    
+    // Fill in the first non-VPN code
+    const codeList = (codes||'').split(',').filter(c=>c.trim());
+    const pkgCode = codeList.find(c => !c.startsWith('VPN-')) || codeList[0] || '';
+    const vpnCode = codeList.find(c => c.startsWith('VPN-'));
+    
+    if(codeEl && pkgCode) {
+      codeEl.value = pkgCode;
+      validateCode(pkgCode);
+    }
+    
+    // If there's a VPN code, fill that in too
+    const vpnSel = document.getElementById('obVPN');
+    const vpnInput = document.getElementById('obVPNCode');
+    if(vpnCode && vpnSel && vpnInput){
+      vpnSel.value = 'free';
+      vpnInput.parentElement.style.display = 'flex';
+      vpnInput.value = vpnCode;
+    }
+    
+    // Populate referral dropdown
+    populateRefDropdown();
+    
+    showToast('⚡ Pre-filled for ' + (name||'').split(' ')[0] + ' — select referrer and onboard!');
+    
+    // Scroll to top of form
+    document.getElementById('page-onboard')?.scrollIntoView({behavior:'smooth'});
+  }, 150);
 }
 
 function populateRefDropdown(){
@@ -1078,8 +1093,8 @@ async function validateCode(code){
   // Auto-set package
   if(data.code_type!=='vpn')document.getElementById('obPkg').value=data.code_type;
     if(data.code_type==='promo_launch'){
-      document.getElementById('obVPN').value='yes';
-      document.getElementById('obVPNCode')?.parentElement?.parentElement&&(document.getElementById('obVPNCode').parentElement.style.display='none');
+      document.getElementById('obVPN').value='free';
+      document.getElementById('obVPNCode')?.parentElement&&(document.getElementById('obVPNCode').parentElement.style.display='flex');
     }
 }
 
@@ -1092,7 +1107,8 @@ async function onboardMember(){
   const discord=document.getElementById('obDiscord').value.trim();
   const pkg=document.getElementById('obPkg').value;
   const type=document.getElementById('obType').value;
-  const vpn=document.getElementById('obVPN').value;
+  const vpnVal=document.getElementById('obVPN').value;
+  const vpn=vpnVal==='yes'||vpnVal==='free';
   const vpnCode=document.getElementById('obVPNCode').value.trim().toUpperCase();
   const ref=document.getElementById('obRef').value;
   const pay=document.getElementById('obPay').value;
@@ -1100,8 +1116,8 @@ async function onboardMember(){
   if(!name||!email){showToast('⚠️ Name and email required');return;}
   if(type!=='affiliate_only'&&!code){showToast('⚠️ Activation code required');return;}
   
-  // If VPN is selected, require VPN code (unless promo which auto-includes)
-  if(vpn==='yes' && !vpnCode && pkg!=='promo_launch' && type!=='affiliate_only'){
+  // If VPN is selected and paid, require VPN code
+  if(vpnVal==='yes' && !vpnCode && pkg!=='promo_launch' && type!=='affiliate_only'){
     showToast('⚠️ VPN code required — get one from SBA HQ or select No VPN');return;
   }
   
@@ -1129,7 +1145,7 @@ async function onboardMember(){
   
   // VPN auto-create
   let vpnUser=null,vpnPass=null;
-  if(vpn==='yes'){
+  if(vpn){
     btn.textContent='Creating VPN...';
     const vu='sba_'+firstName+Math.floor(100+Math.random()*900);
     const vp=password;
@@ -1142,11 +1158,11 @@ async function onboardMember(){
   btn.textContent='Saving member...';
   const member={
     name,email:email.toLowerCase(),phone,discord,pkg,
-    vpn:vpn==='yes'||(pkg==='promo_launch'),payment:pay,
+    vpn:vpn||(pkg==='promo_launch'),payment:pay,
     promo_code:pkg==='promo_launch'?'LAUNCH-SPECIAL':null,
     promo_value:pkg==='promo_launch'?3000:0,
     vpn_username:vpnUser,vpn_password:vpnPass,
-    vpn_status:vpn==='yes'?(vpnUser?'provisioned':'pending'):null,
+    vpn_status:vpn?(vpnUser?'provisioned':'pending'):null,
     referral_code:refCode,referred_by_code:(ref==='HOLDING_TANK'?null:ref)||null,
     package_amount:pkgAmounts[pkg]||0,
     member_type:type,
