@@ -155,7 +155,7 @@ body{background:var(--bg);color:var(--t1);font-family:'Outfit',sans-serif;min-he
 <div class="login-screen" id="loginScreen">
   <div class="login-card">
     <div class="login-logo">SBA</div>
-    <h1>Command Center <span style="margin-left:8px;padding:2px 8px;background:rgba(0,255,136,0.08);border:1px solid rgba(0,255,136,0.2);border-radius:10px;font-family:JetBrains Mono;font-size:9px;color:#00ff88;font-weight:700;letter-spacing:1px;">v32</span></h1>
+    <h1>Command Center <span style="margin-left:8px;padding:2px 8px;background:rgba(0,255,136,0.08);border:1px solid rgba(0,255,136,0.2);border-radius:10px;font-family:JetBrains Mono;font-size:9px;color:#00ff88;font-weight:700;letter-spacing:1px;">v33</span></h1>
     <div class="sub">SBA Leadership Portal — Onboarding & Code Management</div>
     <input type="text" id="loginUser" placeholder="Username" style="width:100%;padding:14px;background:var(--card);border:1px solid var(--border);border-radius:10px;color:var(--t1);font-family:Outfit;font-size:15px;margin-bottom:10px;outline:none;" onkeypress="if(event.key==='Enter')document.getElementById('loginPass').focus()">
     <div style="position:relative;margin-bottom:12px;">
@@ -384,7 +384,8 @@ body{background:var(--bg);color:var(--t1);font-family:'Outfit',sans-serif;min-he
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
           <select class="form-select" id="reqVPN">
             <option value="no">No VPN</option>
-            <option value="yes">🔒 VPN Add-On — $1,000</option>
+            <option value="free" style="color:#22c55e;">🔒 VPN — FREE (Launch Promo thru Apr 7)</option>
+            <option value="yes">🔒 VPN Add-On — $1,000 (after Apr 7)</option>
           </select>
           <select class="form-select" id="reqPayStatus">
             <option value="paid">✅ Paid in Full</option>
@@ -434,7 +435,7 @@ body{background:var(--bg);color:var(--t1);font-family:'Outfit',sans-serif;min-he
           </div>
           <div class="form-group">
             <div class="form-label">VPN Add-On</div>
-            <select class="form-select" id="obVPN" onchange="document.getElementById('obVPNCode').parentElement.style.display=this.value==='yes'?'flex':'none'"><option value="no">No VPN</option><option value="yes">Yes — VPN $1K</option></select>
+            <select class="form-select" id="obVPN" onchange="document.getElementById('obVPNCode').parentElement.style.display=(this.value==='yes'||this.value==='free')?'flex':'none'"><option value="no">No VPN</option><option value="free" style="color:#22c55e;">VPN — FREE (Launch Promo)</option><option value="yes">VPN — $1K (after Apr 7)</option></select>
           </div>
           <div class="form-group" style="display:none;">
             <div class="form-label" style="color:var(--purple);">🔒 VPN Code</div>
@@ -1176,9 +1177,11 @@ async function submitRequest(){
   const statusEmoji={paid:'✅ PAID',partial:'⚠️ PARTIAL',unpaid:'❌ UNPAID',affiliate:'🆓 FREE'};
   const pkgLabels={basic:'Basic $1K',plus:'Plus $2K',elite:'Elite $5K',pro:'Pro $10K',promo_launch:'🔥 Launch $1K'};
   const pkgAmounts={basic:1000,plus:2000,elite:5000,pro:10000,promo_launch:1000};
-  const totalAmt = pkgAmounts[type] + (vpn==='yes'?1000:0);
+  const vpnCost = vpn==='yes'?1000:0; // 'free' = $0 but still gets VPN
+  const totalAmt = pkgAmounts[type] + vpnCost;
+  const vpnLabel = vpn==='free'?' + VPN (FREE)':vpn==='yes'?' + VPN ($1K)':'';
   
-  const summary = name+' | '+(pkgLabels[type]||type)+(vpn==='yes'?' + VPN':'')+' | $'+totalAmt.toLocaleString()+' | '+(statusEmoji[payStatus]||'')+(payNote?' — '+payNote:'')+(email?' | '+email:'');
+  const summary = name+' | '+(pkgLabels[type]||type)+vpnLabel+' | $'+totalAmt.toLocaleString()+' | '+(statusEmoji[payStatus]||'')+(payNote?' — '+payNote:'')+(email?' | '+email:'');
   
   // Visual feedback — show processing
   const btn = document.getElementById('submitBtn');
