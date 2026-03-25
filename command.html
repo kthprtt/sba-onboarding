@@ -155,7 +155,7 @@ body{background:var(--bg);color:var(--t1);font-family:'Outfit',sans-serif;min-he
 <div class="login-screen" id="loginScreen">
   <div class="login-card">
     <div class="login-logo">SBA</div>
-    <h1>Command Center <span style="margin-left:8px;padding:2px 8px;background:rgba(0,255,136,0.08);border:1px solid rgba(0,255,136,0.2);border-radius:10px;font-family:JetBrains Mono;font-size:9px;color:#00ff88;font-weight:700;letter-spacing:1px;">v42</span></h1>
+    <h1>Command Center <span style="margin-left:8px;padding:2px 8px;background:rgba(0,255,136,0.08);border:1px solid rgba(0,255,136,0.2);border-radius:10px;font-family:JetBrains Mono;font-size:9px;color:#00ff88;font-weight:700;letter-spacing:1px;">v43</span></h1>
     <div class="sub">SBA Leadership Portal — Onboarding & Code Management</div>
     <input type="text" id="loginUser" placeholder="Username" style="width:100%;padding:14px;background:var(--card);border:1px solid var(--border);border-radius:10px;color:var(--t1);font-family:Outfit;font-size:15px;margin-bottom:10px;outline:none;" onkeypress="if(event.key==='Enter')document.getElementById('loginPass').focus()">
     <div style="position:relative;margin-bottom:12px;">
@@ -444,7 +444,8 @@ body{background:var(--bg);color:var(--t1);font-family:'Outfit',sans-serif;min-he
           </div>
           <div class="form-group full">
             <div class="form-label">Referred By (Who brought them in?)</div>
-            <select class="form-select" id="obRef"><option value="">Loading members...</option></select>
+            <input class="form-input" id="obRefSearch" placeholder="🔍 Search members..." style="font-size:11px;margin-bottom:4px;" oninput="filterRefDropdown(this.value)">
+            <select class="form-select" id="obRef" size="6" style="height:auto;max-height:180px;overflow-y:auto;"><option value="">Loading members...</option></select>
             <div style="display:flex;gap:8px;margin-top:6px;align-items:center;">
               <input class="form-input" id="obPendingUpline" placeholder="Upline not in system yet? Type their name" style="font-size:11px;flex:1;">
               <button onclick="createPhantom()" class="btn" style="padding:8px 14px;background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.3);color:var(--orange);font-size:11px;width:auto;white-space:nowrap;">+ Add as Pending</button>
@@ -1088,27 +1089,49 @@ function populateRefDropdown(){
   const activeMembers = members.filter(m=>m.member_type!=='phantom').sort((a,b)=>(a.name||'').localeCompare(b.name||''));
   const phantomMembers = members.filter(m=>m.member_type==='phantom').sort((a,b)=>(a.name||'').localeCompare(b.name||''));
   
-  let html='<option value="">Select who referred them...</option>';
+  // Store for filtering
+  window._refOptions = [];
+  
+  let html='<option value="">— Select who referred them —</option>';
   html+='<option value="HOLDING_TANK" style="color:#3b82f6;">📦 Holding Tank — place in tree later</option>';
+  window._refOptions.push({value:'HOLDING_TANK',label:'📦 Holding Tank — place in tree later',group:'system'});
   
   if(activeMembers.length){
-    html+='<optgroup label="Active Members">';
     activeMembers.forEach(m=>{
-      if(m.referral_code) html+=`<option value="${m.referral_code}">✅ ${m.name} (${m.referral_code})</option>`;
+      if(m.referral_code){
+        html+=`<option value="${m.referral_code}">✅ ${m.name} (${m.referral_code})</option>`;
+        window._refOptions.push({value:m.referral_code,label:'✅ '+m.name+' ('+m.referral_code+')',group:'active',name:m.name});
+      }
     });
-    html+='</optgroup>';
   }
   
   if(phantomMembers.length){
-    html+='<optgroup label="⏳ Pending (Not Yet Signed Up)">';
     phantomMembers.forEach(m=>{
-      if(m.referral_code) html+=`<option value="${m.referral_code}">⏳ ${m.name} (pending)</option>`;
+      if(m.referral_code){
+        html+=`<option value="${m.referral_code}">⏳ ${m.name} (pending)</option>`;
+        window._refOptions.push({value:m.referral_code,label:'⏳ '+m.name+' (pending)',group:'phantom',name:m.name});
+      }
     });
-    html+='</optgroup>';
   }
   
   sel.innerHTML=html;
   sel.onchange=function(){showTreePreview(this.value);};
+}
+
+function filterRefDropdown(query){
+  const sel=document.getElementById('obRef');
+  const q=query.toLowerCase().trim();
+  if(!q){populateRefDropdown();return;}
+  
+  const filtered = (window._refOptions||[]).filter(o=>
+    o.label.toLowerCase().includes(q) || (o.name||'').toLowerCase().includes(q)
+  );
+  
+  let html='<option value="">— Select who referred them —</option>';
+  filtered.forEach(o=>{
+    html+=`<option value="${o.value}">${o.label}</option>`;
+  });
+  sel.innerHTML=html;
 }
 
 function showTreePreview(refCode){
