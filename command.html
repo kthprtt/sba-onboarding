@@ -155,7 +155,7 @@ body{background:var(--bg);color:var(--t1);font-family:'Outfit',sans-serif;min-he
 <div class="login-screen" id="loginScreen">
   <div class="login-card">
     <div class="login-logo">SBA</div>
-    <h1>Command Center <span style="margin-left:8px;padding:2px 8px;background:rgba(0,255,136,0.08);border:1px solid rgba(0,255,136,0.2);border-radius:10px;font-family:JetBrains Mono;font-size:9px;color:#00ff88;font-weight:700;letter-spacing:1px;">v38</span></h1>
+    <h1>Command Center <span style="margin-left:8px;padding:2px 8px;background:rgba(0,255,136,0.08);border:1px solid rgba(0,255,136,0.2);border-radius:10px;font-family:JetBrains Mono;font-size:9px;color:#00ff88;font-weight:700;letter-spacing:1px;">v39</span></h1>
     <div class="sub">SBA Leadership Portal — Onboarding & Code Management</div>
     <input type="text" id="loginUser" placeholder="Username" style="width:100%;padding:14px;background:var(--card);border:1px solid var(--border);border-radius:10px;color:var(--t1);font-family:Outfit;font-size:15px;margin-bottom:10px;outline:none;" onkeypress="if(event.key==='Enter')document.getElementById('loginPass').focus()">
     <div style="position:relative;margin-bottom:12px;">
@@ -453,7 +453,7 @@ body{background:var(--bg);color:var(--t1);font-family:'Outfit',sans-serif;min-he
           </div>
           <div class="form-group">
             <div class="form-label">Payment Status</div>
-            <select class="form-select" id="obPay"><option value="paid">Paid — Manual</option><option value="stripe_auto">Paid — Stripe</option></select>
+            <select class="form-select" id="obPay"><option value="paid">✅ Paid in Full</option><option value="partial">⚠️ Partial Payment</option><option value="unpaid">❌ Not Paid Yet</option><option value="affiliate">🆓 Free Affiliate</option><option value="stripe_auto">💳 Paid — Stripe</option></select>
           </div>
         </div>
         <button class="btn btn-gold" style="margin-top:16px;" id="obBtn" onclick="onboardMember()">⚡ Onboard Member</button>
@@ -943,20 +943,30 @@ function renderPersonCards(containerId,byPerson){
     const codes=byPerson[name];
     const isNew=codes.some(c=>(Date.now()-new Date(c.created_at).getTime())<120000);
     const initials=name.split(' ').map(n=>n[0]).join('').toUpperCase().slice(0,2);
-    // Parse info from payment_notes (format: "For: Name | Pkg | $Amount | Status | email")
+    // Parse info from payment_notes (format: "For: Name | Pkg Info | $Amount | Status — notes | email")
     const firstNote = codes[0]?.payment_notes || '';
     const parts = firstNote.replace('For: ','').split(' | ');
     const parsedName = (parts[0]||name).trim();
+    const parsedPkg = (parts[1]||'').trim();
+    const parsedAmount = (parts[2]||'').trim();
+    const parsedPayment = (parts[3]||'').trim();
     const parsedEmail = (parts.find(p=>p.includes('@'))||'').trim();
     const allCodes = codes.map(c=>c.code).join(',');
+    const codeType = codes.find(c=>c.code_type!=='vpn')?.code_type||'basic';
+    const hasVPN = codes.some(c=>c.code_type==='vpn');
+    
+    // Build data string to pass all info
+    const dataStr = JSON.stringify({name:parsedName,email:parsedEmail,codes:allCodes,pkg:codeType,hasVPN,payment:parsedPayment,pkgLabel:parsedPkg}).replace(/'/g,'&#39;').replace(/"/g,'&quot;');
+    
     const escapedName = parsedName.replace(/'/g,"\\'");
-    const escapedEmail = parsedEmail.replace(/'/g,"\\'");
     
     html+=`<div class="person-card ${isNew?'new':''}"><div class="person-header"><div class="person-avatar">${initials}</div><div class="person-name">${parsedName}</div>${isNew?'<span class="person-badge">NEW!</span>':''}</div>`;
+    // Show parsed info summary
+    html+=`<div style="padding:4px 8px;margin-bottom:6px;font-size:10px;color:var(--t2);background:var(--bg);border-radius:4px;">${parsedPkg?'📦 '+parsedPkg:''}${parsedPayment?' · '+parsedPayment:''}${parsedEmail?' · '+parsedEmail:''}</div>`;
     codes.forEach(c=>{
       html+=`<div class="code-chip" onclick="copyCode('${c.code}')"><span style="font-size:13px;">${c.code_type==='vpn'?'🔒':'📦'}</span><span class="code">${c.code}</span><span class="tier ${TC[c.code_type]||''}">${TL[c.code_type]||''}</span><span class="hint">click to copy</span></div>`;
     });
-    html+=`<button onclick="prefillOnboard('${escapedName}','${escapedEmail}','${allCodes}')" style="width:100%;margin-top:8px;padding:10px;background:linear-gradient(135deg,rgba(0,255,136,0.1),rgba(0,255,136,0.05));border:1px solid rgba(0,255,136,0.2);border-radius:8px;color:var(--green);font-family:Outfit;font-weight:700;font-size:12px;cursor:pointer;">⚡ Onboard ${parsedName.split(' ')[0]}</button>`;
+    html+=`<button onclick='prefillOnboard(${dataStr.replace(/&quot;/g,'"')})' style="width:100%;margin-top:8px;padding:10px;background:linear-gradient(135deg,rgba(0,255,136,0.1),rgba(0,255,136,0.05));border:1px solid rgba(0,255,136,0.2);border-radius:8px;color:var(--green);font-family:Outfit;font-weight:700;font-size:12px;cursor:pointer;">⚡ Onboard ${escapedName.split(' ')[0]}</button>`;
     html+='</div>';
   });
   el.innerHTML=html;
@@ -1001,43 +1011,69 @@ function renderTeam(){
 
 function copyCode(code){navigator.clipboard.writeText(code);showToast('📋 Copied: '+code);}
 
-function prefillOnboard(name, email, codes){
+function prefillOnboard(data){
+  // Accept either old format (name,email,codes) or new data object
+  let name,email,codes,pkg,hasVPN,payment;
+  if(typeof data==='object'){
+    name=data.name||'';email=data.email||'';codes=data.codes||'';pkg=data.pkg||'';hasVPN=data.hasVPN||false;payment=data.payment||'';
+  } else {
+    name=arguments[0]||'';email=arguments[1]||'';codes=arguments[2]||'';
+  }
+  
   // Switch to onboard page
   showPage('onboard');
   
   // Small delay to ensure DOM is ready after page switch
   setTimeout(()=>{
-    // Fill in the info
+    // Fill name + email
     const nameEl = document.getElementById('obName');
     const emailEl = document.getElementById('obEmail');
-    const codeEl = document.getElementById('obCode');
+    if(nameEl) nameEl.value = name;
+    if(emailEl) emailEl.value = email;
     
-    if(nameEl) nameEl.value = name || '';
-    if(emailEl) emailEl.value = email || '';
-    
-    // Fill in the first non-VPN code
+    // Fill codes
     const codeList = (codes||'').split(',').filter(c=>c.trim());
     const pkgCode = codeList.find(c => !c.startsWith('VPN-')) || codeList[0] || '';
     const vpnCode = codeList.find(c => c.startsWith('VPN-'));
     
+    const codeEl = document.getElementById('obCode');
     if(codeEl && pkgCode) {
       codeEl.value = pkgCode;
       validateCode(pkgCode);
     }
     
-    // If there's a VPN code, fill that in too
+    // Set package dropdown
+    const pkgEl = document.getElementById('obPkg');
+    if(pkgEl && pkg){
+      pkgEl.value = pkg;
+    }
+    
+    // Set VPN dropdown
     const vpnSel = document.getElementById('obVPN');
     const vpnInput = document.getElementById('obVPNCode');
     if(vpnCode && vpnSel && vpnInput){
       vpnSel.value = 'free';
       vpnInput.parentElement.style.display = 'flex';
       vpnInput.value = vpnCode;
+    } else if(hasVPN && vpnSel){
+      vpnSel.value = 'free';
+      if(vpnInput) vpnInput.parentElement.style.display = 'flex';
+    }
+    
+    // Set payment status
+    const payEl = document.getElementById('obPay');
+    if(payEl && payment){
+      const payLower = payment.toLowerCase();
+      if(payLower.includes('paid')) payEl.value = 'paid';
+      else if(payLower.includes('partial')) payEl.value = 'partial';
+      else if(payLower.includes('unpaid') || payLower.includes('not paid')) payEl.value = 'unpaid';
+      else if(payLower.includes('free')) payEl.value = 'affiliate';
     }
     
     // Populate referral dropdown
     populateRefDropdown();
     
-    showToast('⚡ Pre-filled for ' + (name||'').split(' ')[0] + ' — select referrer and onboard!');
+    showToast('⚡ Pre-filled for ' + (name||'').split(' ')[0] + ' — just pick referrer and onboard!');
     
     // Scroll to top of form
     document.getElementById('page-onboard')?.scrollIntoView({behavior:'smooth'});
