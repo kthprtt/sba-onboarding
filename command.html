@@ -155,7 +155,7 @@ body{background:var(--bg);color:var(--t1);font-family:'Outfit',sans-serif;min-he
 <div class="login-screen" id="loginScreen">
   <div class="login-card">
     <div class="login-logo">SBA</div>
-    <h1>Command Center <span style="margin-left:8px;padding:2px 8px;background:rgba(0,255,136,0.08);border:1px solid rgba(0,255,136,0.2);border-radius:10px;font-family:JetBrains Mono;font-size:9px;color:#00ff88;font-weight:700;letter-spacing:1px;">v48</span></h1>
+    <h1>Command Center <span style="margin-left:8px;padding:2px 8px;background:rgba(0,255,136,0.08);border:1px solid rgba(0,255,136,0.2);border-radius:10px;font-family:JetBrains Mono;font-size:9px;color:#00ff88;font-weight:700;letter-spacing:1px;">v49</span></h1>
     <div class="sub">SBA Leadership Portal — Onboarding & Code Management</div>
     <input type="text" id="loginUser" placeholder="Username" style="width:100%;padding:14px;background:var(--card);border:1px solid var(--border);border-radius:10px;color:var(--t1);font-family:Outfit;font-size:15px;margin-bottom:10px;outline:none;" onkeypress="if(event.key==='Enter')document.getElementById('loginPass').focus()">
     <div style="position:relative;margin-bottom:12px;">
@@ -441,7 +441,8 @@ body{background:var(--bg);color:var(--t1);font-family:'Outfit',sans-serif;min-he
           </div>
           <div class="form-group">
             <div class="form-label">VPN Add-On</div>
-            <select class="form-select" id="obVPN" onchange="document.getElementById('obVPNCode').parentElement.style.display=(this.value==='yes'||this.value==='free')?'flex':'none'"><option value="no">No VPN</option><option value="free" style="color:#22c55e;">VPN — FREE (Launch Promo)</option><option value="yes">VPN — $1K (after Apr 7)</option></select>
+            <select class="form-select" id="obVPN" onchange="document.getElementById('obVPNCode').parentElement.style.display=(this.value==='yes'||this.value==='free'||this.value==='incentive')?'flex':'none';document.getElementById('vpnIncentiveNote').style.display=this.value==='incentive'?'block':'none'"><option value="no">No VPN</option><option value="free" style="color:#22c55e;">VPN — FREE (Launch Promo thru Apr 7)</option><option value="yes">VPN — Paid $1K</option><option value="incentive" style="color:#d4a843;">VPN — FREE Incentive (no commission)</option></select>
+            <div id="vpnIncentiveNote" style="display:none;margin-top:4px;padding:6px 8px;background:rgba(212,168,67,0.06);border:1px solid rgba(212,168,67,0.12);border-radius:6px;font-size:10px;color:var(--gold);">⭐ VPN given as incentive — they get access but no $1K added to commissions.</div>
           </div>
           <div class="form-group" style="display:none;">
             <div class="form-label" style="color:var(--purple);">🔒 VPN Code</div>
@@ -1176,8 +1177,8 @@ async function onboardMember(){
   const paidPkg=document.getElementById('obPaidPkg')?.value||'';
   const type=document.getElementById('obType').value;
   const vpnVal=document.getElementById('obVPN').value;
-  const vpn=type!=='affiliate_only' && (vpnVal==='yes'||vpnVal==='free');
-  const vpnCode=document.getElementById('obVPNCode').value.trim().toUpperCase();
+  const vpn=type!=='affiliate_only' && (vpnVal==='yes'||vpnVal==='free'||vpnVal==='incentive');
+  const vpnPaid=vpnVal==='yes'; // Only 'yes' counts as paid VPN for commissions  const vpnCode=document.getElementById('obVPNCode').value.trim().toUpperCase();
   const ref=document.getElementById('obRef').value;
   const pay=document.getElementById('obPay').value;
   
@@ -1240,7 +1241,7 @@ async function onboardMember(){
     vpn_username:vpnUser,vpn_password:vpnPass,
     vpn_status:vpn?(vpnUser?'provisioned':'pending'):null,
     referral_code:refCode,referred_by_code:(ref==='HOLDING_TANK'?null:ref)||null,
-    package_amount:pkgAmounts[pkg]||0,
+    package_amount:(pkgAmounts[paidPkg||pkg]||0)+(vpnPaid?1000:0),
     member_type:type,
     commission_status:type==='affiliate_only'?'held':type==='legacy'?'legacy_paid':'active',
     status:type,step_progress:1,
