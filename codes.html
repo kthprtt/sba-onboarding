@@ -69,7 +69,7 @@ select:focus,input:focus{border-color:var(--gold);}
 </div>
 
 <div class="container" id="dashContent" style="display:none;">
-  <h1>🔑 <span>SBA</span> Code Dashboard</h1>
+  <h1>🔑 <span>SBA</span> Code Dashboard <span style="margin-left:8px;padding:2px 8px;background:rgba(0,255,136,0.08);border:1px solid rgba(0,255,136,0.2);border-radius:10px;font-family:JetBrains Mono;font-size:9px;color:#00ff88;font-weight:700;letter-spacing:1px;">v41</span></h1>
   <div class="sub">Keith Only — Generate activation codes, approve requests, track all payments</div>
 
   <!-- Stats -->
@@ -212,11 +212,11 @@ select:focus,input:focus{border-color:var(--gold);}
 
 <script>
 const _ms={};const _memStorage={getItem:(k)=>_ms[k]||null,setItem:(k,v)=>{_ms[k]=v;},removeItem:(k)=>{delete _ms[k];}};
-let _sa=_memStorage;try{localStorage.setItem('_t','1');localStorage.removeItem('_t');_sa=localStorage;}catch(e){}
 
 const sb = supabase.createClient(
   'https://anjlmooskwvjystmrhxr.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFuamxtb29za3d2anlzdG1yaHhyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU0NjYzNTUsImV4cCI6MjA4MTA0MjM1NX0.DVLjp9PzNIPNSp2HAGtKTaPVfKy3QLs4HTJsy96UsyM'
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFuamxtb29za3d2anlzdG1yaHhyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU0NjYzNTUsImV4cCI6MjA4MTA0MjM1NX0.DVLjp9PzNIPNSp2HAGtKTaPVfKy3QLs4HTJsy96UsyM',
+  {auth:{storage:_memStorage,autoRefreshToken:false,persistSession:false,detectSessionInUrl:false}}
 );
 
 const AMOUNTS = {basic:1000,plus:2000,elite:5000,pro:10000,vpn:1000};
@@ -251,7 +251,8 @@ function showToast(msg){
 function genStr(type){
   const c='ABCDEFGHJKMNPQRSTUVWXYZ23456789';
   let r='';for(let i=0;i<6;i++)r+=c[Math.floor(Math.random()*c.length)];
-  return type==='vpn'?'VPN-'+r:'SBA-'+type.toUpperCase()+'-'+r;
+  const prefix = type==='vpn'?'VPN':type==='promo_launch'?'SBA-PROMO':'SBA-'+type.toUpperCase();
+  return prefix+'-'+r;
 }
 
 async function generateCode(forRequest){
@@ -407,7 +408,7 @@ async function approveRequest(reqId, requestedBy, codeType){
     generated_by:'keith',
     assigned_to:assignTo
   }]);
-  if(error){showToast('❌ '+error.message);return;}
+  if(error){console.error('Insert error:',JSON.stringify(error));showToast('❌ '+error.message);return;}
   
   // If VPN is included, generate VPN code too
   let vpnCode = null;
