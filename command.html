@@ -155,7 +155,7 @@ body{background:var(--bg);color:var(--t1);font-family:'Outfit',sans-serif;min-he
 <div class="login-screen" id="loginScreen">
   <div class="login-card">
     <div class="login-logo">SBA</div>
-    <h1>Command Center <span style="margin-left:8px;padding:2px 8px;background:rgba(0,255,136,0.08);border:1px solid rgba(0,255,136,0.2);border-radius:10px;font-family:JetBrains Mono;font-size:9px;color:#00ff88;font-weight:700;letter-spacing:1px;">v45</span></h1>
+    <h1>Command Center <span style="margin-left:8px;padding:2px 8px;background:rgba(0,255,136,0.08);border:1px solid rgba(0,255,136,0.2);border-radius:10px;font-family:JetBrains Mono;font-size:9px;color:#00ff88;font-weight:700;letter-spacing:1px;">v46</span></h1>
     <div class="sub">SBA Leadership Portal — Onboarding & Code Management</div>
     <input type="text" id="loginUser" placeholder="Username" style="width:100%;padding:14px;background:var(--card);border:1px solid var(--border);border-radius:10px;color:var(--t1);font-family:Outfit;font-size:15px;margin-bottom:10px;outline:none;" onkeypress="if(event.key==='Enter')document.getElementById('loginPass').focus()">
     <div style="position:relative;margin-bottom:12px;">
@@ -1502,9 +1502,9 @@ async function cancelRequest(id){
 
 
 function renderPeople(){
-  const tank = members.filter(m=>!m.referred_by_code && !m.is_core_team && m.member_type!=='phantom');
+  const tank = members.filter(m=>(!m.referred_by_code || !m.referred_by_code.trim()) && !m.is_core_team && m.member_type!=='phantom' && m.name!=='Keith Pratt');
   const phantoms = members.filter(m=>m.member_type==='phantom');
-  const active = members.filter(m=>m.referred_by_code && m.member_type!=='phantom' && !m.is_core_team);
+  const active = members.filter(m=>m.referred_by_code && m.referred_by_code.trim() && m.member_type!=='phantom' && !m.is_core_team);
   const pendingMoves = members.filter(m=>m.pending_upline && m.pending_upline.trim());
   
   document.getElementById('tankCount').textContent = tank.length;
