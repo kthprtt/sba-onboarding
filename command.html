@@ -155,7 +155,7 @@ body{background:var(--bg);color:var(--t1);font-family:'Outfit',sans-serif;min-he
 <div class="login-screen" id="loginScreen">
   <div class="login-card">
     <div class="login-logo">SBA</div>
-    <h1>Command Center <span style="margin-left:8px;padding:2px 8px;background:rgba(0,255,136,0.08);border:1px solid rgba(0,255,136,0.2);border-radius:10px;font-family:JetBrains Mono;font-size:9px;color:#00ff88;font-weight:700;letter-spacing:1px;">v33</span></h1>
+    <h1>Command Center <span style="margin-left:8px;padding:2px 8px;background:rgba(0,255,136,0.08);border:1px solid rgba(0,255,136,0.2);border-radius:10px;font-family:JetBrains Mono;font-size:9px;color:#00ff88;font-weight:700;letter-spacing:1px;">v34</span></h1>
     <div class="sub">SBA Leadership Portal — Onboarding & Code Management</div>
     <input type="text" id="loginUser" placeholder="Username" style="width:100%;padding:14px;background:var(--card);border:1px solid var(--border);border-radius:10px;color:var(--t1);font-family:Outfit;font-size:15px;margin-bottom:10px;outline:none;" onkeypress="if(event.key==='Enter')document.getElementById('loginPass').focus()">
     <div style="position:relative;margin-bottom:12px;">
@@ -322,6 +322,7 @@ body{background:var(--bg);color:var(--t1);font-family:'Outfit',sans-serif;min-he
           </div>
         </div>
         <div id="mtDetails" style="max-height:200px;overflow-y:auto;"></div>
+        <div id="mtSendToHQ" style="display:none;margin-top:10px;"></div>
       </div>
 
       <!-- Quick Actions -->
@@ -800,15 +801,57 @@ function renderMoneyTracker(){
     if(!isFree){expected+=amt;if(isPaid)collected+=amt;else if(isPartial){collected+=Math.round(amt*0.5);owed+=Math.round(amt*0.5);}else owed+=amt;}
     const st=isFree?'🆓 FREE':isPaid?'✅ PAID':isPartial?'⚠️ PARTIAL':'❌ OWED';
     const sc=isFree?'var(--t3)':isPaid?'var(--green)':isPartial?'var(--orange)':'var(--red)';
-    rows.push({name:m.name,pkg:m.pkg,amt,st,sc,ow:isFree?0:isPaid?0:isPartial?Math.round(amt*0.5):amt});
+    rows.push({id:m.id,name:m.name,pkg:m.pkg,amt,st,sc,ow:isFree?0:isPaid?0:isPartial?Math.round(amt*0.5):amt,isPaid,isFree,payment:m.payment});
   });
   const comm=parseFloat(leaderMember?.total_earned||0);
   const s=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent='$'+v.toLocaleString();};
   s('mtExpected',expected);s('mtCollected',collected);s('mtOwed',owed);s('mtCommissions',Math.round(comm));
   const d=document.getElementById('mtDetails');
   if(d&&rows.length){
-    d.innerHTML=rows.map(r=>`<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.03);font-size:11px;"><span style="flex:1;font-weight:600;">${r.name||'—'}</span><span style="color:var(--t3);font-family:'JetBrains Mono';font-size:10px;">${(r.pkg||'—').toUpperCase()}</span><span style="font-family:'JetBrains Mono';font-size:10px;">$${r.amt.toLocaleString()}</span><span style="color:${r.sc};font-size:10px;font-weight:700;min-width:65px;text-align:right;">${r.st}</span>${r.ow>0?'<span style="font-family:JetBrains Mono;font-size:10px;color:var(--red);">owes $'+r.ow.toLocaleString()+'</span>':''}</div>`).join('');
+    d.innerHTML=rows.map(r=>`<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.03);font-size:11px;">
+      <span style="flex:1;font-weight:600;">${r.name||'—'}</span>
+      <span style="color:var(--t3);font-family:'JetBrains Mono';font-size:10px;">${(r.pkg||'—').toUpperCase()}</span>
+      <span style="font-family:'JetBrains Mono';font-size:10px;">$${r.amt.toLocaleString()}</span>
+      <span style="color:${r.sc};font-size:10px;font-weight:700;min-width:65px;text-align:right;">${r.st}</span>
+      ${r.ow>0?'<span style="font-family:JetBrains Mono;font-size:10px;color:var(--red);">owes $'+r.ow.toLocaleString()+'</span>':''}
+      ${!r.isPaid&&!r.isFree&&r.payment!=='collected'?'<button onclick="markCollected(\''+r.id+'\')" style="padding:2px 8px;background:rgba(212,168,67,0.1);border:1px solid rgba(212,168,67,0.2);border-radius:4px;color:var(--gold);font-size:8px;font-weight:700;cursor:pointer;white-space:nowrap;">💰 I Collected</button>':''}
+      ${r.payment==='collected'?'<span style="font-size:8px;color:var(--gold);font-weight:700;">💰 COLLECTED — Send to HQ</span>':''}
+    </div>`).join('');
   }else if(d){d.innerHTML='<div style="text-align:center;padding:12px;font-size:11px;color:var(--t3);">No members on your side yet</div>';}
+  
+  // Show "Send to SBA HQ" summary if anything collected but not sent
+  const collectedNotSent = rows.filter(r=>r.payment==='collected');
+  const sendEl = document.getElementById('mtSendToHQ');
+  if(sendEl){
+    if(collectedNotSent.length>0){
+      const totalToSend = collectedNotSent.reduce((sum,r)=>sum+r.amt,0);
+      sendEl.style.display='block';
+      sendEl.innerHTML=`<div style="padding:12px;background:rgba(212,168,67,0.06);border:1px solid rgba(212,168,67,0.15);border-radius:8px;text-align:center;">
+        <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:4px;">💸 You owe SBA HQ: $${totalToSend.toLocaleString()}</div>
+        <div style="font-size:10px;color:var(--t2);">${collectedNotSent.length} payment(s) collected but not yet sent to Keith</div>
+        <div style="font-size:10px;color:var(--t3);margin-top:4px;">${collectedNotSent.map(r=>r.name+' $'+r.amt.toLocaleString()).join(' · ')}</div>
+        <button onclick="markSentToHQ()" style="margin-top:8px;padding:6px 16px;background:linear-gradient(135deg,var(--gold),var(--gold-dim));border:none;border-radius:6px;color:#000;font-weight:800;font-size:11px;cursor:pointer;">✅ I Sent This to SBA HQ</button>
+      </div>`;
+    }else{
+      sendEl.style.display='none';
+    }
+  }
+}
+
+async function markCollected(id){
+  await sb.from('onboarding_members').update({payment:'collected'}).eq('id',id);
+  showToast('💰 Marked as collected — remember to send to SBA HQ');
+  await loadAll();
+}
+
+async function markSentToHQ(){
+  if(!confirm('Confirm you sent all collected payments to SBA HQ?')) return;
+  const myPeople = members.filter(m=>m.payment==='collected');
+  for(const m of myPeople){
+    await sb.from('onboarding_members').update({payment:'sent_to_hq'}).eq('id',m.id);
+  }
+  showToast('✅ Marked as sent — SBA HQ will confirm receipt');
+  await loadAll();
 }
 
 

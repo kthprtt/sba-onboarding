@@ -2635,10 +2635,12 @@ function renderLedger(){
       const pay = (m.payment||'').toLowerCase();
       const isFree = m.member_type==='affiliate_only'||m.pkg==='none';
       const isPaid = pay==='paid'||pay==='stripe'||pay==='renewed';
+    const isCollected = pay==='collected';
+    const isSentToHQ = pay==='sent_to_hq';
       const isPartial = pay==='partial';
       const owed = isFree?0:isPaid?0:isPartial?Math.round(amt*0.5):amt;
-      const statusColor = isFree?'var(--text-secondary)':isPaid?'var(--green)':isPartial?'var(--orange)':'var(--red)';
-      const statusText = isFree?'FREE':isPaid?'✅ PAID':isPartial?'⚠️ PARTIAL':'❌ UNPAID';
+      const statusColor = isFree?'var(--text-secondary)':isPaid?'var(--green)':isSentToHQ?'var(--blue)':isCollected?'var(--gold)':isPartial?'var(--orange)':'var(--red)';
+      const statusText = isFree?'FREE':isPaid?'✅ PAID':isSentToHQ?'📨 SENT TO HQ':isCollected?'💰 COLLECTED':isPartial?'⚠️ PARTIAL':'❌ UNPAID';
       const upline = members.find(x=>x.referral_code===m.referred_by_code);
       
       return `<tr style="border-bottom:1px solid rgba(255,255,255,0.03);">
