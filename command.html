@@ -142,12 +142,35 @@ body{background:var(--bg);color:var(--t1);font-family:'Outfit',sans-serif;min-he
 
 
 /* Responsive */
-@media(max-width:768px){.app{grid-template-columns:1fr;}.sidebar{display:none;}.main{padding:16px;}.stats-row{grid-template-columns:repeat(2,1fr);}.form-grid{grid-template-columns:1fr;}}
+.mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:rgba(18,20,28,0.98);backdrop-filter:blur(16px);border-top:1px solid var(--border);padding:6px 4px;z-index:10000;display:none;grid-template-columns:repeat(7,1fr);gap:2px;}
+.mobile-nav button{background:none;border:none;color:var(--t3);font-size:18px;padding:6px 0;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;font-family:'Outfit';}
+.mobile-nav button span{font-size:7px;letter-spacing:0.5px;}
+.mobile-nav button.active{color:var(--gold);}
+@media(max-width:768px){
+  .app{grid-template-columns:1fr;}
+  .sidebar{display:none;}
+  .main{padding:12px 12px 80px;}
+  .stats-row{grid-template-columns:repeat(2,1fr);}
+  .form-grid{grid-template-columns:1fr;}
+  .mobile-nav{display:grid!important;}
+  select[size]{max-height:120px;}
+}
 </style>
 </head>
 <body>
 <div class="bg-grid"></div>
 <div class="bg-glow-1"></div>
+
+<!-- Mobile Bottom Nav -->
+<div class="mobile-nav" id="mobileNav">
+  <button onclick="showPage('dashboard')" id="mb-dashboard"><span>🏠</span><span>Home</span></button>
+  <button onclick="showPage('codes')" id="mb-codes"><span>🔑</span><span>Codes</span></button>
+  <button onclick="showPage('onboard')" id="mb-onboard"><span>⚡</span><span>Onboard</span></button>
+  <button onclick="showPage('team')" id="mb-team"><span>👥</span><span>Team</span></button>
+  <button onclick="showPage('people')" id="mb-people"><span>👤</span><span>People</span></button>
+  <button onclick="showPage('activity')" id="mb-activity"><span>📊</span><span>Activity</span></button>
+  <button onclick="showPage('playbook')" id="mb-playbook"><span>📋</span><span>Book</span></button>
+</div>
 <div class="bg-glow-2"></div>
 <div id="toast" class="toast"></div>
 
@@ -155,7 +178,7 @@ body{background:var(--bg);color:var(--t1);font-family:'Outfit',sans-serif;min-he
 <div class="login-screen" id="loginScreen">
   <div class="login-card">
     <div class="login-logo">SBA</div>
-    <h1>Command Center <span style="margin-left:8px;padding:2px 8px;background:rgba(0,255,136,0.08);border:1px solid rgba(0,255,136,0.2);border-radius:10px;font-family:JetBrains Mono;font-size:9px;color:#00ff88;font-weight:700;letter-spacing:1px;">v49</span></h1>
+    <h1>Command Center <span style="margin-left:8px;padding:2px 8px;background:rgba(0,255,136,0.08);border:1px solid rgba(0,255,136,0.2);border-radius:10px;font-family:JetBrains Mono;font-size:9px;color:#00ff88;font-weight:700;letter-spacing:1px;">v50</span></h1>
     <div class="sub">SBA Leadership Portal — Onboarding & Code Management</div>
     <input type="text" id="loginUser" placeholder="Username" style="width:100%;padding:14px;background:var(--card);border:1px solid var(--border);border-radius:10px;color:var(--t1);font-family:Outfit;font-size:15px;margin-bottom:10px;outline:none;" onkeypress="if(event.key==='Enter')document.getElementById('loginPass').focus()">
     <div style="position:relative;margin-bottom:12px;">
@@ -685,7 +708,12 @@ function showPage(id){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.getElementById('page-'+id)?.classList.add('active');
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-  event?.target?.classList?.add('active');
+  event?.target?.closest?.('.nav-item')?.classList?.add('active');
+  // Mobile nav highlight
+  document.querySelectorAll('.mobile-nav button').forEach(b=>b.classList.remove('active'));
+  document.getElementById('mb-'+id)?.classList.add('active');
+  // Scroll to top on page switch
+  window.scrollTo({top:0});
 }
 
 async function loadAll(){
