@@ -155,7 +155,7 @@ body{background:var(--bg);color:var(--t1);font-family:'Outfit',sans-serif;min-he
 <div class="login-screen" id="loginScreen">
   <div class="login-card">
     <div class="login-logo">SBA</div>
-    <h1>Command Center <span style="margin-left:8px;padding:2px 8px;background:rgba(0,255,136,0.08);border:1px solid rgba(0,255,136,0.2);border-radius:10px;font-family:JetBrains Mono;font-size:9px;color:#00ff88;font-weight:700;letter-spacing:1px;">v34</span></h1>
+    <h1>Command Center <span style="margin-left:8px;padding:2px 8px;background:rgba(0,255,136,0.08);border:1px solid rgba(0,255,136,0.2);border-radius:10px;font-family:JetBrains Mono;font-size:9px;color:#00ff88;font-weight:700;letter-spacing:1px;">v35</span></h1>
     <div class="sub">SBA Leadership Portal — Onboarding & Code Management</div>
     <input type="text" id="loginUser" placeholder="Username" style="width:100%;padding:14px;background:var(--card);border:1px solid var(--border);border-radius:10px;color:var(--t1);font-family:Outfit;font-size:15px;margin-bottom:10px;outline:none;" onkeypress="if(event.key==='Enter')document.getElementById('loginPass').focus()">
     <div style="position:relative;margin-bottom:12px;">
@@ -797,10 +797,11 @@ function renderMoneyTracker(){
     const pay=(m.payment||'').toLowerCase();
     const isFree=m.member_type==='affiliate_only'||m.pkg==='none'||amt===0;
     const isPaid=pay==='paid'||pay==='stripe'||pay==='renewed';
+    const isPartialCollected=pay==='partial_collected';
     const isPartial=pay==='partial';
-    if(!isFree){expected+=amt;if(isPaid)collected+=amt;else if(isPartial){collected+=Math.round(amt*0.5);owed+=Math.round(amt*0.5);}else owed+=amt;}
-    const st=isFree?'🆓 FREE':isPaid?'✅ PAID':isPartial?'⚠️ PARTIAL':'❌ OWED';
-    const sc=isFree?'var(--t3)':isPaid?'var(--green)':isPartial?'var(--orange)':'var(--red)';
+    if(!isFree){expected+=amt;if(isPaid)collected+=amt;else if(pay==='collected'||pay==='sent_to_hq')collected+=amt;else if(isPartialCollected){const pc=parseFloat(m.held_commissions)||0;collected+=pc;owed+=(amt-pc);}else if(isPartial){collected+=Math.round(amt*0.5);owed+=Math.round(amt*0.5);}else owed+=amt;}
+    const st=isFree?'🆓 FREE':isPaid?'✅ PAID':pay==='collected'?'💰 COLLECTED':isPartialCollected?'💰 PARTIAL ($'+(parseFloat(m.held_commissions)||0).toLocaleString()+')':isPartial?'⚠️ PARTIAL':'❌ OWED';
+    const sc=isFree?'var(--t3)':isPaid?'var(--green)':pay==='collected'?'var(--gold)':isPartialCollected?'var(--gold)':isPartial?'var(--orange)':'var(--red)';
     rows.push({id:m.id,name:m.name,pkg:m.pkg,amt,st,sc,ow:isFree?0:isPaid?0:isPartial?Math.round(amt*0.5):amt,isPaid,isFree,payment:m.payment});
   });
   const comm=parseFloat(leaderMember?.total_earned||0);
@@ -814,13 +815,13 @@ function renderMoneyTracker(){
       <span style="font-family:'JetBrains Mono';font-size:10px;">$${r.amt.toLocaleString()}</span>
       <span style="color:${r.sc};font-size:10px;font-weight:700;min-width:65px;text-align:right;">${r.st}</span>
       ${r.ow>0?'<span style="font-family:JetBrains Mono;font-size:10px;color:var(--red);">owes $'+r.ow.toLocaleString()+'</span>':''}
-      ${!r.isPaid&&!r.isFree&&r.payment!=='collected'?'<button onclick="markCollected(\''+r.id+'\')" style="padding:2px 8px;background:rgba(212,168,67,0.1);border:1px solid rgba(212,168,67,0.2);border-radius:4px;color:var(--gold);font-size:8px;font-weight:700;cursor:pointer;white-space:nowrap;">💰 I Collected</button>':''}
-      ${r.payment==='collected'?'<span style="font-size:8px;color:var(--gold);font-weight:700;">💰 COLLECTED — Send to HQ</span>':''}
+      ${!r.isPaid&&!r.isFree&&r.payment!=='collected'&&r.payment!=='sent_to_hq'&&r.payment!=='partial_collected'?'<button onclick="markCollected(\''+r.id+'\')" style="padding:2px 8px;background:rgba(212,168,67,0.1);border:1px solid rgba(212,168,67,0.2);border-radius:4px;color:var(--gold);font-size:8px;font-weight:700;cursor:pointer;white-space:nowrap;">💰 I Collected</button>':''}
+      ${r.payment==='collected'?'<span style="font-size:8px;color:var(--gold);font-weight:700;">💰 COLLECTED — Send to HQ</span>':''}${r.payment==='partial_collected'?'<button onclick="markCollected(\''+r.id+'\')" style="padding:2px 6px;background:rgba(212,168,67,0.1);border:1px solid rgba(212,168,67,0.2);border-radius:4px;color:var(--gold);font-size:7px;font-weight:700;cursor:pointer;">+ More $</button>':''}
     </div>`).join('');
   }else if(d){d.innerHTML='<div style="text-align:center;padding:12px;font-size:11px;color:var(--t3);">No members on your side yet</div>';}
   
   // Show "Send to SBA HQ" summary if anything collected but not sent
-  const collectedNotSent = rows.filter(r=>r.payment==='collected');
+  const collectedNotSent = rows.filter(r=>r.payment==='collected'||r.payment==='partial_collected');
   const sendEl = document.getElementById('mtSendToHQ');
   if(sendEl){
     if(collectedNotSent.length>0){
@@ -839,8 +840,32 @@ function renderMoneyTracker(){
 }
 
 async function markCollected(id){
-  await sb.from('onboarding_members').update({payment:'collected'}).eq('id',id);
-  showToast('💰 Marked as collected — remember to send to SBA HQ');
+  const m = members.find(x=>x.id===id);
+  const fullAmt = parseFloat(m?.package_amount)||0;
+  const amt = prompt('How much did you collect from '+m?.name+'?\n\nFull amount: $'+fullAmt.toLocaleString()+'\nEnter amount collected (or leave blank for full amount):');
+  
+  if(amt === null) return; // cancelled
+  
+  const collected = amt.trim()==='' ? fullAmt : parseFloat(amt.replace(/[$,]/g,''));
+  
+  if(isNaN(collected) || collected <= 0){
+    showToast('Enter a valid amount');
+    return;
+  }
+  
+  if(collected < fullAmt){
+    // Partial payment
+    await sb.from('onboarding_members').update({
+      payment:'partial_collected',
+      package_amount: fullAmt, // keep original amount
+      held_commissions: collected // repurpose this field for amount collected so far
+    }).eq('id',id);
+    showToast('💰 $'+collected.toLocaleString()+' collected (partial) — $'+(fullAmt-collected).toLocaleString()+' remaining');
+  } else {
+    // Full payment
+    await sb.from('onboarding_members').update({payment:'collected'}).eq('id',id);
+    showToast('💰 Full amount collected — remember to send to SBA HQ');
+  }
   await loadAll();
 }
 
@@ -996,7 +1021,7 @@ function prefillOnboard(name, email, codes){
   
   // If there's a VPN code, fill that in too
   if(vpnCode && document.getElementById('obVPNCode')){
-    document.getElementById('obVPN').value = 'yes';
+    document.getElementById('obVPN').value = 'free'; // Default to free during launch promo
     document.getElementById('obVPNCode').parentElement.style.display = 'flex';
     document.getElementById('obVPNCode').value = vpnCode;
   }
