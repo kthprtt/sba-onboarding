@@ -155,7 +155,7 @@ body{background:var(--bg);color:var(--t1);font-family:'Outfit',sans-serif;min-he
 <div class="login-screen" id="loginScreen">
   <div class="login-card">
     <div class="login-logo">SBA</div>
-    <h1>Command Center <span style="margin-left:8px;padding:2px 8px;background:rgba(0,255,136,0.08);border:1px solid rgba(0,255,136,0.2);border-radius:10px;font-family:JetBrains Mono;font-size:9px;color:#00ff88;font-weight:700;letter-spacing:1px;">v44</span></h1>
+    <h1>Command Center <span style="margin-left:8px;padding:2px 8px;background:rgba(0,255,136,0.08);border:1px solid rgba(0,255,136,0.2);border-radius:10px;font-family:JetBrains Mono;font-size:9px;color:#00ff88;font-weight:700;letter-spacing:1px;">v45</span></h1>
     <div class="sub">SBA Leadership Portal — Onboarding & Code Management</div>
     <input type="text" id="loginUser" placeholder="Username" style="width:100%;padding:14px;background:var(--card);border:1px solid var(--border);border-radius:10px;color:var(--t1);font-family:Outfit;font-size:15px;margin-bottom:10px;outline:none;" onkeypress="if(event.key==='Enter')document.getElementById('loginPass').focus()">
     <div style="position:relative;margin-bottom:12px;">
@@ -960,7 +960,7 @@ function renderPersonCards(containerId,byPerson){
     const hasVPN = codes.some(c=>c.code_type==='vpn');
     
     // Build data string to pass all info
-    const dataStr = JSON.stringify({name:parsedName,email:parsedEmail,codes:allCodes,pkg:codeType,hasVPN,payment:parsedPayment,pkgLabel:parsedPkg}).replace(/'/g,'&#39;').replace(/"/g,'&quot;');
+    const dataStr = JSON.stringify({name:parsedName,email:parsedEmail,codes:allCodes,pkg:codeType==='promo_launch'?'plus':codeType,hasVPN,payment:parsedPayment,pkgLabel:parsedPkg}).replace(/'/g,'&#39;').replace(/"/g,'&quot;');
     
     const escapedName = parsedName.replace(/'/g,"\\'");
     
@@ -1049,7 +1049,7 @@ function prefillOnboard(data){
     // Set package dropdown
     const pkgEl = document.getElementById('obPkg');
     if(pkgEl && pkg){
-      pkgEl.value = pkg;
+      pkgEl.value = pkg==='promo_launch'?'plus':pkg;
     }
     
     // Set VPN dropdown
@@ -1153,7 +1153,7 @@ async function validateCode(code){
   if(data.status!=='unused'){el.style.color='var(--red)';el.textContent='❌ Already used'+(data.used_by_name?' by '+data.used_by_name:'');return;}
   el.style.color='var(--green)';el.textContent='✅ Valid — '+(TL[data.code_type]||data.code_type)+' — Ready';
   // Auto-set package
-  if(data.code_type!=='vpn')document.getElementById('obPkg').value=data.code_type;
+  if(data.code_type!=='vpn')document.getElementById('obPkg').value=data.code_type==='promo_launch'?'plus':data.code_type;
     if(data.code_type==='promo_launch'){
       document.getElementById('obVPN').value='free';
       document.getElementById('obVPNCode')?.parentElement&&(document.getElementById('obVPNCode').parentElement.style.display='flex');
