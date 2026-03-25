@@ -69,7 +69,7 @@ select:focus,input:focus{border-color:var(--gold);}
 </div>
 
 <div class="container" id="dashContent" style="display:none;">
-  <h1>🔑 <span>SBA</span> Code Dashboard <span style="margin-left:8px;padding:2px 8px;background:rgba(0,255,136,0.08);border:1px solid rgba(0,255,136,0.2);border-radius:10px;font-family:JetBrains Mono;font-size:9px;color:#00ff88;font-weight:700;letter-spacing:1px;">v41</span></h1>
+  <h1>🔑 <span>SBA</span> Code Dashboard <span style="margin-left:8px;padding:2px 8px;background:rgba(0,255,136,0.08);border:1px solid rgba(0,255,136,0.2);border-radius:10px;font-family:JetBrains Mono;font-size:9px;color:#00ff88;font-weight:700;letter-spacing:1px;">v44</span></h1>
   <div class="sub">Keith Only — Generate activation codes, approve requests, track all payments</div>
 
   <!-- Stats -->
@@ -257,6 +257,7 @@ function genStr(type){
 
 async function generateCode(forRequest){
   const type=forRequest?.code_type||document.getElementById('codeType').value;
+  const dbType=type==='promo_launch'?'plus':type;
   const pay=document.getElementById('codePay').value;
   const ref=document.getElementById('codeRef').value.trim();
   const forName=forRequest?.member_name||document.getElementById('codeFor').value.trim();
@@ -264,7 +265,7 @@ async function generateCode(forRequest){
   const code=genStr(type);
   
   const{error}=await sb.from('activation_codes').insert([{
-    code,code_type:type,status:'unused',
+    code,code_type:dbType,status:'unused',
     payment_amount:AMOUNTS[type],
     payment_method:pay,payment_ref:ref||null,
     payment_notes:forName?'For: '+forName:null,
@@ -397,6 +398,7 @@ async function approveRequest(reqId, requestedBy, codeType){
   if(!req){showToast('❌ Request not found');return;}
   
   const type = req.code_type || codeType || 'basic';
+  const dbType = type==='promo_launch'?'plus':type; // DB constraint only allows basic/plus/elite/pro/vpn
   const memberName = req.member_name || 'Unknown';
   const assignTo = req.requested_by || requestedBy;
   const needsVPN = memberName.toLowerCase().includes('vpn') || type === 'promo_launch';
@@ -404,7 +406,7 @@ async function approveRequest(reqId, requestedBy, codeType){
   // Generate package code
   const pkgCode = genStr(type);
   const{error}=await sb.from('activation_codes').insert([{
-    code:pkgCode, code_type:type, status:'unused',
+    code:pkgCode, code_type:dbType, status:'unused',
     payment_amount:AMOUNTS[type]||1000,
     payment_notes:'For: '+memberName,
     generated_by:'keith',
@@ -454,7 +456,7 @@ async function batchGenerate(){
   for(let i=0;i<count;i++){
     const code=genStr(type);
     const{error}=await sb.from('activation_codes').insert([{
-      code,code_type:type,status:'unused',
+      code,code_type:dbType||type==='promo_launch'?'plus':type,status:'unused',
       payment_amount:AMOUNTS[type],
       payment_method:pay,
       generated_by:'keith',
