@@ -7,12 +7,12 @@ export default async function handler(req, res) {
   }
 
   const { username, password, member_id } = req.body;
-  const VPN_TOKEN = process.env.VPN_RESELLERS_TOKEN;
+  const VPN_TOKEN = process.env.VPN_RESELLER_TOKEN;
   const SUPABASE_URL = 'https://anjlmooskwvjystmrhxr.supabase.co';
   const SUPABASE_KEY = process.env.SUPABASE_SERVICE_KEY;
 
   if (!VPN_TOKEN) {
-    return res.status(500).json({ success: false, error: 'VPN_RESELLERS_TOKEN not configured. Add it to Vercel env vars.' });
+    return res.status(500).json({ success: false, error: 'VPN_RESELLER_TOKEN not configured. Add it to Vercel env vars.' });
   }
 
   const vpnUsername = username || ('sba_' + Math.random().toString(36).substring(2, 10));
