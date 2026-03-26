@@ -3,33 +3,86 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Join SBA Genius</title>
+<title>Join SBA Genius — Guaranteed Profits from Sports Betting</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root{--bg:#0a0b10;--card:#12141c;--border:#252839;--gold:#d4a843;--green:#00e676;--red:#ff4466;--t1:#e8e6e0;--t2:#8b8d9e;--t3:#6b7086;}
+:root{--bg:#0a0b10;--card:#12141c;--card2:#161825;--border:#252839;--gold:#d4a843;--gold-dim:#b8942e;--green:#00e676;--red:#ff4466;--purple:#b388ff;--blue:#4488ff;--orange:#f59e0b;--t1:#e8e6e0;--t2:#8b8d9e;--t3:#6b7086;}
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:var(--bg);color:var(--t1);font-family:'Outfit',sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;position:relative;overflow-x:hidden}
-body::before{content:'';position:fixed;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle at 30% 40%,rgba(212,168,67,0.03),transparent 50%),radial-gradient(circle at 70% 60%,rgba(0,230,118,0.02),transparent 50%);animation:drift 20s ease-in-out infinite alternate;pointer-events:none}
-@keyframes drift{0%{transform:translate(0,0)}100%{transform:translate(-3%,2%)}}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--t1);font-family:'Outfit',sans-serif;overflow-x:hidden}
 
-.container{width:100%;max-width:480px;position:relative;z-index:1}
-.logo{text-align:center;margin-bottom:24px}
-.logo h1{font-size:28px;font-weight:900;letter-spacing:-0.5px}
-.logo h1 span{color:var(--gold)}
-.logo p{font-size:13px;color:var(--t2);margin-top:4px}
-.referrer-bar{text-align:center;padding:8px 16px;background:rgba(212,168,67,0.06);border:1px solid rgba(212,168,67,0.12);border-radius:8px;margin-bottom:16px;font-size:12px;color:var(--gold);display:none}
-.referrer-bar strong{font-weight:800}
+/* HERO */
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px 20px;position:relative}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 30%,rgba(212,168,67,0.08),transparent 60%),radial-gradient(ellipse at 20% 80%,rgba(0,230,118,0.04),transparent 50%),radial-gradient(ellipse at 80% 70%,rgba(139,92,246,0.03),transparent 50%);pointer-events:none}
+.hero::after{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.015'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");pointer-events:none}
+.hero-content{position:relative;z-index:1;max-width:700px}
+.hero-badge{display:inline-block;padding:6px 16px;background:rgba(212,168,67,0.08);border:1px solid rgba(212,168,67,0.15);border-radius:20px;font-size:11px;font-weight:700;color:var(--gold);letter-spacing:2px;text-transform:uppercase;margin-bottom:20px;animation:fadeUp 0.6s ease}
+.hero h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(48px,10vw,80px);line-height:0.95;letter-spacing:2px;margin-bottom:16px;animation:fadeUp 0.6s ease 0.1s both}
+.hero h1 .gold{color:var(--gold)}
+.hero h1 .green{color:var(--green)}
+.hero-sub{font-size:clamp(14px,3vw,18px);color:var(--t2);max-width:500px;margin:0 auto 24px;line-height:1.6;animation:fadeUp 0.6s ease 0.2s both}
+.hero-sub strong{color:var(--t1)}
 
+.hero-stats{display:flex;gap:24px;justify-content:center;margin-bottom:32px;animation:fadeUp 0.6s ease 0.3s both;flex-wrap:wrap}
+.hero-stat{text-align:center}
+.hero-stat .num{font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--gold);line-height:1}
+.hero-stat .label{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:1px}
+
+.hero-cta{display:flex;gap:12px;justify-content:center;animation:fadeUp 0.6s ease 0.4s both;flex-wrap:wrap}
+.btn{padding:14px 28px;border:none;border-radius:10px;font-family:'Outfit';font-size:15px;font-weight:800;cursor:pointer;transition:all 0.2s;text-transform:uppercase;letter-spacing:1px;text-decoration:none;display:inline-flex;align-items:center;gap:8px}
+.btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold-dim));color:#000}
+.btn-gold:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(212,168,67,0.3)}
+.btn-outline{background:transparent;border:2px solid var(--border);color:var(--t1)}
+.btn-outline:hover{border-color:var(--gold);color:var(--gold)}
+.btn-green{background:linear-gradient(135deg,var(--green),#00c853);color:#000}
+.btn-green:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(0,230,118,0.3)}
+.btn:disabled{opacity:0.5;transform:none;cursor:not-allowed}
+
+.scroll-hint{position:absolute;bottom:30px;left:50%;transform:translateX(-50%);animation:bounce 2s infinite;color:var(--t3);font-size:12px;text-align:center}
+@keyframes bounce{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(8px)}}
+
+/* HOW IT WORKS */
+.section{padding:60px 20px;max-width:700px;margin:0 auto}
+.section-label{font-size:11px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:3px;margin-bottom:8px}
+.section h2{font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:1px;margin-bottom:24px}
+
+.steps{display:grid;gap:12px;margin-bottom:32px}
+.step{display:flex;gap:16px;padding:20px;background:var(--card);border:1px solid var(--border);border-radius:12px;transition:all 0.3s}
+.step:hover{border-color:var(--gold);transform:translateX(4px)}
+.step-num{width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,var(--gold),var(--gold-dim));color:#000;font-family:'Bebas Neue',sans-serif;font-size:20px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.step-text h3{font-size:14px;font-weight:800;margin-bottom:2px}
+.step-text p{font-size:12px;color:var(--t2)}
+
+/* EXAMPLE ARB */
+.arb-example{background:var(--card);border:1px solid rgba(0,230,118,0.15);border-radius:14px;padding:20px;margin-bottom:32px;position:relative;overflow:hidden}
+.arb-example::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--green),var(--gold))}
+.arb-example h3{font-size:13px;font-weight:800;color:var(--green);margin-bottom:12px}
+.arb-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.04);font-size:13px}
+.arb-row:last-child{border:none;padding-top:12px;font-weight:800;color:var(--green);font-size:15px}
+
+/* PACKAGES */
+.pkg-section{padding:60px 20px;max-width:700px;margin:0 auto}
+.pkg-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.pkg-card{padding:16px;text-align:center;border-radius:12px;cursor:pointer;border:2px solid var(--border);background:var(--card);transition:all 0.2s}
+.pkg-card:hover{border-color:var(--green);transform:translateY(-2px)}
+.pkg-card.active{border-color:var(--green);background:rgba(0,230,118,0.04);box-shadow:0 4px 20px rgba(0,230,118,0.1)}
+.pkg-card .price{font-family:'Bebas Neue',sans-serif;font-size:32px;margin:4px 0;line-height:1}
+.pkg-card .name{font-size:13px;font-weight:800}
+.pkg-card .sub{font-size:10px;color:var(--t3)}
+.pkg-card.promo{border-color:rgba(245,158,11,0.3);position:relative;overflow:hidden}
+.pkg-card.promo::before{content:'🔥 BEST VALUE';position:absolute;top:0;left:0;right:0;padding:3px;background:linear-gradient(90deg,var(--orange),#e65100);font-size:8px;font-weight:900;letter-spacing:1px;color:#fff;text-align:center}
+.pkg-card.promo.active{border-color:var(--orange);background:rgba(245,158,11,0.06)}
+.pkg-card.promo .price{color:var(--orange)}
+
+/* FORM */
+.form-section{padding:40px 20px 80px;max-width:500px;margin:0 auto}
 .card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:28px;margin-bottom:16px}
-.card h2{font-size:18px;font-weight:800;margin-bottom:16px}
-
 .form-group{margin-bottom:12px}
 .form-label{font-size:11px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px}
-.form-input,.form-select{width:100%;padding:10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--t1);font-family:'Outfit';font-size:13px;outline:none;transition:border-color 0.2s}
-.form-input:focus,.form-select:focus{border-color:var(--gold)}
-.form-select option{background:var(--bg);color:var(--t1)}
+.form-input{width:100%;padding:12px 14px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--t1);font-family:'Outfit';font-size:14px;outline:none;transition:border-color 0.2s}
+.form-input:focus{border-color:var(--gold)}
 
 .type-toggle{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
 .type-btn{padding:14px;text-align:center;border-radius:10px;cursor:pointer;border:2px solid var(--border);background:var(--bg);transition:all 0.2s;font-weight:700;font-size:13px}
@@ -38,424 +91,262 @@ body::before{content:'';position:fixed;top:-50%;left:-50%;width:200%;height:200%
 .type-btn .emoji{font-size:24px;display:block;margin-bottom:4px}
 .type-btn .sub{font-size:10px;color:var(--t3);font-weight:400;margin-top:2px}
 
-.pkg-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
-.pkg-card{padding:12px;text-align:center;border-radius:10px;cursor:pointer;border:2px solid var(--border);background:var(--bg);transition:all 0.2s}
-.pkg-card:hover{border-color:var(--green)}
-.pkg-card.active{border-color:var(--green);background:rgba(0,230,118,0.04)}
-.pkg-card .price{font-size:20px;font-weight:900;margin:4px 0}
-.pkg-card .name{font-size:12px;font-weight:700}
-.pkg-card .sub{font-size:9px;color:var(--t3)}
-.pkg-card.promo{border-color:rgba(245,158,11,0.3)}
-.pkg-card.promo.active{border-color:#f59e0b;background:rgba(245,158,11,0.06)}
-
-.vpn-toggle{padding:12px;border-radius:10px;border:2px solid var(--border);background:var(--bg);cursor:pointer;display:flex;align-items:center;gap:10px;margin-bottom:16px;transition:all 0.2s}
+.vpn-toggle{padding:14px;border-radius:10px;border:2px solid var(--border);background:var(--bg);cursor:pointer;display:flex;align-items:center;gap:12px;margin-bottom:16px;transition:all 0.2s}
 .vpn-toggle:hover{border-color:rgba(139,92,246,0.3)}
 .vpn-toggle.active{border-color:rgba(139,92,246,0.5);background:rgba(139,92,246,0.04)}
-.vpn-check{width:20px;height:20px;border-radius:5px;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:12px;transition:all 0.2s}
-.vpn-toggle.active .vpn-check{border-color:rgba(139,92,246,0.5);background:rgba(139,92,246,0.2);color:#b388ff}
+.vpn-check{width:22px;height:22px;border-radius:6px;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;transition:all 0.2s}
+.vpn-toggle.active .vpn-check{border-color:var(--purple);background:rgba(139,92,246,0.2);color:var(--purple)}
 
-.btn{width:100%;padding:14px;border:none;border-radius:10px;font-family:'Outfit';font-size:15px;font-weight:800;cursor:pointer;transition:all 0.2s;text-transform:uppercase;letter-spacing:1px}
-.btn-gold{background:linear-gradient(135deg,var(--gold),#b8942e);color:#000}
-.btn-gold:hover{transform:translateY(-1px);box-shadow:0 4px 20px rgba(212,168,67,0.3)}
-.btn-gold:disabled{opacity:0.5;transform:none;cursor:not-allowed}
+.pay-toggle{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px}
+.pay-btn{padding:12px 8px;text-align:center;border-radius:10px;cursor:pointer;border:2px solid var(--border);background:var(--bg);transition:all 0.2s;font-weight:700;font-size:12px}
+.pay-btn:hover{border-color:var(--gold)}
+.pay-btn.active{border-color:var(--gold);background:rgba(212,168,67,0.06)}
+.pay-btn .emoji{font-size:20px;display:block;margin-bottom:2px}
+.pay-btn .sub{font-size:8px;color:var(--t3);font-weight:400}
 
-.btn-green{background:linear-gradient(135deg,var(--green),#00c853);color:#000}
-.btn-green:hover{transform:translateY(-1px);box-shadow:0 4px 20px rgba(0,230,118,0.3)}
+.referrer-bar{text-align:center;padding:10px 16px;background:rgba(212,168,67,0.06);border:1px solid rgba(212,168,67,0.12);border-radius:10px;margin-bottom:16px;font-size:13px;color:var(--gold);display:none;font-weight:600}
 
-.success-card{display:none;text-align:center;padding:40px 20px}
-.success-card .check{font-size:60px;margin-bottom:12px}
-.success-card h2{font-size:22px;font-weight:900;margin-bottom:8px}
-.success-card p{font-size:13px;color:var(--t2);line-height:1.6}
-.success-card .creds{margin-top:16px;padding:16px;background:var(--bg);border-radius:10px;text-align:left;font-family:'JetBrains Mono';font-size:12px;line-height:2}
+.success-card{display:none;text-align:center;padding:40px 20px;max-width:500px;margin:0 auto}
+.success-card .check{font-size:72px;margin-bottom:16px;animation:popIn 0.5s ease}
+.success-card h2{font-size:24px;font-weight:900;margin-bottom:12px}
+.success-card p{font-size:14px;color:var(--t2);line-height:1.7}
+.success-card .creds{margin-top:20px;padding:20px;background:var(--bg);border:1px solid var(--border);border-radius:12px;text-align:left;font-family:'JetBrains Mono';font-size:12px;line-height:2.2}
+@keyframes popIn{0%{transform:scale(0)}50%{transform:scale(1.2)}100%{transform:scale(1)}}
 
-.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);padding:10px 20px;background:var(--card);border:1px solid var(--border);border-radius:8px;font-size:12px;font-weight:700;z-index:9999;opacity:0;transition:opacity 0.3s}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);padding:10px 24px;background:var(--card);border:1px solid var(--border);border-radius:8px;font-size:12px;font-weight:700;z-index:9999;opacity:0;transition:opacity 0.3s}
 .toast.show{opacity:1}
 
-.payment-note{padding:10px;background:rgba(212,168,67,0.04);border:1px solid rgba(212,168,67,0.1);border-radius:8px;font-size:11px;color:var(--t2);line-height:1.6;margin-bottom:16px}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.reveal{opacity:0;transform:translateY(20px);transition:all 0.6s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
 
-@media(max-width:480px){.container{padding:0}.card{padding:20px;border-radius:12px}.pkg-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){.hero h1{font-size:48px}.hero-stats{gap:16px}.pkg-grid{grid-template-columns:1fr 1fr}.pay-toggle{grid-template-columns:1fr 1fr 1fr}.hero-cta{flex-direction:column;align-items:center}}
 </style>
 </head>
 <body>
 
-<div class="container">
-  <div class="logo">
-    <h1>SBA <span>GENIUS</span></h1>
-    <p>Sports Bet Arbitrage — Join the Movement</p>
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-content">
+    <div class="hero-badge">Limited Launch · March 2026</div>
+    <h1><span class="gold">GUARANTEED</span><br>PROFITS FROM<br>SPORTS <span class="green">BETTING</span></h1>
+    <p class="hero-sub">SBA Genius finds <strong>risk-free arbitrage opportunities</strong> across 39+ sportsbooks. Place both sides. <strong>Profit every time.</strong> No gambling. Pure math.</p>
+    
+    <div class="hero-stats">
+      <div class="hero-stat"><div class="num" id="statMembers">0</div><div class="label">Active Members</div></div>
+      <div class="hero-stat"><div class="num">39+</div><div class="label">Sportsbooks</div></div>
+      <div class="hero-stat"><div class="num">60</div><div class="label">Leagues Scanned</div></div>
+      <div class="hero-stat"><div class="num">24/7</div><div class="label">Live Scanning</div></div>
+    </div>
+    
+    <div class="hero-cta">
+      <a href="#join" class="btn btn-gold">🚀 Join Now</a>
+      <a href="#how" class="btn btn-outline">How It Works ↓</a>
+    </div>
+  </div>
+  <div class="scroll-hint">↓ Scroll to learn more</div>
+</div>
+
+<!-- HOW IT WORKS -->
+<div class="section" id="how">
+  <div class="section-label reveal">How It Works</div>
+  <h2 class="reveal">THREE STEPS TO GUARANTEED PROFIT</h2>
+  
+  <div class="steps">
+    <div class="step reveal">
+      <div class="step-num">1</div>
+      <div class="step-text"><h3>Genius Finds the Edge</h3><p>Our AI scans 39+ sportsbooks across 60 leagues every 60 seconds. When odds don't match, that's free money.</p></div>
+    </div>
+    <div class="step reveal">
+      <div class="step-num">2</div>
+      <div class="step-text"><h3>You Place Both Sides</h3><p>Bet the Lakers on DraftKings. Bet the Celtics on FanDuel. Both sides covered. One side wins. You profit either way.</p></div>
+    </div>
+    <div class="step reveal">
+      <div class="step-num">3</div>
+      <div class="step-text"><h3>Collect Your Profit</h3><p>No risk. No guessing. The math guarantees profit before you place the bet. $62 in 3 minutes. Every. Single. Time.</p></div>
+    </div>
   </div>
   
-  <div class="referrer-bar" id="referrerBar">
-    Invited by <strong id="referrerName">—</strong>
+  <div class="arb-example reveal">
+    <h3>💰 Real Example — Lakers vs Celtics</h3>
+    <div class="arb-row"><span>DraftKings — Lakers ML</span><span style="color:var(--gold);">+150</span></div>
+    <div class="arb-row"><span>FanDuel — Celtics ML</span><span style="color:var(--gold);">-130</span></div>
+    <div class="arb-row"><span>Your bet (both sides)</span><span>$1,000</span></div>
+    <div class="arb-row"><span>🎯 Guaranteed Profit</span><span>+$62</span></div>
+  </div>
+</div>
+
+<!-- PACKAGES -->
+<div class="pkg-section" id="packages">
+  <div class="section-label reveal">Choose Your Path</div>
+  <h2 class="reveal">PACKAGES</h2>
+  
+  <div class="pkg-grid reveal">
+    <div class="pkg-card promo active" id="pkgPromo" onclick="setPkg('promo')">
+      <div class="name" style="margin-top:12px;">LAUNCH SPECIAL</div>
+      <div class="price">$1K</div>
+      <div class="sub">$3K value · Plus + VPN Free</div>
+    </div>
+    <div class="pkg-card" id="pkgBasic" onclick="setPkg('basic')">
+      <div class="name">BASIC</div>
+      <div class="price">$1K</div>
+      <div class="sub">Sure Bets</div>
+    </div>
+    <div class="pkg-card" id="pkgPlus" onclick="setPkg('plus')">
+      <div class="name">PLUS</div>
+      <div class="price">$2K</div>
+      <div class="sub">+ Value Bets</div>
+    </div>
+    <div class="pkg-card" id="pkgElite" onclick="setPkg('elite')">
+      <div class="name">ELITE</div>
+      <div class="price">$5K</div>
+      <div class="sub">+ Double Value</div>
+    </div>
+    <div class="pkg-card" id="pkgPro" onclick="setPkg('pro')">
+      <div class="name">PRO</div>
+      <div class="price">$10K</div>
+      <div class="sub">Everything + War Room</div>
+    </div>
   </div>
   
-  <!-- SIGNUP FORM -->
+  <div class="vpn-toggle active reveal" id="vpnToggle" onclick="toggleVPN()">
+    <div class="vpn-check" id="vpnCheck">✓</div>
+    <div>
+      <div style="font-weight:800;font-size:14px;">🔒 Add VPN — <span style="color:var(--green);">FREE thru Apr 7</span></div>
+      <div style="font-size:11px;color:var(--t3);">Access 20+ offshore sportsbooks · normally $1,000</div>
+    </div>
+  </div>
+  
+  <div style="text-align:center;margin-top:16px;">
+    <a href="#join" class="btn btn-gold" style="width:100%;justify-content:center;">🚀 Get Started Now</a>
+    <button onclick="setType('free');document.getElementById('join').scrollIntoView({behavior:'smooth'})" style="background:none;border:none;color:var(--gold);font-family:'Outfit';font-size:13px;cursor:pointer;margin-top:12px;font-weight:600;">or start free as an affiliate →</button>
+  </div>
+</div>
+
+<!-- JOIN FORM -->
+<div class="form-section" id="join">
   <div id="signupForm">
-    <div class="card">
-      <h2>Create Your Account</h2>
-      
-      <div class="form-group">
-        <div class="form-label">Full Name *</div>
-        <input class="form-input" id="sName" placeholder="John Smith">
-      </div>
-      <div class="form-group">
-        <div class="form-label">Email *</div>
-        <input class="form-input" id="sEmail" type="email" placeholder="john@email.com">
-      </div>
-      <div class="form-group">
-        <div class="form-label">Phone</div>
-        <input class="form-input" id="sPhone" placeholder="(555) 123-4567">
-      </div>
-      <div class="form-group">
-        <div class="form-label">Discord Username</div>
-        <input class="form-input" id="sDiscord" placeholder="john#1234">
-      </div>
+    <div class="referrer-bar" id="referrerBar">
+      Invited by <strong id="referrerName">—</strong>
     </div>
     
     <div class="card">
-      <h2>How do you want to join?</h2>
+      <h2 style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:1px;">CREATE YOUR ACCOUNT</h2>
       
       <div class="type-toggle">
         <div class="type-btn active" id="typePaid" onclick="setType('paid')">
-          <span class="emoji">💎</span>
-          Get Access
-          <div class="sub">Buy a package & start betting</div>
+          <span class="emoji">💎</span>Get Access
+          <div class="sub">Buy a package</div>
         </div>
         <div class="type-btn" id="typeFree" onclick="setType('free')">
-          <span class="emoji">🆓</span>
-          Free Affiliate
-          <div class="sub">Build a team & earn first</div>
+          <span class="emoji">🆓</span>Free Affiliate
+          <div class="sub">Build first, buy later</div>
         </div>
       </div>
       
-      <!-- PAID OPTIONS -->
-      <div id="paidSection">
-        <div class="form-label" style="margin-bottom:8px;">Choose Your Package</div>
-        <div class="pkg-grid">
-          <div class="pkg-card promo active" id="pkgPromo" onclick="setPkg('promo')">
-            <div class="name">🔥 LAUNCH SPECIAL</div>
-            <div class="price">$1K</div>
-            <div class="sub">$3K value (Plus + VPN)</div>
-          </div>
-          <div class="pkg-card" id="pkgBasic" onclick="setPkg('basic')">
-            <div class="name">Basic</div>
-            <div class="price">$1K</div>
-            <div class="sub">Sure Bets</div>
-          </div>
-          <div class="pkg-card" id="pkgPlus" onclick="setPkg('plus')">
-            <div class="name">Plus</div>
-            <div class="price">$2K</div>
-            <div class="sub">+ Value Bets</div>
-          </div>
-          <div class="pkg-card" id="pkgElite" onclick="setPkg('elite')">
-            <div class="name">Elite</div>
-            <div class="price">$5K</div>
-            <div class="sub">+ Double Value</div>
-          </div>
-          <div class="pkg-card" id="pkgPro" onclick="setPkg('pro')">
-            <div class="name">Pro</div>
-            <div class="price">$10K</div>
-            <div class="sub">Everything + War Room</div>
-          </div>
-        </div>
-        
-        <div class="vpn-toggle" id="vpnToggle" onclick="toggleVPN()">
-          <div class="vpn-check" id="vpnCheck"></div>
-          <div>
-            <div style="font-weight:700;font-size:13px;">🔒 Add VPN — <span style="color:var(--green);">FREE thru Apr 7</span></div>
-            <div style="font-size:10px;color:var(--t3);">Access 20+ offshore sportsbooks (normally $1K)</div>
-          </div>
-        </div>
-        
-        <div style="margin-bottom:16px;">
-          <div class="form-label" style="margin-bottom:8px;">Payment Method</div>
-          <div class="type-toggle" style="grid-template-columns:1fr 1fr 1fr;">
-            <div class="type-btn active" id="payCard" onclick="setPayMethod('card')" style="padding:10px;">
-              <span class="emoji" style="font-size:18px;">💳</span>
-              Card
-              <div class="sub">Visa/MC/Amex</div>
-            </div>
-            <div class="type-btn" id="payCrypto" onclick="setPayMethod('crypto')" style="padding:10px;">
-              <span class="emoji" style="font-size:18px;">₿</span>
-              Crypto
-              <div class="sub">BTC/ETH/USDC</div>
-            </div>
-            <div class="type-btn" id="payManual" onclick="setPayMethod('manual')" style="padding:10px;">
-              <span class="emoji" style="font-size:18px;">📱</span>
-              CashApp/Zelle
-              <div class="sub">Pay your leader</div>
-            </div>
-          </div>
-          <div id="manualPayNote" style="display:none;margin-top:6px;font-size:11px;color:var(--t2);padding:8px;background:var(--bg);border-radius:6px;">
-            After signing up, your team leader will reach out to arrange payment. Your access activates once confirmed.
-          </div>
-        </div>
+      <div class="form-group"><div class="form-label">Full Name *</div><input class="form-input" id="sName" placeholder="Your full name"></div>
+      <div class="form-group"><div class="form-label">Email *</div><input class="form-input" id="sEmail" type="email" placeholder="your@email.com"></div>
+      <div class="form-group"><div class="form-label">Phone</div><input class="form-input" id="sPhone" placeholder="(555) 123-4567"></div>
+      <div class="form-group"><div class="form-label">Discord</div><input class="form-input" id="sDiscord" placeholder="username#1234"></div>
+    </div>
+    
+    <!-- PAID OPTIONS -->
+    <div id="paidSection" class="card">
+      <div class="form-label" style="margin-bottom:8px;">Payment Method</div>
+      <div class="pay-toggle">
+        <div class="pay-btn active" id="payCard" onclick="setPayMethod('card')"><span class="emoji">💳</span>Card<div class="sub">Visa/MC/Amex</div></div>
+        <div class="pay-btn" id="payCrypto" onclick="setPayMethod('crypto')"><span class="emoji">₿</span>Crypto<div class="sub">BTC/ETH/USDC</div></div>
+        <div class="pay-btn" id="payManual" onclick="setPayMethod('manual')"><span class="emoji">📱</span>CashApp<div class="sub">Zelle/PayPal</div></div>
       </div>
-      
-      <!-- FREE SECTION -->
-      <div id="freeSection" style="display:none;">
-        <div style="padding:16px;background:rgba(212,168,67,0.04);border:1px solid rgba(212,168,67,0.1);border-radius:10px;font-size:12px;color:var(--t2);line-height:1.8;">
-          <div style="font-size:14px;font-weight:800;color:var(--gold);margin-bottom:6px;">🆓 Free Affiliate Account</div>
-          ✅ Get your referral link immediately<br>
-          ✅ Access the AI Closer tools<br>
-          ✅ Earn commissions on every signup<br>
-          ✅ Track your team in real-time<br>
-          ❌ No Genius betting access (upgrade anytime)<br>
-          ❌ No VPN access
-        </div>
+      <div id="manualPayNote" style="display:none;font-size:11px;color:var(--t2);padding:10px;background:var(--bg);border-radius:8px;">Your team leader will arrange payment after signup. Access activates once confirmed.</div>
+    </div>
+    
+    <!-- FREE SECTION -->
+    <div id="freeSection" class="card" style="display:none;">
+      <div style="font-size:15px;font-weight:900;color:var(--gold);margin-bottom:8px;">🆓 Free Affiliate Account</div>
+      <div style="font-size:12px;color:var(--t2);line-height:2;">
+        ✅ Referral link + AI Closer tools<br>
+        ✅ Earn commissions on every signup<br>
+        ✅ Track your team in real-time<br>
+        ❌ No Genius betting access (upgrade anytime)
       </div>
     </div>
     
-    <button class="btn btn-gold" id="submitBtn" onclick="submitSignup()">🚀 Join SBA Genius</button>
+    <button class="btn btn-gold" id="submitBtn" onclick="submitSignup()" style="width:100%;justify-content:center;">💳 PAY WITH CARD</button>
+    <div style="text-align:center;margin-top:12px;font-size:10px;color:var(--t3);">🔒 Secured by Stripe · 256-bit encryption</div>
   </div>
   
   <!-- SUCCESS -->
   <div class="success-card card" id="successCard">
     <div class="check">✅</div>
     <h2>Welcome to SBA Genius!</h2>
-    <p id="successMsg">Your application has been submitted. Your team leader will confirm your payment and activate your account.</p>
+    <p id="successMsg"></p>
     <div class="creds" id="successCreds" style="display:none;">
       <div><strong>📧 Email:</strong> <span id="credEmail"></span></div>
       <div><strong>🔑 Password:</strong> <span id="credPass"></span></div>
-      <div><strong>🔗 Your Referral Link:</strong> <span id="credRef"></span></div>
+      <div><strong>🔗 Referral Link:</strong> <span id="credRef"></span></div>
       <div><strong>💬 Discord:</strong> <a href="https://discord.gg/hZXxJMgHb3" style="color:var(--gold);">Join Here</a></div>
     </div>
-    <button class="btn btn-green" style="margin-top:16px;" onclick="window.location.href='https://affiliate.sportsbetarbitrage.com'">Open SBA Bookie Portal →</button>
+    <a href="https://affiliate.sportsbetarbitrage.com" class="btn btn-green" style="width:100%;justify-content:center;margin-top:20px;">Open SBA Bookie Portal →</a>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-const sb = supabase.createClient(
-  'https://anjlmooskwvjystmrhxr.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFuamxtb29za3d2anlzdG1yaHhyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU0NjYzNTUsImV4cCI6MjA4MTA0MjM1NX0.DVLjp9PzNIPNSp2HAGtKTaPVfKy3QLs4HTJsy96UsyM',
-  {auth:{storage:{getItem:()=>null,setItem:()=>{},removeItem:()=>{}},autoRefreshToken:false,persistSession:false,detectSessionInUrl:false}}
-);
+const sb = supabase.createClient('https://anjlmooskwvjystmrhxr.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFuamxtb29za3d2anlzdG1yaHhyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU0NjYzNTUsImV4cCI6MjA4MTA0MjM1NX0.DVLjp9PzNIPNSp2HAGtKTaPVfKy3QLs4HTJsy96UsyM',{auth:{storage:{getItem:()=>null,setItem:()=>{},removeItem:()=>{}},autoRefreshToken:false,persistSession:false,detectSessionInUrl:false}});
 
-let joinType = 'paid';
-let selectedPkg = 'promo';
-let vpnSelected = true;
-let payMethod = 'card';
-let referrerCode = null;
-let referrerMember = null;
+let joinType='paid',selectedPkg='promo',vpnSelected=true,payMethod='card',referrerCode=null,referrerMember=null;
 
-// Stripe Price IDs
-const STRIPE_PRICES = {
-  basic: 'price_1SdKIJ03TcuWq8t5SELJaivD',
-  plus: 'price_1SdKMv03TcuWq8t57xR3XCT2',
-  elite: 'price_1SdKQ403TcuWq8t5LJFFeOQs',
-  pro: 'price_1SdKho03TcuWq8t5Nb7yQqUa',
-  basic_vpn: 'price_1Sh3cT03TcuWq8t5d37imWd0',
-  plus_vpn: 'price_1Sh3bp03TcuWq8t5c1njhLHF',
-  elite_vpn: 'price_1Sh3an03TcuWq8t5aHqwGN3f',
-  pro_vpn: 'price_1Sh3a303TcuWq8t5ceESGmqX',
-  promo: 'price_1SdKIJ03TcuWq8t5SELJaivD' // Launch special = basic price
-};
+const STRIPE_PRICES={basic:'price_1SdKIJ03TcuWq8t5SELJaivD',plus:'price_1SdKMv03TcuWq8t57xR3XCT2',elite:'price_1SdKQ403TcuWq8t5LJFFeOQs',pro:'price_1SdKho03TcuWq8t5Nb7yQqUa',basic_vpn:'price_1Sh3cT03TcuWq8t5d37imWd0',plus_vpn:'price_1Sh3bp03TcuWq8t5c1njhLHF',elite_vpn:'price_1Sh3an03TcuWq8t5aHqwGN3f',pro_vpn:'price_1Sh3a303TcuWq8t5ceESGmqX',promo:'price_1SdKIJ03TcuWq8t5SELJaivD'};
+const COINBASE_IDS={basic:'2cff8e7e-2a9d-4b16-9330-ab0e42fa083f',plus:'8708e845-c7c1-47c1-9725-cd3001aa2f19',elite:'17d6e616-13b7-4cb2-91c4-8ba1ddb68a8f',pro:'7ca1a2ea-17c9-4b4d-aa07-dc4004d036be',basic_vpn:'7cc10bbd-01bb-407a-a02c-68bf78aa1291',plus_vpn:'7164d336-a1b7-41fc-af42-9a62c7ff700a',elite_vpn:'281b5608-3ad1-414a-a4f4-f2ed6a244904',pro_vpn:'2bc88828-56f4-4649-bfe6-14473bb77253',promo:'7cc10bbd-01bb-407a-a02c-68bf78aa1291'};
 
-// Coinbase Checkout IDs
-const COINBASE_IDS = {
-  basic: '2cff8e7e-2a9d-4b16-9330-ab0e42fa083f',
-  plus: '8708e845-c7c1-47c1-9725-cd3001aa2f19',
-  elite: '17d6e616-13b7-4cb2-91c4-8ba1ddb68a8f',
-  pro: '7ca1a2ea-17c9-4b4d-aa07-dc4004d036be',
-  basic_vpn: '7cc10bbd-01bb-407a-a02c-68bf78aa1291',
-  plus_vpn: '7164d336-a1b7-41fc-af42-9a62c7ff700a',
-  elite_vpn: '281b5608-3ad1-414a-a4f4-f2ed6a244904',
-  pro_vpn: '2bc88828-56f4-4649-bfe6-14473bb77253',
-  promo: '7cc10bbd-01bb-407a-a02c-68bf78aa1291' // Launch = basic+vpn
-};
-
-// Get referral code from URL
-const params = new URLSearchParams(window.location.search);
-referrerCode = params.get('ref') || null;
+const params=new URLSearchParams(window.location.search);
+referrerCode=params.get('ref')||null;
 
 async function init(){
-  // Handle return from Stripe checkout
-  if(params.get('success')==='true'){
-    const returnEmail = params.get('email');
-    document.getElementById('signupForm').style.display='none';
-    document.getElementById('successCard').style.display='block';
-    document.getElementById('successMsg').innerHTML='🎉 <strong>Payment confirmed!</strong><br><br>Your account is being activated. You\'ll receive a welcome email shortly with your login credentials, VPN setup, and getting started guide.<br><br>💬 <a href="https://discord.gg/hZXxJMgHb3" style="color:var(--gold);">Join our Discord now</a>';
-    return;
-  }
-  if(params.get('cancelled')==='true'){
-    toast('Payment cancelled — you can try again or choose a different method.');
-  }
-  
-  if(referrerCode){
-    const{data}=await sb.from('onboarding_members').select('name,referral_code').eq('referral_code',referrerCode).single();
-    if(data){
-      referrerMember = data;
-      document.getElementById('referrerBar').style.display='block';
-      document.getElementById('referrerName').textContent=data.name;
-    }
-  }
-  // Default VPN on
-  document.getElementById('vpnToggle').classList.add('active');
-  document.getElementById('vpnCheck').textContent='✓';
-  // Default button text
-  document.getElementById('submitBtn').textContent='💳 Pay with Card';
+  if(params.get('success')==='true'){document.querySelector('.hero').style.display='none';document.getElementById('signupForm').style.display='none';document.getElementById('successCard').style.display='block';document.getElementById('successMsg').innerHTML='🎉 <strong>Payment confirmed!</strong><br><br>Your account is being activated. You\'ll receive a welcome email shortly with login credentials, VPN setup, and getting started guide.<br><br>💬 <a href="https://discord.gg/hZXxJMgHb3" style="color:var(--gold);">Join our Discord now</a>';return;}
+  if(params.get('cancelled')==='true'){toast('Payment cancelled — try again or choose a different method.');}
+  if(referrerCode){const{data}=await sb.from('onboarding_members').select('name,referral_code').eq('referral_code',referrerCode).single();if(data){referrerMember=data;document.getElementById('referrerBar').style.display='block';document.getElementById('referrerName').textContent=data.name;}}
+  // Animate member count
+  const{count}=await sb.from('onboarding_members').select('id',{count:'exact',head:true}).neq('member_type','phantom').eq('is_core_team',false);
+  animateNum('statMembers',count||0);
+  // Scroll reveals
+  const obs=new IntersectionObserver((entries)=>{entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');});},{threshold:0.1});
+  document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
 }
 init();
 
-function setType(type){
-  joinType=type;
-  document.getElementById('typePaid').classList.toggle('active',type==='paid');
-  document.getElementById('typeFree').classList.toggle('active',type==='free');
-  document.getElementById('paidSection').style.display=type==='paid'?'block':'none';
-  document.getElementById('freeSection').style.display=type==='free'?'block':'none';
-  document.getElementById('submitBtn').textContent=type==='paid'?'🚀 Join SBA Genius':'🆓 Create Free Account';
-}
+function animateNum(id,target){let n=0;const el=document.getElementById(id);const step=Math.ceil(target/30);const timer=setInterval(()=>{n+=step;if(n>=target){n=target;clearInterval(timer);}el.textContent=n;},30);}
 
-function setPkg(pkg){
-  selectedPkg=pkg;
-  document.querySelectorAll('.pkg-card').forEach(c=>c.classList.remove('active'));
-  document.getElementById('pkg'+pkg.charAt(0).toUpperCase()+pkg.slice(1))?.classList.add('active');
-  if(pkg==='promo') document.getElementById('pkgPromo').classList.add('active');
-}
-
-function toggleVPN(){
-  vpnSelected=!vpnSelected;
-  document.getElementById('vpnToggle').classList.toggle('active',vpnSelected);
-  document.getElementById('vpnCheck').textContent=vpnSelected?'✓':'';
-}
-
-function setPayMethod(method){
-  payMethod=method;
-  document.querySelectorAll('#payCard,#payCrypto,#payManual').forEach(b=>b.classList.remove('active'));
-  document.getElementById('pay'+method.charAt(0).toUpperCase()+method.slice(1))?.classList.add('active');
-  document.getElementById('manualPayNote').style.display=method==='manual'?'block':'none';
-  // Update button text
-  if(method==='card') document.getElementById('submitBtn').textContent='💳 Pay with Card';
-  else if(method==='crypto') document.getElementById('submitBtn').textContent='₿ Pay with Crypto';
-  else document.getElementById('submitBtn').textContent='🚀 Join SBA Genius';
-}
-
-function toast(msg){
-  const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),3000);
-}
+function setType(type){joinType=type;document.getElementById('typePaid').classList.toggle('active',type==='paid');document.getElementById('typeFree').classList.toggle('active',type==='free');document.getElementById('paidSection').style.display=type==='paid'?'block':'none';document.getElementById('freeSection').style.display=type==='free'?'block':'none';document.getElementById('submitBtn').textContent=type==='paid'?(payMethod==='card'?'💳 PAY WITH CARD':payMethod==='crypto'?'₿ PAY WITH CRYPTO':'🚀 JOIN SBA GENIUS'):'🆓 CREATE FREE ACCOUNT';}
+function setPkg(pkg){selectedPkg=pkg;document.querySelectorAll('.pkg-card').forEach(c=>c.classList.remove('active'));document.getElementById('pkg'+pkg.charAt(0).toUpperCase()+pkg.slice(1))?.classList.add('active');if(pkg==='promo')document.getElementById('pkgPromo').classList.add('active');}
+function toggleVPN(){vpnSelected=!vpnSelected;document.getElementById('vpnToggle').classList.toggle('active',vpnSelected);document.getElementById('vpnCheck').textContent=vpnSelected?'✓':'';}
+function setPayMethod(m){payMethod=m;document.querySelectorAll('.pay-btn').forEach(b=>b.classList.remove('active'));document.getElementById('pay'+m.charAt(0).toUpperCase()+m.slice(1))?.classList.add('active');document.getElementById('manualPayNote').style.display=m==='manual'?'block':'none';if(m==='card')document.getElementById('submitBtn').textContent='💳 PAY WITH CARD';else if(m==='crypto')document.getElementById('submitBtn').textContent='₿ PAY WITH CRYPTO';else document.getElementById('submitBtn').textContent='🚀 JOIN SBA GENIUS';}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
 
 async function submitSignup(){
-  const name=document.getElementById('sName').value.trim();
-  const email=document.getElementById('sEmail').value.trim().toLowerCase();
-  const phone=document.getElementById('sPhone').value.trim();
-  const discord=document.getElementById('sDiscord').value.trim();
-  
+  const name=document.getElementById('sName').value.trim(),email=document.getElementById('sEmail').value.trim().toLowerCase(),phone=document.getElementById('sPhone').value.trim(),discord=document.getElementById('sDiscord').value.trim();
   if(!name||!email){toast('⚠️ Name and email required');return;}
   if(!email.includes('@')){toast('⚠️ Enter a valid email');return;}
-  
-  // Check duplicate email
   const{data:existing}=await sb.from('onboarding_members').select('id').eq('email',email).single();
   if(existing){toast('⚠️ This email is already registered');return;}
-  
-  const btn=document.getElementById('submitBtn');
-  btn.disabled=true;btn.textContent='Processing...';
-  
-  const firstName=name.split(' ')[0].toLowerCase().replace(/[^a-z]/g,'');
-  const refCode=firstName+Math.floor(1000+Math.random()*9000);
-  const chars='ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
-  let password='SBA-';for(let i=0;i<8;i++)password+=chars[Math.floor(Math.random()*chars.length)];
-  
-  const pkgMap={promo:'plus',basic:'basic',plus:'plus',elite:'elite',pro:'pro'};
-  const amtMap={promo:1000,basic:1000,plus:2000,elite:5000,pro:10000};
-  
-  const isFreeMember = joinType==='free';
-  const dbPkg = isFreeMember ? 'none' : (pkgMap[selectedPkg]||'basic');
-  const amount = isFreeMember ? 0 : (amtMap[selectedPkg]||1000);
-  const vpn = isFreeMember ? false : vpnSelected;
-  
-  // For Card or Crypto — create account first then redirect to payment
-  // For Manual — create account with pending_payment status
-  
-  // Check for phantom conversion
+  const btn=document.getElementById('submitBtn');btn.disabled=true;btn.textContent='Processing...';
+  const firstName=name.split(' ')[0].toLowerCase().replace(/[^a-z]/g,''),refCode=firstName+Math.floor(1000+Math.random()*9000);
+  const chars='ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';let password='SBA-';for(let i=0;i<8;i++)password+=chars[Math.floor(Math.random()*chars.length)];
+  const pkgMap={promo:'plus',basic:'basic',plus:'plus',elite:'elite',pro:'pro'},amtMap={promo:1000,basic:1000,plus:2000,elite:5000,pro:10000};
+  const isFree=joinType==='free',dbPkg=isFree?'none':(pkgMap[selectedPkg]||'basic'),amount=isFree?0:(amtMap[selectedPkg]||1000),vpn=isFree?false:vpnSelected,isPaidNow=!isFree&&(payMethod==='card'||payMethod==='crypto');
   const{data:phantom}=await sb.from('onboarding_members').select('*').eq('member_type','phantom').ilike('name',name).single();
-  
-  const isPaidNow = !isFreeMember && (payMethod==='card'||payMethod==='crypto');
-  
-  const member={
-    name,email,phone:phone||'',discord:discord||'',
-    pkg:dbPkg,
-    paid_pkg:selectedPkg==='promo'?'plus':null,
-    package_amount:amount,
-    vpn,vpn_status:vpn?'pending':null,
-    payment:isFreeMember?'affiliate':isPaidNow?'processing':'pending_payment',
-    member_type:isFreeMember?'affiliate_only':'active',
-    affiliate_type:'standard',
-    commission_status:isFreeMember?'held':'pending',
-    status:isFreeMember?'active':'pending_payment',
-    step_progress:1,
-    password,password_changed:false,
-    tos_accepted:false,checklist:'{}',upgrade_requests:'[]',
-    cycle_start:'2026-03-26T21:00:00-04:00',
-    cycle_end:'2026-05-04T21:00:00-04:00',
-    affiliate_rank:'starter',
-    total_referrals:0,held_commissions:0,
-    genius_access:!isFreeMember,
-    cycle_number:1,
-    promo_code:selectedPkg==='promo'?'LAUNCH-SPECIAL':null,
-    promo_value:selectedPkg==='promo'?3000:0
-  };
-  
-  if(referrerCode) member.referred_by_code=referrerCode;
-  
-  let result, error;
-  
-  if(phantom){
-    member.referral_code=phantom.referral_code;
-    if(!member.referred_by_code) member.referred_by_code=phantom.referred_by_code;
-    const resp=await sb.from('onboarding_members').update(member).eq('id',phantom.id).select();
-    result=resp.data;error=resp.error;
-  } else {
-    member.referral_code=refCode;
-    const resp=await sb.from('onboarding_members').insert([member]).select();
-    result=resp.data;error=resp.error;
-  }
-  
-  if(error){
-    toast('❌ '+error.message);
-    btn.disabled=false;btn.textContent='🚀 Join SBA Genius';
-    return;
-  }
-  
-  const memberId = result?.[0]?.id;
-  const memberRefCode = result?.[0]?.referral_code || member.referral_code;
-  
-  // CARD PAYMENT — redirect to Stripe
-  if(!isFreeMember && payMethod==='card'){
-    btn.textContent='Redirecting to checkout...';
-    const priceKey = vpn ? selectedPkg+'_vpn' : selectedPkg;
-    const priceId = STRIPE_PRICES[priceKey] || STRIPE_PRICES[selectedPkg];
-    try{
-      const r = await fetch('/api/checkout',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({price_id:priceId,email,name,ref_code:referrerCode||'',member_id:memberId||''})});
-      const data = await r.json();
-      if(data.url){window.location.href=data.url;return;}
-      else{toast('⚠️ Checkout error — try CashApp/Zelle instead');btn.disabled=false;btn.textContent='💳 Pay with Card';return;}
-    }catch(e){toast('⚠️ Checkout error');btn.disabled=false;btn.textContent='💳 Pay with Card';return;}
-  }
-  
-  // CRYPTO PAYMENT — redirect to Coinbase Commerce
-  if(!isFreeMember && payMethod==='crypto'){
-    btn.textContent='Redirecting to crypto checkout...';
-    const cbKey = vpn ? selectedPkg+'_vpn' : selectedPkg;
-    const cbId = COINBASE_IDS[cbKey] || COINBASE_IDS[selectedPkg];
-    window.location.href='https://commerce.coinbase.com/checkout/'+cbId+'?metadata[email]='+encodeURIComponent(email)+'&metadata[name]='+encodeURIComponent(name)+'&metadata[ref]='+encodeURIComponent(referrerCode||'');
-    return;
-  }
-  
-  // MANUAL or FREE — show success
-  document.getElementById('signupForm').style.display='none';
-  document.getElementById('successCard').style.display='block';
-  
-  if(isFreeMember){
-    document.getElementById('successMsg').textContent='Your free affiliate account is ready! Log in to start building your team and earning commissions.';
-    document.getElementById('successCreds').style.display='block';
-    document.getElementById('credEmail').textContent=email;
-    document.getElementById('credPass').textContent=password;
-    document.getElementById('credRef').textContent='sportsbetarbitrage.com/?ref='+memberRefCode;
-  } else {
-    document.getElementById('successMsg').innerHTML='Your application has been submitted!<br><br>Your team leader will reach out to confirm payment. Once confirmed, you\'ll receive a welcome email with your login credentials.<br><br>💬 <a href="https://discord.gg/hZXxJMgHb3" style="color:var(--gold);">Join our Discord</a> in the meantime!';
-  }
+  const member={name,email,phone:phone||'',discord:discord||'',pkg:dbPkg,paid_pkg:selectedPkg==='promo'?'plus':null,package_amount:amount,vpn,vpn_status:vpn?'pending':null,payment:isFree?'affiliate':isPaidNow?'processing':'pending_payment',member_type:isFree?'affiliate_only':'active',affiliate_type:'standard',commission_status:isFree?'held':'pending',status:isFree?'active':'pending_payment',step_progress:1,password,password_changed:false,tos_accepted:false,checklist:'{}',upgrade_requests:'[]',cycle_start:'2026-03-26T21:00:00-04:00',cycle_end:'2026-05-04T21:00:00-04:00',affiliate_rank:'starter',total_referrals:0,held_commissions:0,genius_access:!isFree,cycle_number:1,promo_code:selectedPkg==='promo'?'LAUNCH-SPECIAL':null,promo_value:selectedPkg==='promo'?3000:0};
+  if(referrerCode)member.referred_by_code=referrerCode;
+  let result,error;
+  if(phantom){member.referral_code=phantom.referral_code;if(!member.referred_by_code)member.referred_by_code=phantom.referred_by_code;const r=await sb.from('onboarding_members').update(member).eq('id',phantom.id).select();result=r.data;error=r.error;}else{member.referral_code=refCode;const r=await sb.from('onboarding_members').insert([member]).select();result=r.data;error=r.error;}
+  if(error){toast('❌ '+error.message);btn.disabled=false;btn.textContent='🚀 JOIN SBA GENIUS';return;}
+  const memberId=result?.[0]?.id,memberRefCode=result?.[0]?.referral_code||member.referral_code;
+  if(!isFree&&payMethod==='card'){btn.textContent='Redirecting to checkout...';const pk=vpn?selectedPkg+'_vpn':selectedPkg;try{const r=await fetch('/api/checkout',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({price_id:STRIPE_PRICES[pk]||STRIPE_PRICES[selectedPkg],email,name,ref_code:referrerCode||'',member_id:memberId||''})});const d=await r.json();if(d.url){window.location.href=d.url;return;}else{toast('⚠️ Checkout error — try CashApp instead');btn.disabled=false;btn.textContent='💳 PAY WITH CARD';return;}}catch(e){toast('⚠️ Checkout error');btn.disabled=false;return;}}
+  if(!isFree&&payMethod==='crypto'){btn.textContent='Redirecting...';const ck=vpn?selectedPkg+'_vpn':selectedPkg;window.location.href='https://commerce.coinbase.com/checkout/'+(COINBASE_IDS[ck]||COINBASE_IDS[selectedPkg])+'?metadata[email]='+encodeURIComponent(email)+'&metadata[name]='+encodeURIComponent(name)+'&metadata[ref]='+encodeURIComponent(referrerCode||'');return;}
+  document.getElementById('signupForm').style.display='none';document.getElementById('successCard').style.display='block';document.querySelector('.hero').style.display='none';
+  if(isFree){document.getElementById('successMsg').textContent='Your free affiliate account is ready! Log in to start building.';document.getElementById('successCreds').style.display='block';document.getElementById('credEmail').textContent=email;document.getElementById('credPass').textContent=password;document.getElementById('credRef').textContent='onboarding.sportsbetarbitrage.com/join.html?ref='+memberRefCode;}else{document.getElementById('successMsg').innerHTML='Application submitted!<br><br>Your team leader will confirm payment and activate your account.<br><br>💬 <a href="https://discord.gg/hZXxJMgHb3" style="color:var(--gold);">Join our Discord</a>';}
 }
 </script>
 </body>
