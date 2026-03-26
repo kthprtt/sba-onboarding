@@ -178,7 +178,7 @@ body{background:var(--bg);color:var(--t1);font-family:'Outfit',sans-serif;min-he
 <div class="login-screen" id="loginScreen">
   <div class="login-card">
     <div class="login-logo">SBA</div>
-    <h1>Command Center <span style="margin-left:8px;padding:2px 8px;background:rgba(0,255,136,0.08);border:1px solid rgba(0,255,136,0.2);border-radius:10px;font-family:JetBrains Mono;font-size:9px;color:#00ff88;font-weight:700;letter-spacing:1px;">v56</span></h1>
+    <h1>Command Center <span style="margin-left:8px;padding:2px 8px;background:rgba(0,255,136,0.08);border:1px solid rgba(0,255,136,0.2);border-radius:10px;font-family:JetBrains Mono;font-size:9px;color:#00ff88;font-weight:700;letter-spacing:1px;">v57</span></h1>
     <div class="sub">SBA Leadership Portal — Onboarding & Code Management</div>
     <input type="text" id="loginUser" placeholder="Username" style="width:100%;padding:14px;background:var(--card);border:1px solid var(--border);border-radius:10px;color:var(--t1);font-family:Outfit;font-size:15px;margin-bottom:10px;outline:none;" onkeypress="if(event.key==='Enter')document.getElementById('loginPass').focus()">
     <div style="position:relative;margin-bottom:12px;">
@@ -1654,12 +1654,29 @@ function renderPeople(){
     active.forEach(m=>{
       const upline = members.find(x=>x.referral_code===m.referred_by_code);
       const upName = upline?(upline.member_type==='phantom'?'⏳ '+upline.name:upline.name):'—';
-      html+='<div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--bg);border:1px solid rgba(0,255,136,0.1);border-radius:6px;margin-bottom:3px;"><span style="font-size:13px;font-weight:700;flex:1;">'+m.name+'</span><span style="font-size:10px;color:var(--t3);">under: '+upName+'</span><span style="padding:2px 8px;border-radius:4px;font-size:9px;font-weight:700;background:rgba(0,255,136,0.1);color:var(--green);">'+(m.pkg?.toUpperCase()||'ACTIVE')+'</span></div>';
+      html+='<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--bg);border:1px solid rgba(0,255,136,0.1);border-radius:6px;margin-bottom:3px;flex-wrap:wrap;"><span style="font-size:13px;font-weight:700;flex:1;min-width:120px;">'+m.name+'</span><span style="font-size:10px;color:var(--t3);">under: '+upName+'</span><span style="padding:2px 8px;border-radius:4px;font-size:9px;font-weight:700;background:rgba(0,255,136,0.1);color:var(--green);">'+(m.pkg?.toUpperCase()||'ACTIVE')+'</span><button onclick="editMemberEmail(\''+m.id+'\')" style="padding:2px 6px;background:rgba(68,136,255,0.1);border:1px solid rgba(68,136,255,0.15);border-radius:4px;color:var(--blue);font-size:8px;font-weight:700;cursor:pointer;">✏️ Email</button><button onclick="resendWelcome(\''+m.id+'\')" style="padding:2px 6px;background:rgba(0,230,118,0.1);border:1px solid rgba(0,230,118,0.15);border-radius:4px;color:var(--green);font-size:8px;font-weight:700;cursor:pointer;">📨 Resend</button></div>';
     });
     document.getElementById('activeList').innerHTML=html;
   } else {
     document.getElementById('activeList').innerHTML='<div style="text-align:center;padding:12px;color:var(--t3);font-size:11px;">No active members yet</div>';
   }
+}
+
+async function editMemberEmail(id){
+  const m = members.find(x=>x.id===id);
+  if(!m) return;
+  const newEmail = prompt('Edit email for '+m.name+'\\n\\nCurrent: '+(m.email||'none')+'\\n\\nEnter new email:');
+  if(!newEmail || !newEmail.includes('@')) return;
+  await sb.from('onboarding_members').update({email:newEmail.trim().toLowerCase()}).eq('id',id);
+  showToast('✅ Email updated to '+newEmail.trim());
+  await loadAll();
+}
+
+async function resendWelcome(id){
+  const m = members.find(x=>x.id===id);
+  if(!m) return;
+  if(!m.email){showToast('⚠️ No email on file — edit email first');return;}
+  showWelcomeEmailPopup({...m,vpnUser:m.vpn_username,vpnPass:m.vpn_password,refCode:m.referral_code});
 }
 
 async function suggestPlacement(memberId){
@@ -1740,8 +1757,9 @@ Password: ${m.password}
 ${m.vpn?`
 🔒 YOUR VPN:${m.vpnUser?`
 Username: ${m.vpnUser}
-Password: ${m.vpnPass||'See portal'}`:' Credentials in your portal'}
-VPN included FREE through April 7th!`:''}
+Password: ${m.vpnPass||'See portal'}`:' Credentials coming shortly — check your portal.'}
+Your VPN access is active through your full cycle (May 4, 2026).
+Note: The FREE VPN promotion ends April 7 — after that, VPN is $1K for new members. Your access is locked in.`:''}
 ${isPromo?`
 🔥 YOUR LAUNCH SPECIAL:
 Plus Package ($2K value)
