@@ -178,7 +178,7 @@ body{background:var(--bg);color:var(--t1);font-family:'Outfit',sans-serif;min-he
 <div class="login-screen" id="loginScreen">
   <div class="login-card">
     <div class="login-logo">SBA</div>
-    <h1>Command Center <span style="margin-left:8px;padding:2px 8px;background:rgba(0,255,136,0.08);border:1px solid rgba(0,255,136,0.2);border-radius:10px;font-family:JetBrains Mono;font-size:9px;color:#00ff88;font-weight:700;letter-spacing:1px;">v60</span></h1>
+    <h1>Command Center <span style="margin-left:8px;padding:2px 8px;background:rgba(0,255,136,0.08);border:1px solid rgba(0,255,136,0.2);border-radius:10px;font-family:JetBrains Mono;font-size:9px;color:#00ff88;font-weight:700;letter-spacing:1px;">v61</span></h1>
     <div class="sub">SBA Leadership Portal — Onboarding & Code Management</div>
     <input type="text" id="loginUser" placeholder="Username" style="width:100%;padding:14px;background:var(--card);border:1px solid var(--border);border-radius:10px;color:var(--t1);font-family:Outfit;font-size:15px;margin-bottom:10px;outline:none;" onkeypress="if(event.key==='Enter')document.getElementById('loginPass').focus()">
     <div style="position:relative;margin-bottom:12px;">
@@ -512,7 +512,20 @@ body{background:var(--bg);color:var(--t1);font-family:'Outfit',sans-serif;min-he
     <!-- PEOPLE PAGE — All phantoms + holding tank -->
     <div class="page" id="page-people">
       <h1 style="font-size:22px;font-weight:900;margin-bottom:4px;">👥 All People</h1>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+        <h1 style="font-size:22px;font-weight:900;">👥 All People</h1>
+        <div style="display:flex;gap:6px;">
+          <button onclick="document.getElementById('treeViewSection').style.display=document.getElementById('treeViewSection').style.display==='none'?'block':'none'" style="padding:4px 10px;background:rgba(139,92,246,0.1);border:1px solid rgba(139,92,246,0.2);border-radius:6px;color:var(--purple);font-size:10px;font-weight:700;cursor:pointer;">🌳 Tree View</button>
+        </div>
+      </div>
       <div style="font-size:13px;color:var(--t2);margin-bottom:20px;">Everyone in the system — active, holding tank, and pending. SBA HQ handles placements.</div>
+      
+      <!-- Tree View (toggle) -->
+      <div id="treeViewSection" class="card" style="display:none;border-color:rgba(139,92,246,0.2);margin-bottom:12px;">
+        <h3 style="color:var(--purple);margin-bottom:8px;">🌳 Organization Tree</h3>
+        <div style="font-size:10px;color:var(--t3);margin-bottom:12px;">Full hierarchy — who's under who. Click the toggle above to show/hide.</div>
+        <div id="orgTree" style="font-family:'JetBrains Mono';font-size:11px;line-height:2;"></div>
+      </div>
       
       <!-- Pending Move Suggestions -->
       <div id="pendingMovesSection" style="display:none;"></div>
@@ -1665,6 +1678,66 @@ function renderPeople(){
   } else {
     document.getElementById('activeList').innerHTML='<div style="text-align:center;padding:12px;color:var(--t3);font-size:11px;">No active members yet</div>';
   }
+  renderOrgTree();
+}
+
+function renderOrgTree(){
+  const el=document.getElementById('orgTree');
+  if(!el) return;
+  
+  const roots = members.filter(m=>m.is_core_team && m.referral_code);
+  
+  function getChildren(refCode){
+    return members.filter(m=>m.referred_by_code===refCode && !m.is_core_team);
+  }
+  
+  function buildNode(m, depth, isLast, prefix){
+    const connector = depth===0 ? '' : (isLast ? '└── ' : '├── ');
+    const childPrefix = depth===0 ? '' : (isLast ? '    ' : '│   ');
+    const type = m.member_type;
+    let badge = type==='phantom'?'⏳':type==='affiliate_only'?'🆓':type==='legacy'?'👴':'✅';
+    const badgeColor = type==='phantom'?'var(--orange)':type==='affiliate_only'?'var(--gold)':type==='legacy'?'var(--purple)':'var(--green)';
+    const pkg = m.pkg && m.pkg!=='none' ? ' <span style="padding:1px 5px;border-radius:3px;font-size:8px;font-weight:700;background:rgba(0,255,136,0.08);color:var(--green);">'+m.pkg.toUpperCase()+'</span>' : '';
+    const vpnB = m.vpn ? ' <span style="padding:1px 5px;border-radius:3px;font-size:8px;font-weight:700;background:rgba(139,92,246,0.08);color:var(--purple);">VPN</span>' : '';
+    
+    let html = '<div style="white-space:nowrap;"><span style="color:var(--t3);">'+prefix+connector+'</span><span style="color:'+badgeColor+';">'+badge+'</span> <span style="font-weight:700;color:var(--t1);">'+m.name+'</span>'+pkg+vpnB+'</div>';
+    
+    const children = getChildren(m.referral_code);
+    children.forEach((child, i)=>{
+      html += buildNode(child, depth+1, i===children.length-1, prefix+childPrefix);
+    });
+    return html;
+  }
+  
+  let html = '';
+  roots.forEach(root=>{
+    if((root.name||'').toLowerCase().includes('backend')) return;
+    const children = getChildren(root.referral_code);
+    html += '<div style="margin-bottom:16px;"><div style="font-weight:900;font-size:13px;color:var(--gold);margin-bottom:4px;">👑 '+root.name+' <span style="font-size:9px;color:var(--t3);">('+root.referral_code+')</span> — '+children.length+' direct</div>';
+    children.forEach((child, i)=>{ html += buildNode(child, 1, i===children.length-1, ''); });
+    html += '</div>';
+  });
+  
+  const tank = members.filter(m=>(!m.referred_by_code || !m.referred_by_code.trim()) && !m.is_core_team && m.member_type!=='phantom');
+  if(tank.length){
+    html += '<div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--border);"><div style="font-weight:900;font-size:13px;color:var(--blue);margin-bottom:4px;">📦 Holding Tank — '+tank.length+' people</div>';
+    tank.forEach(m=>{
+      const badge = m.member_type==='affiliate_only'?'🆓':'✅';
+      const pkg = m.pkg&&m.pkg!=='none'?' <span style="padding:1px 5px;border-radius:3px;font-size:8px;font-weight:700;background:rgba(0,255,136,0.08);color:var(--green);">'+m.pkg.toUpperCase()+'</span>':'';
+      html += '<div style="white-space:nowrap;"><span style="color:var(--t3);">├── </span>'+badge+' <span style="font-weight:700;">'+m.name+'</span>'+pkg+'</div>';
+    });
+    html += '</div>';
+  }
+  
+  const loosePh = members.filter(m=>m.member_type==='phantom' && (!m.referred_by_code || !m.referred_by_code.trim()));
+  if(loosePh.length){
+    html += '<div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--border);"><div style="font-weight:900;font-size:13px;color:var(--orange);margin-bottom:4px;">⏳ Unplaced Phantoms — '+loosePh.length+'</div>';
+    loosePh.forEach(m=>{ html += '<div style="white-space:nowrap;"><span style="color:var(--t3);">├── </span>⏳ <span style="font-weight:700;color:var(--orange);">'+m.name+'</span></div>'; });
+    html += '</div>';
+  }
+  
+  if(!html) html = '<div style="color:var(--t3);text-align:center;padding:20px;">No members in the tree yet</div>';
+  el.innerHTML = '<div style="overflow-x:auto;padding:8px;">'+html+'</div>';
 }
 
 async function editMemberEmail(id){
