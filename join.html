@@ -117,6 +117,7 @@ body{background:var(--bg);color:var(--t1);font-family:'Outfit',sans-serif;overfl
 .toast.show{opacity:1}
 
 @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.4;transform:scale(1.5)}}
 .reveal{opacity:0;transform:translateY(20px);transition:all 0.6s ease}
 .reveal.visible{opacity:1;transform:translateY(0)}
 
@@ -128,12 +129,11 @@ body{background:var(--bg);color:var(--t1);font-family:'Outfit',sans-serif;overfl
 <!-- HERO -->
 <div class="hero">
   <div class="hero-content">
-    <div class="hero-badge">Limited Launch · March 2026</div>
+    <div class="hero-badge">🔥 LAUNCH WINDOW · Join Before April 7 → Get Grandfathered at 55% Commission</div>
     <h1><span class="gold">GUARANTEED</span><br>PROFITS FROM<br>SPORTS <span class="green">BETTING</span></h1>
     <p class="hero-sub">SBA Genius finds <strong>risk-free arbitrage opportunities</strong> across 39+ sportsbooks. Place both sides. <strong>Profit every time.</strong> No gambling. Pure math.</p>
     
     <div class="hero-stats">
-      <div class="hero-stat"><div class="num" id="statMembers">0</div><div class="label">Active Members</div></div>
       <div class="hero-stat"><div class="num">39+</div><div class="label">Sportsbooks</div></div>
       <div class="hero-stat"><div class="num">60</div><div class="label">Leagues Scanned</div></div>
       <div class="hero-stat"><div class="num">24/7</div><div class="label">Live Scanning</div></div>
@@ -173,6 +173,53 @@ body{background:var(--bg);color:var(--t1);font-family:'Outfit',sans-serif;overfl
     <div class="arb-row"><span>FanDuel — Celtics ML</span><span style="color:var(--gold);">-130</span></div>
     <div class="arb-row"><span>Your total bet (both sides)</span><span>$1,000</span></div>
     <div class="arb-row"><span>🎯 Guaranteed Profit</span><span>+$62 in 3 minutes</span></div>
+  </div>
+</div>
+
+<!-- LIVE PLATFORM PREVIEW -->
+<div class="section">
+  <div class="section-label reveal">See It In Action</div>
+  <h2 class="reveal">SBA GENIUS — LIVE PREVIEW</h2>
+  <div class="reveal" style="font-size:13px;color:var(--t2);margin-bottom:16px;">This is what members see every day. Real arbs. Real money. Real-time.</div>
+  
+  <!-- Simulated ARB Cards -->
+  <div id="liveArbs" style="display:grid;gap:8px;margin-bottom:20px;">
+  </div>
+  
+  <!-- Platform Screenshots as styled cards -->
+  <div class="reveal" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px;">
+    <div style="padding:16px;background:var(--card);border:1px solid var(--border);border-radius:12px;text-align:center;">
+      <div style="font-size:32px;margin-bottom:6px;">🎯</div>
+      <div style="font-weight:800;font-size:13px;margin-bottom:2px;">ARB Center</div>
+      <div style="font-size:10px;color:var(--t3);">Live opportunities every 60 seconds</div>
+      <div style="margin-top:8px;padding:6px;background:var(--bg);border-radius:6px;font-family:'JetBrains Mono';font-size:9px;color:var(--green);line-height:1.8;">
+        scanning 60 leagues...<br>
+        432 markets checked<br>
+        <span style="color:var(--gold);">3 arbs found →</span>
+      </div>
+    </div>
+    <div style="padding:16px;background:var(--card);border:1px solid var(--border);border-radius:12px;text-align:center;">
+      <div style="font-size:32px;margin-bottom:6px;">⚔️</div>
+      <div style="font-weight:800;font-size:13px;margin-bottom:2px;">War Room</div>
+      <div style="font-size:10px;color:var(--t3);">Manage positions in real-time</div>
+      <div style="margin-top:8px;padding:6px;background:var(--bg);border-radius:6px;font-family:'JetBrains Mono';font-size:9px;line-height:1.8;">
+        <span style="color:var(--green);">Watch Score: 82/100</span><br>
+        <span style="color:var(--t2);">Position: SAFE</span><br>
+        <span style="color:var(--gold);">Profit locked: +$47</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Urgency banner -->
+  <div class="reveal" style="background:linear-gradient(135deg,rgba(212,168,67,0.08),rgba(245,158,11,0.04));border:1px solid rgba(212,168,67,0.2);border-radius:12px;padding:20px;text-align:center;margin-bottom:16px;">
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--gold);margin-bottom:4px;">⏰ LAUNCH WINDOW CLOSING</div>
+    <div style="font-size:13px;color:var(--t2);margin-bottom:8px;">Everyone who joins before <strong style="color:var(--gold);">April 7, 2026</strong> gets:</div>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;font-size:12px;">
+      <span style="padding:6px 14px;background:rgba(0,230,118,0.06);border:1px solid rgba(0,230,118,0.15);border-radius:20px;color:var(--green);font-weight:700;">✅ Grandfathered 55% commissions</span>
+      <span style="padding:6px 14px;background:rgba(139,92,246,0.06);border:1px solid rgba(139,92,246,0.15);border-radius:20px;color:var(--purple);font-weight:700;">✅ FREE VPN ($1K value)</span>
+      <span style="padding:6px 14px;background:rgba(212,168,67,0.06);border:1px solid rgba(212,168,67,0.15);border-radius:20px;color:var(--gold);font-weight:700;">✅ Launch Special pricing</span>
+    </div>
+    <div id="countdown" style="font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--t1);margin-top:12px;letter-spacing:2px;"></div>
   </div>
 </div>
 
@@ -284,7 +331,7 @@ body{background:var(--bg);color:var(--t1);font-family:'Outfit',sans-serif;overfl
       <div style="text-align:center;padding:8px 4px;background:rgba(0,230,118,0.01);border-radius:6px;"><div style="font-size:9px;color:var(--t3);">L6</div><div style="font-family:'Bebas Neue';font-size:22px;color:var(--t2);">2%</div></div>
       <div style="text-align:center;padding:8px 4px;background:rgba(0,230,118,0.01);border-radius:6px;"><div style="font-size:9px;color:var(--t3);">L7</div><div style="font-family:'Bebas Neue';font-size:22px;color:var(--t2);">2%</div></div>
     </div>
-    <div style="text-align:center;font-size:12px;color:var(--t2);">Standard · <strong style="color:var(--gold);">45% total</strong> across 7 levels</div>
+    <div style="text-align:center;font-size:12px;color:var(--gold);font-weight:700;">🔥 Join before April 7 → get GRANDFATHERED at 55% total (normally 45%)</div>
   </div>
   
   <div class="arb-example reveal" style="border-color:rgba(212,168,67,0.15);">
@@ -421,16 +468,76 @@ async function init(){
   if(params.get('success')==='true'){document.querySelector('.hero').style.display='none';document.getElementById('signupForm').style.display='none';document.getElementById('successCard').style.display='block';document.getElementById('successMsg').innerHTML='🎉 <strong>Payment confirmed!</strong><br><br>Your account is being activated. You\'ll receive a welcome email shortly with login credentials, VPN setup, and getting started guide.<br><br>💬 <a href="https://discord.gg/hZXxJMgHb3" style="color:var(--gold);">Join our Discord now</a>';return;}
   if(params.get('cancelled')==='true'){toast('Payment cancelled — try again or choose a different method.');}
   if(referrerCode){const{data}=await sb.from('onboarding_members').select('name,referral_code').eq('referral_code',referrerCode).single();if(data){referrerMember=data;document.getElementById('referrerBar').style.display='block';document.getElementById('referrerName').textContent=data.name;}}
-  // Animate member count
-  const{count}=await sb.from('onboarding_members').select('id',{count:'exact',head:true}).neq('member_type','phantom').eq('is_core_team',false);
-  animateNum('statMembers',count||0);
+  
   // Scroll reveals
   const obs=new IntersectionObserver((entries)=>{entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');});},{threshold:0.1});
   document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
 }
 init();
 
-function animateNum(id,target){let n=0;const el=document.getElementById(id);const step=Math.ceil(target/30);const timer=setInterval(()=>{n+=step;if(n>=target){n=target;clearInterval(timer);}el.textContent=n;},30);}
+function animateNum(id,target){let n=0;const el=document.getElementById(id);if(!el)return;const step=Math.ceil(target/30);const timer=setInterval(()=>{n+=step;if(n>=target){n=target;clearInterval(timer);}el.textContent=n;},30);}
+
+// Live ARB simulation
+const ARBS=[
+  {sport:'🏀',match:'Celtics vs Bucks',book1:'DraftKings',side1:'Celtics ML',odds1:'+145',book2:'FanDuel',side2:'Bucks ML',odds2:'-132',roi:'3.2%',profit:'+$64'},
+  {sport:'⚽',match:'Liverpool vs Arsenal',book1:'BetMGM',side1:'Liverpool',odds1:'+180',book2:'Caesars',side2:'Arsenal/Draw',odds2:'-155',roi:'2.8%',profit:'+$56'},
+  {sport:'🏈',match:'Chiefs vs Bills',book1:'FanDuel',side1:'Chiefs +3.5',odds1:'-108',book2:'DraftKings',side2:'Bills -3.5',odds2:'+115',roi:'3.5%',profit:'+$70'},
+  {sport:'🏒',match:'Rangers vs Bruins',book1:'BetRivers',side1:'Over 5.5',odds1:'+105',book2:'Pinnacle',side2:'Under 5.5',odds2:'-100',roi:'2.4%',profit:'+$48'},
+  {sport:'⚾',match:'Yankees vs Dodgers',book1:'Bovada',side1:'Yankees ML',odds1:'+155',book2:'FanDuel',side2:'Dodgers ML',odds2:'-140',roi:'2.9%',profit:'+$58'},
+  {sport:'🥊',match:'UFC 312 Main Event',book1:'1xBet',side1:'Fighter A',odds1:'+200',book2:'DraftKings',side2:'Fighter B',odds2:'-170',roi:'4.1%',profit:'+$82'},
+  {sport:'🎾',match:'Djokovic vs Alcaraz',book1:'Pinnacle',side1:'Djokovic',odds1:'+130',book2:'BetOnline',side2:'Alcaraz',odds2:'-120',roi:'3.8%',profit:'+$76'},
+];
+
+function renderLiveArbs(){
+  const el=document.getElementById('liveArbs');
+  if(!el)return;
+  const shuffled=[...ARBS].sort(()=>Math.random()-0.5).slice(0,3);
+  el.innerHTML=shuffled.map((a,i)=>`
+    <div class="reveal visible" style="background:var(--card);border:1px solid rgba(0,230,118,0.1);border-radius:12px;padding:14px;position:relative;overflow:hidden;animation:fadeUp 0.4s ease ${i*0.1}s both;">
+      <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--green),var(--gold));"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <div style="font-size:13px;font-weight:800;">${a.sport} ${a.match}</div>
+        <div style="padding:3px 10px;background:rgba(0,230,118,0.08);border:1px solid rgba(0,230,118,0.15);border-radius:20px;font-family:'JetBrains Mono';font-size:11px;font-weight:700;color:var(--green);">${a.roi} ROI</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px;">
+        <div style="padding:8px;background:var(--bg);border-radius:6px;font-size:11px;">
+          <div style="color:var(--t3);font-size:9px;">${a.book1}</div>
+          <div style="font-weight:700;">${a.side1} <span style="color:var(--gold);font-family:'JetBrains Mono';">${a.odds1}</span></div>
+        </div>
+        <div style="padding:8px;background:var(--bg);border-radius:6px;font-size:11px;">
+          <div style="color:var(--t3);font-size:9px;">${a.book2}</div>
+          <div style="font-weight:700;">${a.side2} <span style="color:var(--gold);font-family:'JetBrains Mono';">${a.odds2}</span></div>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:12px;">
+        <span style="color:var(--t3);">$2,000 total bet</span>
+        <span style="font-weight:800;color:var(--green);">${a.profit} guaranteed</span>
+      </div>
+      <div style="position:absolute;top:8px;right:8px;width:6px;height:6px;background:var(--green);border-radius:50%;animation:pulse 2s infinite;"></div>
+    </div>
+  `).join('');
+}
+
+// Rotate arbs every 8 seconds
+renderLiveArbs();
+setInterval(renderLiveArbs,8000);
+
+// Countdown to April 7
+function updateCountdown(){
+  const el=document.getElementById('countdown');
+  if(!el)return;
+  const target=new Date('2026-04-07T23:59:59-04:00');
+  const now=new Date();
+  const diff=target-now;
+  if(diff<=0){el.textContent='WINDOW CLOSED';return;}
+  const d=Math.floor(diff/(1000*60*60*24));
+  const h=Math.floor((diff%(1000*60*60*24))/(1000*60*60));
+  const m=Math.floor((diff%(1000*60*60))/(1000*60));
+  const s=Math.floor((diff%(1000*60))/1000);
+  el.textContent=d+'D '+h+'H '+m+'M '+s+'S';
+}
+updateCountdown();
+setInterval(updateCountdown,1000);
 
 function setType(type){joinType=type;document.getElementById('typePaid').classList.toggle('active',type==='paid');document.getElementById('typeFree').classList.toggle('active',type==='free');document.getElementById('paidSection').style.display=type==='paid'?'block':'none';document.getElementById('freeSection').style.display=type==='free'?'block':'none';document.getElementById('submitBtn').textContent=type==='paid'?(payMethod==='card'?'💳 PAY WITH CARD':payMethod==='crypto'?'₿ PAY WITH CRYPTO':'🚀 JOIN SBA GENIUS'):'🆓 CREATE FREE ACCOUNT';}
 function setPkg(pkg){selectedPkg=pkg;document.querySelectorAll('.pkg-card').forEach(c=>c.classList.remove('active'));document.getElementById('pkg'+pkg.charAt(0).toUpperCase()+pkg.slice(1))?.classList.add('active');if(pkg==='promo')document.getElementById('pkgPromo').classList.add('active');}
