@@ -4,768 +4,469 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Join SBA Genius — Guaranteed Profits from Sports Betting</title>
+<meta name="description" content="SBA Genius scans 39+ sportsbooks to find risk-free arbitrage opportunities. Place both sides. Profit every time. Pure math, not gambling.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root{--bg:#0a0b10;--card:#12141c;--card2:#161825;--border:#252839;--gold:#d4a843;--gold-dim:#b8942e;--green:#00e676;--red:#ff4466;--purple:#b388ff;--blue:#4488ff;--orange:#f59e0b;--t1:#e8e6e0;--t2:#8b8d9e;--t3:#6b7086;}
+:root{--bg:#0a0b10;--card:#12141c;--card2:#161825;--border:#1e2030;--gold:#d4a843;--gold2:#b8942e;--green:#00e676;--red:#ff4466;--purple:#b388ff;--blue:#4488ff;--orange:#f59e0b;--t1:#e8e6e0;--t2:#8b8d9e;--t3:#5a5d72}
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
-body{background:var(--bg);color:var(--t1);font-family:'Outfit',sans-serif;overflow-x:hidden}
+body{background:var(--bg);color:var(--t1);font-family:'Outfit',sans-serif;overflow-x:hidden;-webkit-font-smoothing:antialiased}
 
-/* HERO */
+/* === HERO === */
 .hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px 20px;position:relative}
-.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 30%,rgba(212,168,67,0.08),transparent 60%),radial-gradient(ellipse at 20% 80%,rgba(0,230,118,0.04),transparent 50%),radial-gradient(ellipse at 80% 70%,rgba(139,92,246,0.03),transparent 50%);pointer-events:none}
-.hero::after{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.015'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");pointer-events:none}
-.hero-content{position:relative;z-index:1;max-width:700px}
-.hero-badge{display:inline-block;padding:6px 16px;background:rgba(212,168,67,0.08);border:1px solid rgba(212,168,67,0.15);border-radius:20px;font-size:11px;font-weight:700;color:var(--gold);letter-spacing:2px;text-transform:uppercase;margin-bottom:20px;animation:fadeUp 0.6s ease}
-.hero h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(48px,10vw,80px);line-height:0.95;letter-spacing:2px;margin-bottom:16px;animation:fadeUp 0.6s ease 0.1s both}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 40%,rgba(212,168,67,0.07),transparent),radial-gradient(ellipse 60% 50% at 20% 80%,rgba(0,230,118,0.04),transparent),radial-gradient(ellipse 40% 40% at 85% 20%,rgba(139,92,246,0.03),transparent);pointer-events:none}
+.hero-content{position:relative;z-index:1;max-width:660px}
+.hero-badge{display:inline-flex;align-items:center;gap:6px;padding:8px 18px;background:rgba(212,168,67,0.06);border:1px solid rgba(212,168,67,0.12);border-radius:24px;font-size:11px;font-weight:700;color:var(--gold);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:24px;animation:fadeUp .5s ease}
+.hero-badge .dot{width:6px;height:6px;background:var(--green);border-radius:50%;animation:pulse 2s infinite}
+.hero h1{font-family:'Bebas Neue';font-size:clamp(52px,11vw,88px);line-height:.9;letter-spacing:3px;margin-bottom:20px;animation:fadeUp .5s ease .1s both}
 .hero h1 .gold{color:var(--gold)}
 .hero h1 .green{color:var(--green)}
-.hero-sub{font-size:clamp(14px,3vw,18px);color:var(--t2);max-width:500px;margin:0 auto 24px;line-height:1.6;animation:fadeUp 0.6s ease 0.2s both}
+.hero-sub{font-size:clamp(15px,3vw,19px);color:var(--t2);max-width:480px;margin:0 auto 28px;line-height:1.6;animation:fadeUp .5s ease .2s both}
 .hero-sub strong{color:var(--t1)}
+.hero-stats{display:flex;gap:32px;justify-content:center;margin-bottom:36px;animation:fadeUp .5s ease .3s both}
+.hero-stat .num{font-family:'Bebas Neue';font-size:40px;color:var(--gold);line-height:1}
+.hero-stat .label{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:1px;margin-top:2px}
+.hero-cta{display:flex;gap:12px;justify-content:center;animation:fadeUp .5s ease .4s both;flex-wrap:wrap}
+.scroll-hint{position:absolute;bottom:28px;left:50%;transform:translateX(-50%);animation:float 2.5s ease-in-out infinite;color:var(--t3);font-size:20px}
+@keyframes float{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(10px)}}
 
-.hero-stats{display:flex;gap:24px;justify-content:center;margin-bottom:32px;animation:fadeUp 0.6s ease 0.3s both;flex-wrap:wrap}
-.hero-stat{text-align:center}
-.hero-stat .num{font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--gold);line-height:1}
-.hero-stat .label{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:1px}
-
-.hero-cta{display:flex;gap:12px;justify-content:center;animation:fadeUp 0.6s ease 0.4s both;flex-wrap:wrap}
-.btn{padding:14px 28px;border:none;border-radius:10px;font-family:'Outfit';font-size:15px;font-weight:800;cursor:pointer;transition:all 0.2s;text-transform:uppercase;letter-spacing:1px;text-decoration:none;display:inline-flex;align-items:center;gap:8px}
-.btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold-dim));color:#000}
-.btn-gold:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(212,168,67,0.3)}
-.btn-outline{background:transparent;border:2px solid var(--border);color:var(--t1)}
+/* === BUTTONS === */
+.btn{padding:14px 32px;border:none;border-radius:10px;font-family:'Outfit';font-size:15px;font-weight:800;cursor:pointer;transition:all .25s;text-transform:uppercase;letter-spacing:1.5px;text-decoration:none;display:inline-flex;align-items:center;gap:8px;justify-content:center}
+.btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#000;box-shadow:0 4px 20px rgba(212,168,67,0.15)}
+.btn-gold:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(212,168,67,0.25)}
+.btn-outline{background:transparent;border:2px solid var(--border);color:var(--t2)}
 .btn-outline:hover{border-color:var(--gold);color:var(--gold)}
 .btn-green{background:linear-gradient(135deg,var(--green),#00c853);color:#000}
-.btn-green:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(0,230,118,0.3)}
-.btn:disabled{opacity:0.5;transform:none;cursor:not-allowed}
+.btn-green:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(0,230,118,0.2)}
+.btn:disabled{opacity:.4;transform:none;cursor:not-allowed}
+.btn-sm{padding:10px 20px;font-size:12px;letter-spacing:1px}
 
-.scroll-hint{position:absolute;bottom:30px;left:50%;transform:translateX(-50%);animation:bounce 2s infinite;color:var(--t3);font-size:12px;text-align:center}
-@keyframes bounce{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(8px)}}
+/* === SECTIONS === */
+.section{padding:80px 20px;max-width:700px;margin:0 auto}
+.section-divider{height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent);max-width:300px;margin:0 auto}
+.section-label{font-size:10px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:3px;margin-bottom:8px}
+.section h2{font-family:'Bebas Neue';font-size:clamp(32px,6vw,42px);letter-spacing:1px;margin-bottom:20px;line-height:1}
+.section h2 .gold{color:var(--gold)}
+.section h2 .green{color:var(--green)}
 
-/* HOW IT WORKS */
-.section{padding:60px 20px;max-width:700px;margin:0 auto}
-.section-label{font-size:11px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:3px;margin-bottom:8px}
-.section h2{font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:1px;margin-bottom:24px}
+/* === CARDS === */
+.gcard{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;position:relative;overflow:hidden;transition:border-color .3s}
+.gcard:hover{border-color:rgba(212,168,67,0.15)}
+.gcard-accent{position:absolute;top:0;left:0;right:0;height:2px}
 
-.steps{display:grid;gap:12px;margin-bottom:32px}
-.step{display:flex;gap:16px;padding:20px;background:var(--card);border:1px solid var(--border);border-radius:12px;transition:all 0.3s}
-.step:hover{border-color:var(--gold);transform:translateX(4px)}
-.step-num{width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,var(--gold),var(--gold-dim));color:#000;font-family:'Bebas Neue',sans-serif;font-size:20px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+/* === STEPS === */
+.steps{display:grid;gap:10px;margin-bottom:28px}
+.step{display:flex;gap:16px;padding:18px;background:var(--card);border:1px solid var(--border);border-radius:12px;transition:all .3s}
+.step:hover{border-color:rgba(212,168,67,0.2);transform:translateX(4px)}
+.step-num{width:38px;height:38px;border-radius:9px;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#000;font-family:'Bebas Neue';font-size:18px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .step-text h3{font-size:14px;font-weight:800;margin-bottom:2px}
-.step-text p{font-size:12px;color:var(--t2)}
+.step-text p{font-size:12px;color:var(--t2);line-height:1.5}
 
-/* EXAMPLE ARB */
-.arb-example{background:var(--card);border:1px solid rgba(0,230,118,0.15);border-radius:14px;padding:20px;margin-bottom:32px;position:relative;overflow:hidden}
-.arb-example::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--green),var(--gold))}
-.arb-example h3{font-size:13px;font-weight:800;color:var(--green);margin-bottom:12px}
-.arb-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.04);font-size:13px}
-.arb-row:last-child{border:none;padding-top:12px;font-weight:800;color:var(--green);font-size:15px}
+/* === ARB CARDS === */
+.arb-card{background:var(--card);border:1px solid rgba(0,230,118,0.08);border-radius:12px;padding:14px;position:relative;overflow:hidden}
+.arb-card .accent{position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--green),var(--gold))}
+.arb-card .live-dot{position:absolute;top:10px;right:10px;width:6px;height:6px;background:var(--green);border-radius:50%;animation:pulse 2s infinite}
+.arb-row{display:flex;justify-content:space-between;padding:6px 0;font-size:13px;border-bottom:1px solid rgba(255,255,255,0.03)}
+.arb-row:last-child{border:none;padding-top:10px;font-weight:800;color:var(--green);font-size:14px}
 
-/* PACKAGES */
-.pkg-section{padding:60px 20px;max-width:700px;margin:0 auto}
-.pkg-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
-.pkg-card{padding:16px;text-align:center;border-radius:12px;cursor:pointer;border:2px solid var(--border);background:var(--card);transition:all 0.2s}
+/* === PACKAGES === */
+.pkg-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.pkg-card{padding:16px;text-align:center;border-radius:12px;cursor:pointer;border:2px solid var(--border);background:var(--card);transition:all .2s}
 .pkg-card:hover{border-color:var(--green);transform:translateY(-2px)}
-.pkg-card.active{border-color:var(--green);background:rgba(0,230,118,0.04);box-shadow:0 4px 20px rgba(0,230,118,0.1)}
-.pkg-card .price{font-family:'Bebas Neue',sans-serif;font-size:32px;margin:4px 0;line-height:1}
-.pkg-card .name{font-size:13px;font-weight:800}
-.pkg-card .sub{font-size:10px;color:var(--t3)}
-.pkg-card.promo{border-color:rgba(245,158,11,0.3);position:relative;overflow:hidden}
-.pkg-card.promo::before{content:'🔥 BEST VALUE';position:absolute;top:0;left:0;right:0;padding:3px;background:linear-gradient(90deg,var(--orange),#e65100);font-size:8px;font-weight:900;letter-spacing:1px;color:#fff;text-align:center}
-.pkg-card.promo.active{border-color:var(--orange);background:rgba(245,158,11,0.06)}
+.pkg-card.active{border-color:var(--green);background:rgba(0,230,118,0.03);box-shadow:0 4px 24px rgba(0,230,118,0.08)}
+.pkg-card .price{font-family:'Bebas Neue';font-size:36px;line-height:1;margin:4px 0}
+.pkg-card .name{font-size:12px;font-weight:800;letter-spacing:.5px}
+.pkg-card .feat{font-size:9px;color:var(--t3);margin-top:2px}
+.pkg-card .roi-tag{display:inline-block;margin-top:6px;padding:2px 8px;border-radius:10px;font-size:9px;font-weight:700;background:rgba(0,230,118,0.06);color:var(--green)}
+.pkg-card.promo{border-color:rgba(245,158,11,0.2)}
+.pkg-card.promo::before{content:"\1F525 BEST VALUE";position:absolute;top:0;left:0;right:0;padding:3px;background:linear-gradient(90deg,var(--orange),#e65100);font-size:8px;font-weight:900;letter-spacing:1px;color:#fff;text-align:center;z-index:1}
+.pkg-card.promo.active{border-color:var(--orange);background:rgba(245,158,11,0.04)}
 .pkg-card.promo .price{color:var(--orange)}
 
-/* FORM */
-.form-section{padding:40px 20px 80px;max-width:500px;margin:0 auto}
-.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:28px;margin-bottom:16px}
-.form-group{margin-bottom:12px}
-.form-label{font-size:11px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px}
-.form-input{width:100%;padding:12px 14px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--t1);font-family:'Outfit';font-size:14px;outline:none;transition:border-color 0.2s}
+/* === VPN === */
+.vpn-toggle{padding:14px;border-radius:10px;border:2px solid var(--border);background:var(--card);cursor:pointer;display:flex;align-items:center;gap:12px;transition:all .2s;margin-top:10px}
+.vpn-toggle:hover{border-color:rgba(139,92,246,0.2)}
+.vpn-toggle.active{border-color:rgba(139,92,246,0.4);background:rgba(139,92,246,0.03)}
+.vpn-check{width:22px;height:22px;border-radius:6px;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;transition:all .2s;flex-shrink:0}
+.vpn-toggle.active .vpn-check{border-color:var(--purple);background:rgba(139,92,246,0.15);color:var(--purple)}
+
+/* === FORM === */
+.form-section{padding:40px 20px 100px;max-width:500px;margin:0 auto}
+.form-group{margin-bottom:10px}
+.form-label{font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
+.form-input{width:100%;padding:12px 14px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--t1);font-family:'Outfit';font-size:14px;outline:none;transition:border-color .2s}
 .form-input:focus{border-color:var(--gold)}
-
-.type-toggle{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
-.type-btn{padding:14px;text-align:center;border-radius:10px;cursor:pointer;border:2px solid var(--border);background:var(--bg);transition:all 0.2s;font-weight:700;font-size:13px}
+.type-toggle{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.type-btn{padding:12px;text-align:center;border-radius:10px;cursor:pointer;border:2px solid var(--border);background:var(--card);transition:all .2s;font-weight:700;font-size:13px}
 .type-btn:hover{border-color:var(--gold)}
-.type-btn.active{border-color:var(--gold);background:rgba(212,168,67,0.06)}
-.type-btn .emoji{font-size:24px;display:block;margin-bottom:4px}
-.type-btn .sub{font-size:10px;color:var(--t3);font-weight:400;margin-top:2px}
-
-.vpn-toggle{padding:14px;border-radius:10px;border:2px solid var(--border);background:var(--bg);cursor:pointer;display:flex;align-items:center;gap:12px;margin-bottom:16px;transition:all 0.2s}
-.vpn-toggle:hover{border-color:rgba(139,92,246,0.3)}
-.vpn-toggle.active{border-color:rgba(139,92,246,0.5);background:rgba(139,92,246,0.04)}
-.vpn-check{width:22px;height:22px;border-radius:6px;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;transition:all 0.2s}
-.vpn-toggle.active .vpn-check{border-color:var(--purple);background:rgba(139,92,246,0.2);color:var(--purple)}
-
-.pay-toggle{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px}
-.pay-btn{padding:12px 8px;text-align:center;border-radius:10px;cursor:pointer;border:2px solid var(--border);background:var(--bg);transition:all 0.2s;font-weight:700;font-size:12px}
+.type-btn.active{border-color:var(--gold);background:rgba(212,168,67,0.04)}
+.type-btn .emoji{font-size:22px;display:block;margin-bottom:2px}
+.type-btn .sub{font-size:9px;color:var(--t3);font-weight:400;margin-top:1px}
+.pay-toggle{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:10px}
+.pay-btn{padding:10px 6px;text-align:center;border-radius:8px;cursor:pointer;border:2px solid var(--border);background:var(--card);transition:all .2s;font-weight:700;font-size:11px}
 .pay-btn:hover{border-color:var(--gold)}
-.pay-btn.active{border-color:var(--gold);background:rgba(212,168,67,0.06)}
-.pay-btn .emoji{font-size:20px;display:block;margin-bottom:2px}
+.pay-btn.active{border-color:var(--gold);background:rgba(212,168,67,0.04)}
+.pay-btn .emoji{font-size:18px;display:block;margin-bottom:1px}
 .pay-btn .sub{font-size:8px;color:var(--t3);font-weight:400}
 
-.referrer-bar{text-align:center;padding:10px 16px;background:rgba(212,168,67,0.06);border:1px solid rgba(212,168,67,0.12);border-radius:10px;margin-bottom:16px;font-size:13px;color:var(--gold);display:none;font-weight:600}
+.referrer-bar{text-align:center;padding:10px 16px;background:rgba(212,168,67,0.05);border:1px solid rgba(212,168,67,0.1);border-radius:10px;margin-bottom:14px;font-size:13px;color:var(--gold);display:none;font-weight:600}
 
-.success-card{display:none;text-align:center;padding:40px 20px;max-width:500px;margin:0 auto}
-.success-card .check{font-size:72px;margin-bottom:16px;animation:popIn 0.5s ease}
+/* === STICKY CTA === */
+.sticky-cta{position:fixed;bottom:0;left:0;right:0;padding:12px 20px;background:linear-gradient(to top,var(--bg) 80%,transparent);z-index:100;display:flex;justify-content:center;gap:10px;transform:translateY(100%);transition:transform .3s;pointer-events:none}
+.sticky-cta.show{transform:translateY(0);pointer-events:all}
+.sticky-cta .btn{box-shadow:0 -4px 20px rgba(0,0,0,.5)}
+
+/* === SUCCESS === */
+.success-wrap{display:none;min-height:100vh;align-items:center;justify-content:center;padding:40px 20px}
+.success-card{text-align:center;max-width:500px;margin:0 auto}
+.success-card .check{font-size:72px;margin-bottom:16px;animation:popIn .5s ease}
 .success-card h2{font-size:24px;font-weight:900;margin-bottom:12px}
 .success-card p{font-size:14px;color:var(--t2);line-height:1.7}
-.success-card .creds{margin-top:20px;padding:20px;background:var(--bg);border:1px solid var(--border);border-radius:12px;text-align:left;font-family:'JetBrains Mono';font-size:12px;line-height:2.2}
+.success-card .creds{margin-top:20px;padding:20px;background:var(--card);border:1px solid var(--border);border-radius:12px;text-align:left;font-family:'JetBrains Mono';font-size:12px;line-height:2.2}
 @keyframes popIn{0%{transform:scale(0)}50%{transform:scale(1.2)}100%{transform:scale(1)}}
 
-.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);padding:10px 24px;background:var(--card);border:1px solid var(--border);border-radius:8px;font-size:12px;font-weight:700;z-index:9999;opacity:0;transition:opacity 0.3s}
+.toast{position:fixed;bottom:70px;left:50%;transform:translateX(-50%);padding:10px 24px;background:var(--card);border:1px solid var(--gold);border-radius:8px;font-size:12px;font-weight:700;z-index:999;opacity:0;transition:opacity .3s;color:var(--gold)}
 .toast.show{opacity:1}
 
-@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
-@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.4;transform:scale(1.5)}}
-.reveal{opacity:0;transform:translateY(20px);transition:all 0.6s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.reveal{opacity:0;transform:translateY(16px);transition:all .5s ease}
 .reveal.visible{opacity:1;transform:translateY(0)}
 
-@media(max-width:600px){.hero h1{font-size:48px}.hero-stats{gap:16px}.pkg-grid{grid-template-columns:1fr 1fr}.pay-toggle{grid-template-columns:1fr 1fr 1fr}.hero-cta{flex-direction:column;align-items:center}}
+/* Commission visual */
+.comm-bar{display:flex;align-items:flex-end;gap:3px;height:80px;margin:12px 0}
+.comm-bar .bar{flex:1;border-radius:4px 4px 0 0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:4px;font-family:'Bebas Neue';font-size:16px;position:relative;transition:all .3s}
+.comm-bar .bar .lbl{position:absolute;top:-16px;font-size:8px;color:var(--t3);font-family:'Outfit';letter-spacing:.5px}
+
+@media(max-width:600px){.hero h1{font-size:52px}.hero-stats{gap:20px}.pkg-grid{grid-template-columns:1fr 1fr}.pay-toggle{grid-template-columns:1fr 1fr 1fr}.hero-cta{flex-direction:column;align-items:center}.sticky-cta{flex-direction:column;align-items:stretch}.sticky-cta .btn{width:100%}}
 </style>
 </head>
 <body>
 
-<!-- HERO -->
-<div class="hero">
+<!-- === HERO === -->
+<div class="hero" id="top">
   <div class="hero-content">
-    <div class="hero-badge">🔥 LAUNCH WINDOW · Join Before April 7 → Get Grandfathered at 55% Commission</div>
+    <div class="hero-badge"><span class="dot"></span> LAUNCH WINDOW · ENDS APRIL 7</div>
     <h1><span class="gold">GUARANTEED</span><br>PROFITS FROM<br>SPORTS <span class="green">BETTING</span></h1>
-    <p class="hero-sub">SBA Genius finds <strong>risk-free arbitrage opportunities</strong> across 39+ sportsbooks. Place both sides. <strong>Profit every time.</strong> No gambling. Pure math.</p>
-    
+    <p class="hero-sub">SBA Genius finds <strong>risk-free arbitrage</strong> across 39+ sportsbooks. Place both sides. <strong>Profit every time.</strong> No gambling. Pure math.</p>
     <div class="hero-stats">
       <div class="hero-stat"><div class="num">39+</div><div class="label">Sportsbooks</div></div>
-      <div class="hero-stat"><div class="num">60</div><div class="label">Leagues Scanned</div></div>
-      <div class="hero-stat"><div class="num">24/7</div><div class="label">Live Scanning</div></div>
+      <div class="hero-stat"><div class="num">60</div><div class="label">Leagues</div></div>
+      <div class="hero-stat"><div class="num">24/7</div><div class="label">Scanning</div></div>
     </div>
-    
     <div class="hero-cta">
       <a href="#join" class="btn btn-gold">🚀 Join Now</a>
       <a href="#how" class="btn btn-outline">How It Works ↓</a>
     </div>
   </div>
-  <div class="scroll-hint">↓ Scroll to learn more</div>
+  <div class="scroll-hint">↓</div>
 </div>
 
-<!-- HOW IT WORKS -->
+<!-- === HOW IT WORKS === -->
 <div class="section" id="how">
   <div class="section-label reveal">How It Works</div>
-  <h2 class="reveal">THREE STEPS TO GUARANTEED PROFIT</h2>
-  
+  <h2 class="reveal">THREE STEPS. <span class="green">GUARANTEED</span> PROFIT.</h2>
   <div class="steps">
-    <div class="step reveal">
-      <div class="step-num">1</div>
-      <div class="step-text"><h3>Genius Finds the Edge</h3><p>Our AI scans 39+ sportsbooks across 60 leagues every 60 seconds. When odds don't match between books, that's an arbitrage — free money waiting to be claimed.</p></div>
-    </div>
-    <div class="step reveal">
-      <div class="step-num">2</div>
-      <div class="step-text"><h3>You Place Both Sides</h3><p>Bet the Lakers on DraftKings. Bet the Celtics on FanDuel. Both sides covered. One side always wins. You profit either way. 20 minutes. Done.</p></div>
-    </div>
-    <div class="step reveal">
-      <div class="step-num">3</div>
-      <div class="step-text"><h3>Collect Your Profit</h3><p>No risk. No guessing. No luck. The math guarantees your profit before you place the bet. Withdraw to your bank. Repeat daily.</p></div>
-    </div>
+    <div class="step reveal"><div class="step-num">1</div><div class="step-text"><h3>Genius Scans 39+ Sportsbooks</h3><p>AI checks 432 market types across 60 leagues every 60 seconds. When odds don't match — that's free money.</p></div></div>
+    <div class="step reveal"><div class="step-num">2</div><div class="step-text"><h3>You Place Both Sides</h3><p>Lakers on DraftKings. Celtics on FanDuel. Both sides covered. One always wins. You profit either way.</p></div></div>
+    <div class="step reveal"><div class="step-num">3</div><div class="step-text"><h3>Collect Your Profit</h3><p>The math guarantees your profit before you bet. $62 in 3 minutes. Withdraw to your bank. Repeat daily.</p></div></div>
   </div>
-  
-  <div class="arb-example reveal">
-    <h3>💰 Real Example — Lakers vs Celtics</h3>
-    <div class="arb-row"><span>DraftKings — Lakers ML</span><span style="color:var(--gold);">+150</span></div>
-    <div class="arb-row"><span>FanDuel — Celtics ML</span><span style="color:var(--gold);">-130</span></div>
-    <div class="arb-row"><span>Your total bet (both sides)</span><span>$1,000</span></div>
-    <div class="arb-row"><span>🎯 Guaranteed Profit</span><span>+$62 in 3 minutes</span></div>
+  <div class="arb-card reveal" style="margin-bottom:20px">
+    <div class="accent"></div>
+    <h3 style="font-size:13px;font-weight:800;color:var(--green);margin-bottom:10px">💰 Real Example</h3>
+    <div class="arb-row"><span>DraftKings — Lakers ML</span><span style="color:var(--gold)">+150</span></div>
+    <div class="arb-row"><span>FanDuel — Celtics ML</span><span style="color:var(--gold)">-130</span></div>
+    <div class="arb-row"><span>Both sides bet</span><span>$1,000</span></div>
+    <div class="arb-row"><span>🎯 Guaranteed Profit</span><span>+$62</span></div>
   </div>
 </div>
 
-<!-- LIVE PLATFORM PREVIEW -->
+<div class="section-divider"></div>
+
+<!-- === LIVE PREVIEW === -->
 <div class="section">
-  <div class="section-label reveal">See It In Action</div>
-  <h2 class="reveal">SBA GENIUS — LIVE PREVIEW</h2>
-  <div class="reveal" style="font-size:13px;color:var(--t2);margin-bottom:16px;">This is what members see every day. Real arbs. Real money. Real-time.</div>
+  <div class="section-label reveal">See It Live</div>
+  <h2 class="reveal">SBA GENIUS IN <span class="green">REAL TIME</span></h2>
+  <div class="reveal" style="font-size:13px;color:var(--t2);margin-bottom:16px">These rotate every 8 seconds — just like the real platform.</div>
+  <div id="liveArbs" style="display:grid;gap:8px;margin-bottom:24px"></div>
   
-  <!-- Simulated ARB Cards -->
-  <div id="liveArbs" style="display:grid;gap:8px;margin-bottom:20px;">
-  </div>
-  
-  <!-- Platform Screenshots as styled cards -->
-  <div class="reveal" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px;">
-    <div style="padding:16px;background:var(--card);border:1px solid var(--border);border-radius:12px;text-align:center;">
-      <div style="font-size:32px;margin-bottom:6px;">🎯</div>
-      <div style="font-weight:800;font-size:13px;margin-bottom:2px;">ARB Center</div>
-      <div style="font-size:10px;color:var(--t3);">Live opportunities every 60 seconds</div>
-      <div style="margin-top:8px;padding:6px;background:var(--bg);border-radius:6px;font-family:'JetBrains Mono';font-size:9px;color:var(--green);line-height:1.8;">
-        scanning 60 leagues...<br>
-        432 markets checked<br>
-        <span style="color:var(--gold);">3 arbs found →</span>
-      </div>
+  <!-- Urgency -->
+  <div class="reveal" style="background:linear-gradient(135deg,rgba(212,168,67,0.06),rgba(0,230,118,0.03));border:1px solid rgba(212,168,67,0.12);border-radius:14px;padding:24px;text-align:center">
+    <div style="font-family:'Bebas Neue';font-size:32px;color:var(--gold);margin-bottom:6px">⏰ LAUNCH WINDOW</div>
+    <div style="font-size:12px;color:var(--t2);margin-bottom:10px">Join before <strong style="color:var(--gold)">April 7</strong> and lock in:</div>
+    <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;font-size:11px;margin-bottom:12px">
+      <span style="padding:5px 12px;background:rgba(0,230,118,0.05);border:1px solid rgba(0,230,118,0.1);border-radius:16px;color:var(--green);font-weight:700">✅ 25% Level 1 commissions</span>
+      <span style="padding:5px 12px;background:rgba(139,92,246,0.05);border:1px solid rgba(139,92,246,0.1);border-radius:16px;color:var(--purple);font-weight:700">✅ FREE VPN ($1K value)</span>
+      <span style="padding:5px 12px;background:rgba(212,168,67,0.05);border:1px solid rgba(212,168,67,0.1);border-radius:16px;color:var(--gold);font-weight:700">✅ 55% total payout</span>
     </div>
-    <div style="padding:16px;background:var(--card);border:1px solid var(--border);border-radius:12px;text-align:center;">
-      <div style="font-size:32px;margin-bottom:6px;">⚔️</div>
-      <div style="font-weight:800;font-size:13px;margin-bottom:2px;">War Room</div>
-      <div style="font-size:10px;color:var(--t3);">Manage positions in real-time</div>
-      <div style="margin-top:8px;padding:6px;background:var(--bg);border-radius:6px;font-family:'JetBrains Mono';font-size:9px;line-height:1.8;">
-        <span style="color:var(--green);">Watch Score: 82/100</span><br>
-        <span style="color:var(--t2);">Position: SAFE</span><br>
-        <span style="color:var(--gold);">Profit locked: +$47</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- Urgency banner -->
-  <div class="reveal" style="background:linear-gradient(135deg,rgba(212,168,67,0.08),rgba(245,158,11,0.04));border:1px solid rgba(212,168,67,0.2);border-radius:12px;padding:20px;text-align:center;margin-bottom:16px;">
-    <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--gold);margin-bottom:4px;">⏰ LAUNCH WINDOW CLOSING</div>
-    <div style="font-size:13px;color:var(--t2);margin-bottom:8px;">Everyone who joins before <strong style="color:var(--gold);">April 7, 2026</strong> gets:</div>
-    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;font-size:12px;">
-      <span style="padding:6px 14px;background:rgba(0,230,118,0.06);border:1px solid rgba(0,230,118,0.15);border-radius:20px;color:var(--green);font-weight:700;">✅ Grandfathered 55% commissions</span>
-      <span style="padding:6px 14px;background:rgba(139,92,246,0.06);border:1px solid rgba(139,92,246,0.15);border-radius:20px;color:var(--purple);font-weight:700;">✅ FREE VPN ($1K value)</span>
-      <span style="padding:6px 14px;background:rgba(212,168,67,0.06);border:1px solid rgba(212,168,67,0.15);border-radius:20px;color:var(--gold);font-weight:700;">✅ Launch Special pricing</span>
-    </div>
-    <div id="countdown" style="font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--t1);margin-top:12px;letter-spacing:2px;"></div>
+    <div id="countdown" style="font-family:'Bebas Neue';font-size:40px;color:var(--t1);letter-spacing:3px"></div>
   </div>
 </div>
 
-<!-- WHAT YOU GET -->
-<div class="section">
-  <div class="section-label reveal">The Platform</div>
-  <h2 class="reveal">WHAT YOU GET WITH SBA GENIUS</h2>
-  
-  <div style="display:grid;gap:10px;" class="reveal">
-    <div style="display:flex;gap:14px;padding:16px;background:var(--card);border:1px solid var(--border);border-radius:12px;align-items:flex-start;">
-      <div style="font-size:24px;width:40px;text-align:center;flex-shrink:0;">🎯</div>
-      <div><div style="font-weight:800;font-size:14px;margin-bottom:2px;">ARB Center — Live Opportunities</div><div style="font-size:12px;color:var(--t2);">Real-time arbitrage cards with ROI, odds, and one-click links to each sportsbook. Filter by your books, your ROI threshold. New arbs every 60 seconds.</div></div>
-    </div>
-    <div style="display:flex;gap:14px;padding:16px;background:var(--card);border:1px solid var(--border);border-radius:12px;align-items:flex-start;">
-      <div style="font-size:24px;width:40px;text-align:center;flex-shrink:0;">🧠</div>
-      <div><div style="font-weight:800;font-size:14px;margin-bottom:2px;">AI Synthesis Engine</div><div style="font-size:12px;color:var(--t2);">ESPN-powered analysis on every bet. Injury reports, weather, momentum, matchup history — all synthesized into a confidence score so you know which arbs are safest.</div></div>
-    </div>
-    <div style="display:flex;gap:14px;padding:16px;background:var(--card);border:1px solid var(--border);border-radius:12px;align-items:flex-start;">
-      <div style="font-size:24px;width:40px;text-align:center;flex-shrink:0;">⚔️</div>
-      <div><div style="font-weight:800;font-size:14px;margin-bottom:2px;">War Room — Position Management</div><div style="font-size:12px;color:var(--t2);">Track active bets. Watch Score monitors risk in real-time. Hedge calculator tells you exactly when and how to lock in profit or minimize exposure.</div></div>
-    </div>
-    <div style="display:flex;gap:14px;padding:16px;background:var(--card);border:1px solid var(--border);border-radius:12px;align-items:flex-start;">
-      <div style="font-size:24px;width:40px;text-align:center;flex-shrink:0;">⚡</div>
-      <div><div style="font-weight:800;font-size:14px;margin-bottom:2px;">Power Play — Single Book Profits</div><div style="font-size:12px;color:var(--t2);">Don't have multiple sportsbooks? Power Play finds value bets on a single book with AI-calculated win probability and risk scoring.</div></div>
-    </div>
-    <div style="display:flex;gap:14px;padding:16px;background:var(--card);border:1px solid var(--border);border-radius:12px;align-items:flex-start;">
-      <div style="font-size:24px;width:40px;text-align:center;flex-shrink:0;">🎓</div>
-      <div><div style="font-weight:800;font-size:14px;margin-bottom:2px;">Betting Academy</div><div style="font-size:12px;color:var(--t2);">Complete interactive course — from "what is a moneyline" to advanced middle bet strategies. Shadow sessions, quizzes, and a week-1 playbook.</div></div>
-    </div>
-    <div style="display:flex;gap:14px;padding:16px;background:var(--card);border:1px solid var(--border);border-radius:12px;align-items:flex-start;">
-      <div style="font-size:24px;width:40px;text-align:center;flex-shrink:0;">💬</div>
-      <div><div style="font-weight:800;font-size:14px;margin-bottom:2px;">Discord Community</div><div style="font-size:12px;color:var(--t2);">Live alerts, hot drops by tier, education channels, strategy rooms. Your package determines which channels you unlock.</div></div>
-    </div>
-  </div>
-</div>
+<div class="section-divider"></div>
 
-<!-- EARNINGS BY PACKAGE -->
+<!-- === WHAT YOUR MONEY DOES === -->
 <div class="section">
   <div class="section-label reveal">The Math</div>
-  <h2 class="reveal">WHAT YOUR INVESTMENT DOES</h2>
-  <div class="reveal" style="font-size:13px;color:var(--t2);margin-bottom:16px;">Conservative estimates. 3 bets/day. 3% average ROI. These numbers are based on real member activity — not hype.</div>
-  
-  <div style="display:grid;gap:10px;" class="reveal">
-    <!-- Basic -->
-    <div style="background:var(--card);border:1px solid rgba(0,230,118,0.1);border-radius:12px;padding:16px;position:relative;overflow:hidden;">
-      <div style="position:absolute;top:0;left:0;right:0;height:2px;background:var(--green);"></div>
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-        <div><div style="font-size:11px;color:var(--t3);">BASIC</div><div style="font-family:'Bebas Neue';font-size:28px;">$1K</div></div>
-        <div style="text-align:right;"><div style="font-size:10px;color:var(--t3);">MONTHLY PROFIT</div><div style="font-family:'Bebas Neue';font-size:28px;color:var(--green);">$2,700</div></div>
-      </div>
-      <div style="display:flex;gap:8px;font-size:10px;color:var(--t2);">
-        <span style="padding:3px 8px;background:var(--bg);border-radius:4px;">$90/day</span>
-        <span style="padding:3px 8px;background:var(--bg);border-radius:4px;">$32K/year</span>
-        <span style="padding:3px 8px;background:rgba(0,230,118,0.06);border-radius:4px;color:var(--green);font-weight:700;">270% ROI Month 1</span>
-      </div>
-    </div>
+  <h2 class="reveal">WHAT YOUR <span class="gold">INVESTMENT</span> DOES</h2>
+  <div class="reveal" style="font-size:12px;color:var(--t3);margin-bottom:16px">Conservative: 3 bets/day, 3% avg ROI. Real member data.</div>
 
-    <!-- Plus -->
-    <div style="background:var(--card);border:1px solid rgba(212,168,67,0.1);border-radius:12px;padding:16px;position:relative;overflow:hidden;">
-      <div style="position:absolute;top:0;left:0;right:0;height:2px;background:var(--gold);"></div>
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-        <div><div style="font-size:11px;color:var(--t3);">PLUS</div><div style="font-family:'Bebas Neue';font-size:28px;">$2K</div></div>
-        <div style="text-align:right;"><div style="font-size:10px;color:var(--t3);">MONTHLY PROFIT</div><div style="font-family:'Bebas Neue';font-size:28px;color:var(--green);">$4,500</div></div>
+  <div style="display:grid;gap:8px" class="reveal">
+    <div class="gcard"><div class="gcard-accent" style="background:var(--green)"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div><div style="font-size:10px;color:var(--t3)">BASIC</div><div style="font-family:'Bebas Neue';font-size:32px">$1K</div></div>
+        <div style="text-align:right"><div style="font-size:10px;color:var(--t3)">MONTHLY PROFIT</div><div style="font-family:'Bebas Neue';font-size:32px;color:var(--green)">$2,700</div></div>
       </div>
-      <div style="display:flex;gap:8px;font-size:10px;color:var(--t2);">
-        <span style="padding:3px 8px;background:var(--bg);border-radius:4px;">$150/day</span>
-        <span style="padding:3px 8px;background:var(--bg);border-radius:4px;">$54K/year</span>
-        <span style="padding:3px 8px;background:rgba(0,230,118,0.06);border-radius:4px;color:var(--green);font-weight:700;">225% ROI Month 1</span>
-      </div>
-      <div style="font-size:9px;color:var(--gold);margin-top:6px;">+ Value Bets unlock 40% more opportunities</div>
+      <div style="display:flex;gap:6px;margin-top:8px;font-size:10px"><span style="padding:3px 8px;background:var(--bg);border-radius:4px">$90/day</span><span style="padding:3px 8px;background:var(--bg);border-radius:4px">$32K/year</span><span style="padding:3px 8px;background:rgba(0,230,118,0.06);border-radius:4px;color:var(--green);font-weight:700">270% ROI</span></div>
     </div>
-
-    <!-- Elite -->
-    <div style="background:var(--card);border:1px solid rgba(245,158,11,0.1);border-radius:12px;padding:16px;position:relative;overflow:hidden;">
-      <div style="position:absolute;top:0;left:0;right:0;height:2px;background:var(--orange);"></div>
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-        <div><div style="font-size:11px;color:var(--t3);">ELITE</div><div style="font-family:'Bebas Neue';font-size:28px;">$5K</div></div>
-        <div style="text-align:right;"><div style="font-size:10px;color:var(--t3);">MONTHLY PROFIT</div><div style="font-family:'Bebas Neue';font-size:28px;color:var(--green);">$7,200</div></div>
+    <div class="gcard"><div class="gcard-accent" style="background:var(--gold)"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div><div style="font-size:10px;color:var(--t3)">PLUS</div><div style="font-family:'Bebas Neue';font-size:32px">$2K</div></div>
+        <div style="text-align:right"><div style="font-size:10px;color:var(--t3)">MONTHLY PROFIT</div><div style="font-family:'Bebas Neue';font-size:32px;color:var(--green)">$4,500</div></div>
       </div>
-      <div style="display:flex;gap:8px;font-size:10px;color:var(--t2);flex-wrap:wrap;">
-        <span style="padding:3px 8px;background:var(--bg);border-radius:4px;">$240/day</span>
-        <span style="padding:3px 8px;background:var(--bg);border-radius:4px;">$86K/year</span>
-        <span style="padding:3px 8px;background:rgba(0,230,118,0.06);border-radius:4px;color:var(--green);font-weight:700;">144% ROI Month 1</span>
-        <span style="padding:3px 8px;background:rgba(0,230,118,0.06);border-radius:4px;color:var(--green);font-weight:700;">Paid back by Week 3</span>
-      </div>
-      <div style="font-size:9px;color:var(--orange);margin-top:6px;">+ Double Value Bets + Power Play = 2x the edge</div>
+      <div style="display:flex;gap:6px;margin-top:8px;font-size:10px"><span style="padding:3px 8px;background:var(--bg);border-radius:4px">$150/day</span><span style="padding:3px 8px;background:var(--bg);border-radius:4px">$54K/year</span><span style="padding:3px 8px;background:rgba(0,230,118,0.06);border-radius:4px;color:var(--green);font-weight:700">225% ROI</span></div>
+      <div style="font-size:9px;color:var(--gold);margin-top:4px">+ Value Bets unlock 40% more arbs</div>
     </div>
-
-    <!-- Pro -->
-    <div style="background:var(--card);border:1px solid rgba(68,136,255,0.15);border-radius:12px;padding:16px;position:relative;overflow:hidden;">
-      <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--blue),var(--purple));"></div>
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-        <div><div style="font-size:11px;color:var(--blue);">PRO — THE WAR ROOM</div><div style="font-family:'Bebas Neue';font-size:28px;">$10K</div></div>
-        <div style="text-align:right;"><div style="font-size:10px;color:var(--t3);">MONTHLY PROFIT</div><div style="font-family:'Bebas Neue';font-size:28px;color:var(--green);">$12,000+</div></div>
+    <div class="gcard"><div class="gcard-accent" style="background:var(--orange)"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div><div style="font-size:10px;color:var(--orange)">ELITE</div><div style="font-family:'Bebas Neue';font-size:32px">$5K</div></div>
+        <div style="text-align:right"><div style="font-size:10px;color:var(--t3)">MONTHLY PROFIT</div><div style="font-family:'Bebas Neue';font-size:32px;color:var(--green)">$7,200</div></div>
       </div>
-      <div style="display:flex;gap:8px;font-size:10px;color:var(--t2);flex-wrap:wrap;">
-        <span style="padding:3px 8px;background:var(--bg);border-radius:4px;">$400/day</span>
-        <span style="padding:3px 8px;background:var(--bg);border-radius:4px;">$144K/year</span>
-        <span style="padding:3px 8px;background:rgba(0,230,118,0.06);border-radius:4px;color:var(--green);font-weight:700;">120% ROI Month 1</span>
-        <span style="padding:3px 8px;background:rgba(0,230,118,0.06);border-radius:4px;color:var(--green);font-weight:700;">Paid back by Week 4</span>
+      <div style="display:flex;gap:6px;margin-top:8px;font-size:10px;flex-wrap:wrap"><span style="padding:3px 8px;background:var(--bg);border-radius:4px">$240/day</span><span style="padding:3px 8px;background:var(--bg);border-radius:4px">$86K/year</span><span style="padding:3px 8px;background:rgba(0,230,118,0.06);border-radius:4px;color:var(--green);font-weight:700">Pays back Week 3</span></div>
+    </div>
+    <div class="gcard" style="border-color:rgba(68,136,255,0.12)"><div class="gcard-accent" style="background:linear-gradient(90deg,var(--blue),var(--purple))"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div><div style="font-size:10px;color:var(--blue)">PRO — WAR ROOM</div><div style="font-family:'Bebas Neue';font-size:32px">$10K</div></div>
+        <div style="text-align:right"><div style="font-size:10px;color:var(--t3)">MONTHLY PROFIT</div><div style="font-family:'Bebas Neue';font-size:32px;color:var(--green)">$12K+</div></div>
       </div>
-      <div style="font-size:9px;color:var(--blue);margin-top:6px;">+ War Room + Middle Bets + Hedge Calculator + 1-on-1 with Keith</div>
+      <div style="display:flex;gap:6px;margin-top:8px;font-size:10px;flex-wrap:wrap"><span style="padding:3px 8px;background:var(--bg);border-radius:4px">$400/day</span><span style="padding:3px 8px;background:var(--bg);border-radius:4px">$144K/year</span><span style="padding:3px 8px;background:rgba(0,230,118,0.06);border-radius:4px;color:var(--green);font-weight:700">Pays back Week 4</span></div>
+      <div style="font-size:9px;color:var(--blue);margin-top:4px">+ War Room + Middle Bets + Hedge Calc + 1-on-1</div>
     </div>
   </div>
-  
-  <div class="reveal" style="text-align:center;font-size:10px;color:var(--t3);margin-top:12px;margin-bottom:8px;">Based on $1K bankroll per bet, 3 bets/day, 3% avg ROI. Higher bankroll = proportionally higher profits. Results vary.</div>
-  
-  <!-- Compound growth teaser -->
-  <div class="reveal" style="background:linear-gradient(135deg,rgba(0,230,118,0.04),rgba(212,168,67,0.04));border:1px solid rgba(0,230,118,0.1);border-radius:12px;padding:20px;text-align:center;margin-top:12px;">
-    <div style="font-size:11px;color:var(--t3);margin-bottom:4px;">THE REAL POWER</div>
-    <div style="font-family:'Bebas Neue';font-size:24px;color:var(--t1);margin-bottom:4px;">BETTING + BUILDING = DOUBLE INCOME</div>
-    <div style="font-size:12px;color:var(--t2);line-height:1.7;">Your arb profits pay your bills. Your affiliate commissions build your wealth.<br>A Pro member who refers 10 people at $5K earns <strong style="color:var(--green);">$10K in commissions</strong> — their membership pays for itself from referrals alone.</div>
-  </div>
+  <div class="reveal" style="text-align:center;font-size:9px;color:var(--t3);margin-top:10px">Based on $1K bankroll/bet. Higher bankroll = proportionally higher profits.</div>
 </div>
 
-<!-- PACKAGES DETAILED -->
-<div class="pkg-section" id="packages">
-  <div class="section-label reveal">Choose Your Path</div>
-  <h2 class="reveal">PACKAGES</h2>
-  
-  <div class="reveal" style="overflow-x:auto;margin-bottom:20px;">
-    <table style="width:100%;border-collapse:collapse;font-size:11px;min-width:500px;">
-      <thead><tr style="border-bottom:2px solid var(--border);">
-        <th style="text-align:left;padding:8px;color:var(--t3);">Feature</th>
-        <th style="text-align:center;padding:8px;color:var(--green);font-weight:800;">BASIC<br><span style="font-size:9px;color:var(--t3);">$1K</span></th>
-        <th style="text-align:center;padding:8px;color:var(--gold);font-weight:800;">PLUS<br><span style="font-size:9px;color:var(--t3);">$2K</span></th>
-        <th style="text-align:center;padding:8px;color:var(--orange);font-weight:800;">ELITE<br><span style="font-size:9px;color:var(--t3);">$5K</span></th>
-        <th style="text-align:center;padding:8px;color:var(--blue);font-weight:800;">PRO<br><span style="font-size:9px;color:var(--t3);">$10K</span></th>
-      </tr></thead>
-      <tbody>
-        <tr style="border-bottom:1px solid var(--border);"><td style="padding:8px;">Sure Bet Alerts</td><td style="text-align:center;color:var(--green);">✅</td><td style="text-align:center;color:var(--green);">✅</td><td style="text-align:center;color:var(--green);">✅</td><td style="text-align:center;color:var(--green);">✅</td></tr>
-        <tr style="border-bottom:1px solid var(--border);"><td style="padding:8px;">Value Bet Engine</td><td style="text-align:center;color:var(--t3);">—</td><td style="text-align:center;color:var(--green);">✅</td><td style="text-align:center;color:var(--green);">✅</td><td style="text-align:center;color:var(--green);">✅</td></tr>
-        <tr style="border-bottom:1px solid var(--border);"><td style="padding:8px;">Double Value Bets</td><td style="text-align:center;color:var(--t3);">—</td><td style="text-align:center;color:var(--t3);">—</td><td style="text-align:center;color:var(--green);">✅</td><td style="text-align:center;color:var(--green);">✅</td></tr>
-        <tr style="border-bottom:1px solid var(--border);"><td style="padding:8px;">Power Play</td><td style="text-align:center;color:var(--t3);">—</td><td style="text-align:center;color:var(--t3);">—</td><td style="text-align:center;color:var(--green);">✅</td><td style="text-align:center;color:var(--green);">✅</td></tr>
-        <tr style="border-bottom:1px solid var(--border);"><td style="padding:8px;">War Room + Hedging</td><td style="text-align:center;color:var(--t3);">—</td><td style="text-align:center;color:var(--t3);">—</td><td style="text-align:center;color:var(--t3);">—</td><td style="text-align:center;color:var(--green);">✅</td></tr>
-        <tr style="border-bottom:1px solid var(--border);"><td style="padding:8px;">AI Synthesis</td><td style="text-align:center;">Basic</td><td style="text-align:center;color:var(--gold);">Full</td><td style="text-align:center;color:var(--gold);">Full</td><td style="text-align:center;color:var(--gold);">Full</td></tr>
-        <tr style="border-bottom:1px solid var(--border);"><td style="padding:8px;">Discord Channels</td><td style="text-align:center;">Basic</td><td style="text-align:center;color:var(--gold);">Plus</td><td style="text-align:center;color:var(--orange);">Elite</td><td style="text-align:center;color:var(--blue);">All</td></tr>
-        <tr><td style="padding:8px;font-weight:800;">Affiliate Program</td><td style="text-align:center;color:var(--green);">✅ 7 levels</td><td style="text-align:center;color:var(--green);">✅ 7 levels</td><td style="text-align:center;color:var(--green);">✅ 7 levels</td><td style="text-align:center;color:var(--green);">✅ 7 levels</td></tr>
-      </tbody>
-    </table>
-  </div>
-  
-  <div class="pkg-grid reveal">
-    <div class="pkg-card promo active" id="pkgPromo" onclick="setPkg('promo')"><div class="name" style="margin-top:12px;">LAUNCH SPECIAL</div><div class="price">$1K</div><div class="sub">$3K value · Plus + VPN Free</div></div>
-    <div class="pkg-card" id="pkgBasic" onclick="setPkg('basic')"><div class="name">BASIC</div><div class="price">$1K</div><div class="sub">Sure Bets · Get Started</div></div>
-    <div class="pkg-card" id="pkgPlus" onclick="setPkg('plus')"><div class="name">PLUS</div><div class="price">$2K</div><div class="sub">+ Value Bets</div></div>
-    <div class="pkg-card" id="pkgElite" onclick="setPkg('elite')"><div class="name">ELITE</div><div class="price">$5K</div><div class="sub">+ Double Value · Power Play</div></div>
-    <div class="pkg-card" id="pkgPro" onclick="setPkg('pro')"><div class="name">PRO</div><div class="price">$10K</div><div class="sub">Everything · War Room · 1-on-1</div></div>
-  </div>
-  
-  <div class="vpn-toggle active reveal" id="vpnToggle" onclick="toggleVPN()">
-    <div class="vpn-check" id="vpnCheck">✓</div>
-    <div>
-      <div style="font-weight:800;font-size:14px;">🔒 Add VPN — <span style="color:var(--green);">FREE thru Apr 7</span></div>
-      <div style="font-size:11px;color:var(--t3);">Access 20+ offshore sportsbooks (Bovada, 1xBet, Pinnacle) · normally $1,000</div>
-    </div>
-  </div>
-</div>
+<div class="section-divider"></div>
 
-<!-- COMP PLAN -->
+<!-- === COMP PLAN === -->
 <div class="section">
   <div class="section-label reveal">Build an Empire</div>
-  <h2 class="reveal">THE BOOKIE PROGRAM</h2>
-  <div class="reveal" style="font-size:13px;color:var(--t2);line-height:1.7;margin-bottom:20px;">Every member is an affiliate. Share your link, earn commissions 7 levels deep. No monthly fee, no inventory, no recruiting requirement. You earn because your people are making money.</div>
+  <h2 class="reveal">THE <span class="gold">BOOKIE</span> PROGRAM</h2>
+  <div class="reveal" style="font-size:13px;color:var(--t2);line-height:1.6;margin-bottom:20px">Every member earns commissions 7 levels deep. No monthly fees. No inventory. Share your link → earn when your people join.</div>
   
-  <div class="reveal" style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px;">
-    <div style="font-weight:900;font-size:15px;margin-bottom:4px;">💰 Commission Structure (7 Levels)</div>
-    <div style="font-size:11px;color:var(--gold);margin-bottom:12px;">🔥 Everyone who joins before April 7 gets the GRANDFATHERED rate — 25% on Level 1</div>
-    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:12px;">
-      <div style="text-align:center;padding:8px 4px;background:rgba(212,168,67,0.08);border-radius:6px;border:1px solid rgba(212,168,67,0.15);"><div style="font-size:9px;color:var(--gold);">L1</div><div style="font-family:'Bebas Neue';font-size:22px;color:var(--gold);">25%</div><div style="font-size:8px;color:var(--t3);">Direct</div></div>
-      <div style="text-align:center;padding:8px 4px;background:rgba(0,230,118,0.04);border-radius:6px;"><div style="font-size:9px;color:var(--t3);">L2</div><div style="font-family:'Bebas Neue';font-size:22px;color:var(--green);">10%</div></div>
-      <div style="text-align:center;padding:8px 4px;background:rgba(0,230,118,0.03);border-radius:6px;"><div style="font-size:9px;color:var(--t3);">L3</div><div style="font-family:'Bebas Neue';font-size:22px;">5%</div></div>
-      <div style="text-align:center;padding:8px 4px;background:rgba(0,230,118,0.02);border-radius:6px;"><div style="font-size:9px;color:var(--t3);">L4</div><div style="font-family:'Bebas Neue';font-size:22px;">5%</div></div>
-      <div style="text-align:center;padding:8px 4px;background:rgba(0,230,118,0.02);border-radius:6px;"><div style="font-size:9px;color:var(--t3);">L5</div><div style="font-family:'Bebas Neue';font-size:22px;">5%</div></div>
-      <div style="text-align:center;padding:8px 4px;background:rgba(0,230,118,0.01);border-radius:6px;"><div style="font-size:9px;color:var(--t3);">L6</div><div style="font-family:'Bebas Neue';font-size:22px;color:var(--t2);">3%</div></div>
-      <div style="text-align:center;padding:8px 4px;background:rgba(0,230,118,0.01);border-radius:6px;"><div style="font-size:9px;color:var(--t3);">L7</div><div style="font-family:'Bebas Neue';font-size:22px;color:var(--t2);">2%</div></div>
+  <!-- Commission bars -->
+  <div class="reveal gcard" style="margin-bottom:12px">
+    <div style="font-weight:800;font-size:13px;margin-bottom:4px">💰 Grandfathered Rate <span style="font-size:10px;color:var(--gold)">(join before April 7)</span></div>
+    <div class="comm-bar">
+      <div class="bar" style="height:100%;background:rgba(212,168,67,0.2);color:var(--gold)"><span class="lbl">L1</span>25%</div>
+      <div class="bar" style="height:60%;background:rgba(0,230,118,0.15);color:var(--green)"><span class="lbl">L2</span>10%</div>
+      <div class="bar" style="height:40%;background:rgba(0,230,118,0.1)"><span class="lbl">L3</span>5%</div>
+      <div class="bar" style="height:40%;background:rgba(0,230,118,0.08)"><span class="lbl">L4</span>5%</div>
+      <div class="bar" style="height:40%;background:rgba(0,230,118,0.06)"><span class="lbl">L5</span>5%</div>
+      <div class="bar" style="height:28%;background:rgba(0,230,118,0.04);color:var(--t2)"><span class="lbl">L6</span>3%</div>
+      <div class="bar" style="height:20%;background:rgba(0,230,118,0.03);color:var(--t3)"><span class="lbl">L7</span>2%</div>
     </div>
-    <div style="text-align:center;font-size:12px;color:var(--gold);font-weight:700;">Grandfathered rate: <span style="font-family:'Bebas Neue';font-size:18px;">55%</span> total payout across 7 levels</div>
-    <div style="text-align:center;font-size:10px;color:var(--t3);margin-top:4px;">After April 7, new members get Standard rate (20% L1, 45% total)</div>
+    <div style="text-align:center;font-size:12px;color:var(--gold);font-weight:700">55% total payout · <span style="color:var(--t3);font-weight:400">After April 7: Standard 20% L1 / 45% total</span></div>
   </div>
   
-  <!-- Multiple earning scenarios -->
-  <div style="display:grid;gap:10px;margin-bottom:16px;" class="reveal">
-    <div class="arb-example" style="border-color:rgba(0,230,118,0.15);">
-      <h3 style="color:var(--green);">📊 Scenario 1 — Casual Builder (5 referrals)</h3>
-      <div class="arb-row"><span>You refer 5 friends at $2K each</span><span></span></div>
-      <div class="arb-row"><span>L1 — 5 × $2K × 25%</span><span style="color:var(--green);">$2,500</span></div>
-      <div class="arb-row"><span>They each refer 2 (L2 — 10 × $2K × 10%)</span><span style="color:var(--green);">$2,000</span></div>
-      <div class="arb-row"><span>🎯 Your commissions</span><span>$4,500</span></div>
+  <!-- Scenarios -->
+  <div style="display:grid;gap:8px;margin-bottom:16px" class="reveal">
+    <div class="arb-card">
+      <div class="accent" style="background:var(--green)"></div>
+      <div style="font-size:12px;font-weight:800;color:var(--green);margin-bottom:6px">📊 Refer 5 people at $2K</div>
+      <div class="arb-row"><span>L1 — 5 × $2K × 25%</span><span style="color:var(--green)">$2,500</span></div>
+      <div class="arb-row"><span>L2 — their referrals</span><span style="color:var(--green)">$2,000</span></div>
+      <div class="arb-row"><span>🎯 Total</span><span>$4,500</span></div>
     </div>
-    
-    <div class="arb-example" style="border-color:rgba(212,168,67,0.15);">
-      <h3 style="color:var(--gold);">📊 Scenario 2 — Serious Builder (10 referrals)</h3>
-      <div class="arb-row"><span>You refer 10 people at $5K average</span><span></span></div>
-      <div class="arb-row"><span>L1 — 10 × $5K × 25%</span><span style="color:var(--green);">$12,500</span></div>
-      <div class="arb-row"><span>L2 — 30 × $5K × 10%</span><span style="color:var(--green);">$15,000</span></div>
-      <div class="arb-row"><span>L3 — 60 × $5K × 5%</span><span style="color:var(--green);">$15,000</span></div>
-      <div class="arb-row"><span>🎯 100 people in your org</span><span>$42,500+</span></div>
+    <div class="arb-card">
+      <div class="accent" style="background:var(--gold)"></div>
+      <div style="font-size:12px;font-weight:800;color:var(--gold);margin-bottom:6px">📊 Refer 10 people at $5K</div>
+      <div class="arb-row"><span>L1 — 10 × $5K × 25%</span><span style="color:var(--green)">$12,500</span></div>
+      <div class="arb-row"><span>L2–L3 — org growth</span><span style="color:var(--green)">$30,000</span></div>
+      <div class="arb-row"><span>🎯 100 people deep</span><span>$42,500+</span></div>
     </div>
-    
-    <div class="arb-example" style="border-color:rgba(139,92,246,0.15);">
-      <h3 style="color:var(--purple);">📊 Scenario 3 — Empire Builder (Pro referrals)</h3>
-      <div class="arb-row"><span>You refer 5 Pro members at $10K</span><span></span></div>
-      <div class="arb-row"><span>L1 — 5 × $10K × 25%</span><span style="color:var(--green);">$12,500</span></div>
-      <div class="arb-row"><span>They build teams (L2-L7)</span><span style="color:var(--green);">$30,000+</span></div>
-      <div class="arb-row"><span>🎯 Your membership paid for itself 4x</span><span style="font-size:16px;">$42,500+</span></div>
+    <div class="arb-card">
+      <div class="accent" style="background:linear-gradient(90deg,var(--blue),var(--purple))"></div>
+      <div style="font-size:12px;font-weight:800;color:var(--purple);margin-bottom:6px">📊 Refer 5 Pro members at $10K</div>
+      <div class="arb-row"><span>L1 commissions</span><span style="color:var(--green)">$12,500</span></div>
+      <div class="arb-row"><span>Their teams build below</span><span style="color:var(--green)">$30,000+</span></div>
+      <div class="arb-row"><span>🎯 Membership pays itself 4x</span><span>$42,500+</span></div>
     </div>
   </div>
-  
-  <div class="reveal" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;">
-    <div style="padding:14px;background:var(--card);border:1px solid var(--border);border-radius:10px;text-align:center;"><div style="font-size:11px;color:var(--t3);">STANDARD</div><div style="font-family:'Bebas Neue';font-size:28px;">45%</div></div>
-    <div style="padding:14px;background:var(--card);border:1px solid rgba(212,168,67,0.15);border-radius:10px;text-align:center;"><div style="font-size:11px;color:var(--gold);">GRANDFATHERED</div><div style="font-family:'Bebas Neue';font-size:28px;color:var(--gold);">55%</div></div>
-    <div style="padding:14px;background:var(--card);border:1px solid rgba(0,230,118,0.15);border-radius:10px;text-align:center;"><div style="font-size:11px;color:var(--green);">BUILDER / INFLUENCER</div><div style="font-family:'Bebas Neue';font-size:28px;color:var(--green);">60%</div></div>
-    <div style="padding:14px;background:var(--card);border:1px solid rgba(139,92,246,0.15);border-radius:10px;text-align:center;"><div style="font-size:11px;color:var(--purple);">AMBASSADOR</div><div style="font-family:'Bebas Neue';font-size:28px;color:var(--purple);">60%</div></div>
+
+  <!-- Affiliate types -->
+  <div class="reveal" style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:16px">
+    <div style="padding:12px 6px;background:var(--card);border:1px solid var(--border);border-radius:8px;text-align:center"><div style="font-size:8px;color:var(--t3)">STANDARD</div><div style="font-family:'Bebas Neue';font-size:24px">45%</div></div>
+    <div style="padding:12px 6px;background:var(--card);border:1px solid rgba(212,168,67,0.12);border-radius:8px;text-align:center"><div style="font-size:8px;color:var(--gold)">GRANDFATHERED</div><div style="font-family:'Bebas Neue';font-size:24px;color:var(--gold)">55%</div></div>
+    <div style="padding:12px 6px;background:var(--card);border:1px solid rgba(0,230,118,0.12);border-radius:8px;text-align:center"><div style="font-size:8px;color:var(--green)">BUILDER</div><div style="font-family:'Bebas Neue';font-size:24px;color:var(--green)">60%</div></div>
+    <div style="padding:12px 6px;background:var(--card);border:1px solid rgba(139,92,246,0.12);border-radius:8px;text-align:center"><div style="font-size:8px;color:var(--purple)">AMBASSADOR</div><div style="font-family:'Bebas Neue';font-size:24px;color:var(--purple)">60%</div></div>
   </div>
   
-  <div class="reveal" style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px;">
-    <div style="font-weight:900;font-size:15px;margin-bottom:10px;">🏆 7 Ranks</div>
-    <div style="display:flex;gap:6px;flex-wrap:wrap;">
-      <span style="padding:6px 12px;border-radius:6px;font-size:11px;font-weight:700;background:rgba(107,114,134,0.1);color:var(--t2);">Starter</span>
-      <span style="padding:6px 12px;border-radius:6px;font-size:11px;font-weight:700;background:rgba(205,127,50,0.1);color:#cd7f32;">Builder</span>
-      <span style="padding:6px 12px;border-radius:6px;font-size:11px;font-weight:700;background:rgba(245,158,11,0.1);color:var(--orange);">Hustler</span>
-      <span style="padding:6px 12px;border-radius:6px;font-size:11px;font-weight:700;background:rgba(212,168,67,0.1);color:var(--gold);">Leader</span>
-      <span style="padding:6px 12px;border-radius:6px;font-size:11px;font-weight:700;background:rgba(68,136,255,0.1);color:var(--blue);">Captain</span>
-      <span style="padding:6px 12px;border-radius:6px;font-size:11px;font-weight:700;background:rgba(139,92,246,0.1);color:var(--purple);">Elite</span>
-      <span style="padding:6px 12px;border-radius:6px;font-size:11px;font-weight:700;background:linear-gradient(135deg,rgba(212,168,67,0.15),rgba(0,230,118,0.1));color:var(--gold);">👑 Legend</span>
-    </div>
-    <div style="font-size:11px;color:var(--t3);margin-top:8px;">Higher ranks unlock team volume bonuses, monthly stipends up to $5K/mo, and Fast Start bonuses.</div>
-  </div>
-  
-  <div style="text-align:center;margin-top:20px;">
-    <a href="#join" class="btn btn-gold" style="width:100%;max-width:400px;justify-content:center;">🚀 Get Started Now</a>
-    <div style="margin-top:8px;font-size:11px;color:var(--t3);">Every package includes affiliate access</div>
+  <!-- Free affiliate path -->
+  <div class="reveal" style="background:linear-gradient(135deg,rgba(212,168,67,0.04),rgba(0,230,118,0.03));border:1px solid rgba(212,168,67,0.1);border-radius:12px;padding:20px;text-align:center">
+    <div style="font-family:'Bebas Neue';font-size:22px;margin-bottom:4px">🆓 CAN'T INVEST YET?</div>
+    <div style="font-size:12px;color:var(--t2);line-height:1.7;margin-bottom:12px">Start free. Refer <strong style="color:var(--green)">2 people at $2K</strong> → earn <strong style="color:var(--green)">$1,000</strong> → buy your own membership.<br><strong style="color:var(--t1)">Your team pays your way in.</strong></div>
+    <a href="#join" class="btn btn-sm btn-outline" onclick="setTimeout(()=>setType('free'),100)">🆓 Start Free</a>
   </div>
 </div>
 
-<!-- THE FREE PATH -->
-<div class="section">
-  <div class="section-label reveal">Can't Invest Yet?</div>
-  <h2 class="reveal">START FREE. BUILD FIRST.</h2>
-  
-  <div class="reveal" style="background:linear-gradient(135deg,rgba(212,168,67,0.06),rgba(0,230,118,0.04));border:1px solid rgba(212,168,67,0.15);border-radius:14px;padding:24px;text-align:center;margin-bottom:16px;">
-    <div style="font-size:36px;margin-bottom:8px;">🆓</div>
-    <div style="font-family:'Bebas Neue';font-size:24px;margin-bottom:8px;">THE FREE AFFILIATE PLAY</div>
-    <div style="font-size:13px;color:var(--t2);line-height:1.8;max-width:450px;margin:0 auto;margin-bottom:16px;">
-      Don't have $1K right now? No problem.<br>
-      Create a <strong style="color:var(--gold);">free affiliate account</strong>, get your referral link, and start building your team today.<br><br>
-      Refer just <strong style="color:var(--green);">2 people at $2K</strong> → you earn <strong style="color:var(--green);">$1,000 in commissions</strong>.<br>
-      <strong style="color:var(--t1);">Use that to buy your own membership. Your team literally pays your way in.</strong>
-    </div>
-    <a href="#join" class="btn btn-gold" onclick="setTimeout(()=>setType('free'),100)" style="display:inline-flex;">🆓 Create Free Account</a>
-  </div>
-</div>
+<div class="section-divider"></div>
 
-<!-- WHO THIS IS FOR -->
-<div class="section">
-  <div class="section-label reveal">Is This For You?</div>
-  <h2 class="reveal">THIS IS FOR PEOPLE WHO</h2>
-  
-  <div style="display:grid;gap:6px;" class="reveal">
-    <div style="display:flex;gap:12px;align-items:center;padding:12px 16px;background:var(--card);border:1px solid var(--border);border-radius:10px;"><span style="color:var(--green);font-size:16px;">✅</span><span style="font-size:13px;">Are tired of trading time for money at a 9-5</span></div>
-    <div style="display:flex;gap:12px;align-items:center;padding:12px 16px;background:var(--card);border:1px solid var(--border);border-radius:10px;"><span style="color:var(--green);font-size:16px;">✅</span><span style="font-size:13px;">Want a side income that doesn't require 40 hours a week</span></div>
-    <div style="display:flex;gap:12px;align-items:center;padding:12px 16px;background:var(--card);border:1px solid var(--border);border-radius:10px;"><span style="color:var(--green);font-size:16px;">✅</span><span style="font-size:13px;">Already bet on sports but keep losing money to the books</span></div>
-    <div style="display:flex;gap:12px;align-items:center;padding:12px 16px;background:var(--card);border:1px solid var(--border);border-radius:10px;"><span style="color:var(--green);font-size:16px;">✅</span><span style="font-size:13px;">Want math-based income — not gambling, not guessing</span></div>
-    <div style="display:flex;gap:12px;align-items:center;padding:12px 16px;background:var(--card);border:1px solid var(--border);border-radius:10px;"><span style="color:var(--green);font-size:16px;">✅</span><span style="font-size:13px;">Are ready to invest in themselves and build real wealth</span></div>
-    <div style="display:flex;gap:12px;align-items:center;padding:12px 16px;background:var(--card);border:1px solid var(--border);border-radius:10px;"><span style="color:var(--green);font-size:16px;">✅</span><span style="font-size:13px;">Want to be part of something bigger — a community, not just a tool</span></div>
-  </div>
-  
-  <div class="reveal" style="text-align:center;margin-top:20px;font-size:14px;color:var(--t2);line-height:1.8;">
-    <strong style="color:var(--t1);font-size:16px;">This isn't a get-rich-quick scheme.</strong><br>
-    It's a system. A platform. A community.<br>
-    The math works. The tools are built. The only variable is <strong style="color:var(--gold);">you</strong>.
-  </div>
-</div>
-
-<!-- WHY SBA -->
-<div class="section">
-  <div class="section-label reveal">The Difference</div>
-  <h2 class="reveal">WHY SBA GENIUS</h2>
-  
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;margin-bottom:20px;border-radius:12px;overflow:hidden;" class="reveal">
-    <!-- Without SBA -->
-    <div style="padding:20px;background:rgba(255,68,102,0.04);border:1px solid rgba(255,68,102,0.1);">
-      <div style="font-size:13px;font-weight:900;color:var(--red);margin-bottom:12px;">❌ WITHOUT SBA</div>
-      <div style="font-size:11px;color:var(--t2);line-height:2.2;">
-        Manual odds scanning<br>
-        Miss arbs in seconds<br>
-        No hedge protection<br>
-        Guessing on bets<br>
-        Solo — no community<br>
-        No education<br>
-        Gambling, not investing
-      </div>
-    </div>
-    <!-- With SBA -->
-    <div style="padding:20px;background:rgba(0,230,118,0.04);border:1px solid rgba(0,230,118,0.1);">
-      <div style="font-size:13px;font-weight:900;color:var(--green);margin-bottom:12px;">✅ WITH SBA GENIUS</div>
-      <div style="font-size:11px;color:var(--t2);line-height:2.2;">
-        AI scans 39+ books for you<br>
-        Real-time alerts, never miss<br>
-        War Room + hedge calculator<br>
-        Math-backed, zero guessing<br>
-        Discord + live sessions<br>
-        Full academy + mentorship<br>
-        Investing with guaranteed edge
-      </div>
-    </div>
-  </div>
-  
-  <!-- OddsJam comparison -->
-  <div class="reveal" style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px;">
-    <div style="font-weight:900;font-size:14px;margin-bottom:10px;">📊 SBA Genius vs OddsJam ($160M valuation)</div>
-    <div style="display:grid;grid-template-columns:auto 1fr 1fr;gap:0;font-size:11px;">
-      <div style="padding:6px 10px;border-bottom:1px solid var(--border);color:var(--t3);font-weight:600;"></div>
-      <div style="padding:6px 10px;border-bottom:1px solid var(--border);text-align:center;color:var(--gold);font-weight:800;">SBA Genius</div>
-      <div style="padding:6px 10px;border-bottom:1px solid var(--border);text-align:center;color:var(--t3);font-weight:600;">OddsJam</div>
-      
-      <div style="padding:6px 10px;border-bottom:1px solid var(--border);">Price</div>
-      <div style="padding:6px 10px;border-bottom:1px solid var(--border);text-align:center;color:var(--green);font-weight:700;">$1K one-time</div>
-      <div style="padding:6px 10px;border-bottom:1px solid var(--border);text-align:center;color:var(--red);">$250/mo</div>
-      
-      <div style="padding:6px 10px;border-bottom:1px solid var(--border);">AI Analysis</div>
-      <div style="padding:6px 10px;border-bottom:1px solid var(--border);text-align:center;color:var(--green);">✅ ESPN Synthesis</div>
-      <div style="padding:6px 10px;border-bottom:1px solid var(--border);text-align:center;color:var(--t3);">Basic</div>
-      
-      <div style="padding:6px 10px;border-bottom:1px solid var(--border);">Affiliate Program</div>
-      <div style="padding:6px 10px;border-bottom:1px solid var(--border);text-align:center;color:var(--green);">✅ 7 levels deep</div>
-      <div style="padding:6px 10px;border-bottom:1px solid var(--border);text-align:center;color:var(--t3);">None</div>
-      
-      <div style="padding:6px 10px;border-bottom:1px solid var(--border);">Community</div>
-      <div style="padding:6px 10px;border-bottom:1px solid var(--border);text-align:center;color:var(--green);">✅ Discord + Live</div>
-      <div style="padding:6px 10px;border-bottom:1px solid var(--border);text-align:center;color:var(--t3);">Forum only</div>
-      
-      <div style="padding:6px 10px;">VPN Access</div>
-      <div style="padding:6px 10px;text-align:center;color:var(--green);font-weight:700;">✅ FREE at launch</div>
-      <div style="padding:6px 10px;text-align:center;color:var(--red);">$50/mo extra</div>
-    </div>
-  </div>
-  
-  <!-- Trust badges -->
-  <div class="reveal" style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:16px;">
-    <div style="padding:8px 16px;background:var(--card);border:1px solid var(--border);border-radius:8px;font-size:11px;text-align:center;"><div style="font-size:18px;margin-bottom:2px;">🔒</div>256-bit SSL</div>
-    <div style="padding:8px 16px;background:var(--card);border:1px solid var(--border);border-radius:8px;font-size:11px;text-align:center;"><div style="font-size:18px;margin-bottom:2px;">💳</div>Stripe Secured</div>
-    <div style="padding:8px 16px;background:var(--card);border:1px solid var(--border);border-radius:8px;font-size:11px;text-align:center;"><div style="font-size:18px;margin-bottom:2px;">₿</div>Crypto Accepted</div>
-    <div style="padding:8px 16px;background:var(--card);border:1px solid var(--border);border-radius:8px;font-size:11px;text-align:center;"><div style="font-size:18px;margin-bottom:2px;">📱</div>Mobile Ready</div>
-  </div>
-</div>
-
-<!-- FAQ -->
-<div class="section">
-  <div class="section-label reveal">Questions?</div>
-  <h2 class="reveal">FREQUENTLY ASKED</h2>
-  <div style="display:grid;gap:8px;" class="reveal">
-    <details style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;"><summary style="font-weight:700;font-size:13px;list-style:none;display:flex;justify-content:space-between;">Is this gambling? <span style="color:var(--gold);">+</span></summary><p style="font-size:12px;color:var(--t2);margin-top:8px;line-height:1.7;">No. Arbitrage is mathematics, not gambling. You bet both sides at different sportsbooks where odds create guaranteed profit regardless of outcome. The profit is locked in before you bet.</p></details>
-    <details style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;"><summary style="font-weight:700;font-size:13px;list-style:none;display:flex;justify-content:space-between;">Is this legal? <span style="color:var(--gold);">+</span></summary><p style="font-size:12px;color:var(--t2);margin-top:8px;line-height:1.7;">Yes. Sports betting is legal in 38+ US states. Arbitrage is simply placing bets at two different sportsbooks. It's what Wall Street does with stocks, applied to sports.</p></details>
-    <details style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;"><summary style="font-weight:700;font-size:13px;list-style:none;display:flex;justify-content:space-between;">How much to start? <span style="color:var(--gold);">+</span></summary><p style="font-size:12px;color:var(--t2);margin-top:8px;line-height:1.7;">SBA membership starts at $1,000. For betting bankroll, $500–$2,000 across 2–4 sportsbooks. More bankroll = more profit per arb.</p></details>
-    <details style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;"><summary style="font-weight:700;font-size:13px;list-style:none;display:flex;justify-content:space-between;">Can I do this on my phone? <span style="color:var(--gold);">+</span></summary><p style="font-size:12px;color:var(--t2);margin-top:8px;line-height:1.7;">100%. SBA Genius runs in your browser. All sportsbooks have mobile apps. Find arbs on Genius, place bets on the apps, done in 20 minutes.</p></details>
-    <details style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;"><summary style="font-weight:700;font-size:13px;list-style:none;display:flex;justify-content:space-between;">What's the VPN for? <span style="color:var(--gold);">+</span></summary><p style="font-size:12px;color:var(--t2);margin-top:8px;line-height:1.7;">Unlocks 20+ offshore sportsbooks with better odds and more arb opportunities. More books = more arbs = more profit. FREE during launch.</p></details>
-    <details style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;"><summary style="font-weight:700;font-size:13px;list-style:none;display:flex;justify-content:space-between;">Can I just be an affiliate? <span style="color:var(--gold);">+</span></summary><p style="font-size:12px;color:var(--t2);margin-top:8px;line-height:1.7;">Yes. Free affiliate account gives you a referral link and commission tracking. No betting access, but you earn on every signup. Upgrade anytime.</p></details>
-  </div>
-</div>
-
-<!-- JOIN FORM -->
+<!-- === CHOOSE PACKAGE + JOIN === -->
 <div class="form-section" id="join">
   <div id="signupForm">
-    <div class="referrer-bar" id="referrerBar">
-      Invited by <strong id="referrerName">—</strong>
-    </div>
+    <div class="referrer-bar" id="referrerBar">Invited by <strong id="referrerName">—</strong></div>
     
-    <div class="card">
-      <h2 style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:1px;">CREATE YOUR ACCOUNT</h2>
+    <div class="gcard" style="margin-bottom:14px">
+      <div style="font-family:'Bebas Neue';font-size:28px;letter-spacing:1px;margin-bottom:14px">JOIN SBA GENIUS</div>
       
       <div class="type-toggle">
-        <div class="type-btn active" id="typePaid" onclick="setType('paid')">
-          <span class="emoji">💎</span>Get Access
-          <div class="sub">Buy a package</div>
-        </div>
-        <div class="type-btn" id="typeFree" onclick="setType('free')">
-          <span class="emoji">🆓</span>Free Affiliate
-          <div class="sub">Build first, buy later</div>
-        </div>
+        <div class="type-btn active" id="typePaid" onclick="setType('paid')"><span class="emoji">💎</span>Get Access<div class="sub">Buy a package</div></div>
+        <div class="type-btn" id="typeFree" onclick="setType('free')"><span class="emoji">🆓</span>Free Affiliate<div class="sub">Build first</div></div>
       </div>
       
       <div class="form-group"><div class="form-label">Full Name *</div><input class="form-input" id="sName" placeholder="Your full name"></div>
       <div class="form-group"><div class="form-label">Email *</div><input class="form-input" id="sEmail" type="email" placeholder="your@email.com"></div>
       <div class="form-group"><div class="form-label">Phone</div><input class="form-input" id="sPhone" placeholder="(555) 123-4567"></div>
-      <div class="form-group"><div class="form-label">Discord</div><input class="form-input" id="sDiscord" placeholder="username#1234"></div>
+      <div class="form-group"><div class="form-label">Discord</div><input class="form-input" id="sDiscord" placeholder="username"></div>
     </div>
     
-    <!-- PAID OPTIONS -->
-    <div id="paidSection" class="card">
-      <div class="form-label" style="margin-bottom:8px;">Payment Method</div>
-      <div class="pay-toggle">
-        <div class="pay-btn active" id="payCard" onclick="setPayMethod('card')"><span class="emoji">💳</span>Card<div class="sub">Visa/MC/Amex</div></div>
-        <div class="pay-btn" id="payCrypto" onclick="setPayMethod('crypto')"><span class="emoji">₿</span>Crypto<div class="sub">BTC/ETH/USDC</div></div>
-        <div class="pay-btn" id="payManual" onclick="setPayMethod('manual')"><span class="emoji">📱</span>CashApp<div class="sub">Zelle/PayPal</div></div>
+    <!-- PAID -->
+    <div id="paidSection">
+      <div class="gcard" style="margin-bottom:14px">
+        <div class="form-label" style="margin-bottom:8px">Select Package</div>
+        <div class="pkg-grid">
+          <div class="pkg-card promo active" id="pkgPromo" onclick="setPkg('promo')" style="position:relative"><div class="name" style="margin-top:12px">LAUNCH</div><div class="price">$1K</div><div class="feat">$3K value · Plus+VPN</div><div class="roi-tag">270% ROI/mo</div></div>
+          <div class="pkg-card" id="pkgBasic" onclick="setPkg('basic')"><div class="name">BASIC</div><div class="price">$1K</div><div class="feat">Sure Bets</div><div class="roi-tag">270% ROI/mo</div></div>
+          <div class="pkg-card" id="pkgPlus" onclick="setPkg('plus')"><div class="name">PLUS</div><div class="price">$2K</div><div class="feat">+ Value Bets</div><div class="roi-tag">225% ROI/mo</div></div>
+          <div class="pkg-card" id="pkgElite" onclick="setPkg('elite')"><div class="name">ELITE</div><div class="price">$5K</div><div class="feat">+ Power Play</div><div class="roi-tag">Payback Wk 3</div></div>
+          <div class="pkg-card" id="pkgPro" onclick="setPkg('pro')"><div class="name">PRO</div><div class="price">$10K</div><div class="feat">Everything + War Room</div><div class="roi-tag">Payback Wk 4</div></div>
+        </div>
+        <div class="vpn-toggle active" id="vpnToggle" onclick="toggleVPN()">
+          <div class="vpn-check" id="vpnCheck">✓</div>
+          <div><div style="font-weight:800;font-size:13px">🔒 VPN — <span style="color:var(--green)">FREE thru Apr 7</span></div><div style="font-size:10px;color:var(--t3)">20+ offshore books · normally $1K</div></div>
+        </div>
       </div>
-      <div id="manualPayNote" style="display:none;font-size:11px;color:var(--t2);padding:10px;background:var(--bg);border-radius:8px;">Your team leader will arrange payment after signup. Access activates once confirmed.</div>
-    </div>
-    
-    <!-- FREE SECTION -->
-    <div id="freeSection" class="card" style="display:none;">
-      <div style="font-size:15px;font-weight:900;color:var(--gold);margin-bottom:8px;">🆓 Free Affiliate Account</div>
-      <div style="font-size:12px;color:var(--t2);line-height:2;">
-        ✅ Referral link + AI Closer tools<br>
-        ✅ Earn commissions on every signup<br>
-        ✅ Track your team in real-time<br>
-        ❌ No Genius betting access (upgrade anytime)
+      
+      <div class="gcard" style="margin-bottom:14px">
+        <div class="form-label" style="margin-bottom:6px">Payment</div>
+        <div class="pay-toggle">
+          <div class="pay-btn active" id="payCard" onclick="setPayMethod('card')"><span class="emoji">💳</span>Card<div class="sub">Visa/MC</div></div>
+          <div class="pay-btn" id="payCrypto" onclick="setPayMethod('crypto')"><span class="emoji">₿</span>Crypto<div class="sub">BTC/ETH</div></div>
+          <div class="pay-btn" id="payManual" onclick="setPayMethod('manual')"><span class="emoji">📱</span>CashApp<div class="sub">Zelle</div></div>
+        </div>
+        <div id="manualPayNote" style="display:none;font-size:10px;color:var(--t2);padding:8px;background:var(--bg);border-radius:6px">Your leader will arrange payment. Access activates once confirmed.</div>
       </div>
     </div>
     
-    <button class="btn btn-gold" id="submitBtn" onclick="submitSignup()" style="width:100%;justify-content:center;">💳 PAY WITH CARD</button>
-    <div style="text-align:center;margin-top:12px;font-size:10px;color:var(--t3);">🔒 Secured by Stripe · 256-bit encryption</div>
+    <!-- FREE -->
+    <div id="freeSection" style="display:none">
+      <div class="gcard" style="margin-bottom:14px;border-color:rgba(212,168,67,0.1)">
+        <div style="font-size:14px;font-weight:900;color:var(--gold);margin-bottom:6px">🆓 Free Affiliate Account</div>
+        <div style="font-size:12px;color:var(--t2);line-height:2">✅ Referral link + AI Closer tools<br>✅ Earn commissions 7 levels deep<br>✅ Track your team in real-time<br>❌ No Genius betting access (upgrade anytime)</div>
+      </div>
+    </div>
+    
+    <button class="btn btn-gold" id="submitBtn" onclick="submitSignup()" style="width:100%">💳 PAY WITH CARD</button>
+    <div style="text-align:center;margin-top:8px;font-size:9px;color:var(--t3)">🔒 Secured by Stripe · 256-bit encryption</div>
   </div>
   
   <!-- SUCCESS -->
-  <div class="success-card card" id="successCard">
-    <div class="check">✅</div>
-    <h2>Welcome to SBA Genius!</h2>
-    <p id="successMsg"></p>
-    <div class="creds" id="successCreds" style="display:none;">
-      <div><strong>📧 Email:</strong> <span id="credEmail"></span></div>
-      <div><strong>🔑 Password:</strong> <span id="credPass"></span></div>
-      <div><strong>🔗 Referral Link:</strong> <span id="credRef"></span></div>
-      <div><strong>💬 Discord:</strong> <a href="https://discord.gg/hZXxJMgHb3" style="color:var(--gold);">Join Here</a></div>
+  <div class="success-wrap" id="successWrap">
+    <div class="success-card gcard">
+      <div class="check">✅</div>
+      <h2>Welcome to SBA Genius!</h2>
+      <p id="successMsg"></p>
+      <div class="creds" id="successCreds" style="display:none">
+        <div><strong>📧 Email:</strong> <span id="credEmail"></span></div>
+        <div><strong>🔑 Password:</strong> <span id="credPass"></span></div>
+        <div><strong>🔗 Referral Link:</strong> <span id="credRef"></span></div>
+        <div><strong>💬 Discord:</strong> <a href="https://discord.gg/hZXxJMgHb3" style="color:var(--gold)">Join Here</a></div>
+      </div>
+      <a href="https://affiliate.sportsbetarbitrage.com" class="btn btn-green" style="width:100%;margin-top:16px">Open SBA Bookie →</a>
     </div>
-    <a href="https://affiliate.sportsbetarbitrage.com" class="btn btn-green" style="width:100%;justify-content:center;margin-top:20px;">Open SBA Bookie Portal →</a>
   </div>
+</div>
+
+<!-- STICKY CTA -->
+<div class="sticky-cta" id="stickyCta">
+  <a href="#join" class="btn btn-gold btn-sm">🚀 Join Now</a>
+  <a href="#join" class="btn btn-outline btn-sm" onclick="setTimeout(()=>setType('free'),100)">🆓 Start Free</a>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-const sb = supabase.createClient('https://anjlmooskwvjystmrhxr.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFuamxtb29za3d2anlzdG1yaHhyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU0NjYzNTUsImV4cCI6MjA4MTA0MjM1NX0.DVLjp9PzNIPNSp2HAGtKTaPVfKy3QLs4HTJsy96UsyM',{auth:{storage:{getItem:()=>null,setItem:()=>{},removeItem:()=>{}},autoRefreshToken:false,persistSession:false,detectSessionInUrl:false}});
-
+const sb=supabase.createClient('https://anjlmooskwvjystmrhxr.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFuamxtb29za3d2anlzdG1yaHhyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU0NjYzNTUsImV4cCI6MjA4MTA0MjM1NX0.DVLjp9PzNIPNSp2HAGtKTaPVfKy3QLs4HTJsy96UsyM',{auth:{storage:{getItem:()=>null,setItem:()=>{},removeItem:()=>{}},autoRefreshToken:false,persistSession:false,detectSessionInUrl:false}});
 let joinType='paid',selectedPkg='promo',vpnSelected=true,payMethod='card',referrerCode=null,referrerMember=null;
-
 const STRIPE_PRICES={basic:'price_1SdKIJ03TcuWq8t5SELJaivD',plus:'price_1SdKMv03TcuWq8t57xR3XCT2',elite:'price_1SdKQ403TcuWq8t5LJFFeOQs',pro:'price_1SdKho03TcuWq8t5Nb7yQqUa',basic_vpn:'price_1Sh3cT03TcuWq8t5d37imWd0',plus_vpn:'price_1Sh3bp03TcuWq8t5c1njhLHF',elite_vpn:'price_1Sh3an03TcuWq8t5aHqwGN3f',pro_vpn:'price_1Sh3a303TcuWq8t5ceESGmqX',promo:'price_1SdKIJ03TcuWq8t5SELJaivD'};
 const COINBASE_IDS={basic:'2cff8e7e-2a9d-4b16-9330-ab0e42fa083f',plus:'8708e845-c7c1-47c1-9725-cd3001aa2f19',elite:'17d6e616-13b7-4cb2-91c4-8ba1ddb68a8f',pro:'7ca1a2ea-17c9-4b4d-aa07-dc4004d036be',basic_vpn:'7cc10bbd-01bb-407a-a02c-68bf78aa1291',plus_vpn:'7164d336-a1b7-41fc-af42-9a62c7ff700a',elite_vpn:'281b5608-3ad1-414a-a4f4-f2ed6a244904',pro_vpn:'2bc88828-56f4-4649-bfe6-14473bb77253',promo:'7cc10bbd-01bb-407a-a02c-68bf78aa1291'};
-
 const params=new URLSearchParams(window.location.search);
 referrerCode=params.get('ref')||null;
 
 async function init(){
-  if(params.get('success')==='true'){document.querySelector('.hero').style.display='none';document.getElementById('signupForm').style.display='none';document.getElementById('successCard').style.display='block';document.getElementById('successMsg').innerHTML='🎉 <strong>Payment confirmed!</strong><br><br>Your account is being activated. You\'ll receive a welcome email shortly with login credentials, VPN setup, and getting started guide.<br><br>💬 <a href="https://discord.gg/hZXxJMgHb3" style="color:var(--gold);">Join our Discord now</a>';return;}
-  if(params.get('cancelled')==='true'){toast('Payment cancelled — try again or choose a different method.');}
+  if(params.get('success')==='true'){document.querySelector('.hero').style.display='none';document.getElementById('signupForm').style.display='none';document.getElementById('successWrap').style.display='flex';document.getElementById('successMsg').innerHTML='🎉 <strong>Payment confirmed!</strong><br><br>Your account is being activated. Welcome email coming shortly.<br><br>💬 <a href="https://discord.gg/hZXxJMgHb3" style="color:var(--gold)">Join our Discord now</a>';return;}
+  if(params.get('cancelled')==='true')toast('Payment cancelled — try again or choose a different method.');
   if(referrerCode){const{data}=await sb.from('onboarding_members').select('name,referral_code').eq('referral_code',referrerCode).single();if(data){referrerMember=data;document.getElementById('referrerBar').style.display='block';document.getElementById('referrerName').textContent=data.name;}}
-  
-  // Scroll reveals
-  const obs=new IntersectionObserver((entries)=>{entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');});},{threshold:0.1});
+  const obs=new IntersectionObserver(e=>{e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('visible')})},{threshold:.1});
   document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+  // Sticky CTA
+  const hero=document.querySelector('.hero');
+  const sticky=document.getElementById('stickyCta');
+  const joinSection=document.getElementById('join');
+  window.addEventListener('scroll',()=>{
+    const heroBottom=hero.getBoundingClientRect().bottom;
+    const joinTop=joinSection.getBoundingClientRect().top;
+    sticky.classList.toggle('show',heroBottom<0&&joinTop>window.innerHeight);
+  });
 }
 init();
 
-function animateNum(id,target){let n=0;const el=document.getElementById(id);if(!el)return;const step=Math.ceil(target/30);const timer=setInterval(()=>{n+=step;if(n>=target){n=target;clearInterval(timer);}el.textContent=n;},30);}
-
-// Live ARB simulation
 const ARBS=[
-  {sport:'🏀',match:'Celtics vs Bucks',book1:'DraftKings',side1:'Celtics ML',odds1:'+145',book2:'FanDuel',side2:'Bucks ML',odds2:'-132',roi:'3.2%',profit:'+$64'},
-  {sport:'⚽',match:'Liverpool vs Arsenal',book1:'BetMGM',side1:'Liverpool',odds1:'+180',book2:'Caesars',side2:'Arsenal/Draw',odds2:'-155',roi:'2.8%',profit:'+$56'},
-  {sport:'🏈',match:'Chiefs vs Bills',book1:'FanDuel',side1:'Chiefs +3.5',odds1:'-108',book2:'DraftKings',side2:'Bills -3.5',odds2:'+115',roi:'3.5%',profit:'+$70'},
-  {sport:'🏒',match:'Rangers vs Bruins',book1:'BetRivers',side1:'Over 5.5',odds1:'+105',book2:'Pinnacle',side2:'Under 5.5',odds2:'-100',roi:'2.4%',profit:'+$48'},
-  {sport:'⚾',match:'Yankees vs Dodgers',book1:'Bovada',side1:'Yankees ML',odds1:'+155',book2:'FanDuel',side2:'Dodgers ML',odds2:'-140',roi:'2.9%',profit:'+$58'},
-  {sport:'🥊',match:'UFC 312 Main Event',book1:'1xBet',side1:'Fighter A',odds1:'+200',book2:'DraftKings',side2:'Fighter B',odds2:'-170',roi:'4.1%',profit:'+$82'},
-  {sport:'🎾',match:'Djokovic vs Alcaraz',book1:'Pinnacle',side1:'Djokovic',odds1:'+130',book2:'BetOnline',side2:'Alcaraz',odds2:'-120',roi:'3.8%',profit:'+$76'},
+  {sport:'🏀',match:'Celtics vs Bucks',b1:'DraftKings',s1:'Celtics ML',o1:'+145',b2:'FanDuel',s2:'Bucks ML',o2:'-132',roi:'3.2%',p:'+$64'},
+  {sport:'⚽',match:'Liverpool vs Arsenal',b1:'BetMGM',s1:'Liverpool',o1:'+180',b2:'Caesars',s2:'Draw/Arsenal',o2:'-155',roi:'2.8%',p:'+$56'},
+  {sport:'🏈',match:'Chiefs vs Bills',b1:'FanDuel',s1:'Chiefs +3.5',o1:'-108',b2:'DraftKings',s2:'Bills -3.5',o2:'+115',roi:'3.5%',p:'+$70'},
+  {sport:'🏒',match:'Rangers vs Bruins',b1:'BetRivers',s1:'Over 5.5',o1:'+105',b2:'Pinnacle',s2:'Under 5.5',o2:'-100',roi:'2.4%',p:'+$48'},
+  {sport:'⚾',match:'Yankees vs Dodgers',b1:'Bovada',s1:'Yankees ML',o1:'+155',b2:'FanDuel',s2:'Dodgers ML',o2:'-140',roi:'2.9%',p:'+$58'},
+  {sport:'🥊',match:'UFC Main Event',b1:'1xBet',s1:'Fighter A',o1:'+200',b2:'DraftKings',s2:'Fighter B',o2:'-170',roi:'4.1%',p:'+$82'},
+  {sport:'🎾',match:'Djokovic vs Alcaraz',b1:'Pinnacle',s1:'Djokovic',o1:'+130',b2:'BetOnline',s2:'Alcaraz',o2:'-120',roi:'3.8%',p:'+$76'},
 ];
+function renderLiveArbs(){const el=document.getElementById('liveArbs');if(!el)return;const s=[...ARBS].sort(()=>Math.random()-.5).slice(0,3);el.innerHTML=s.map((a,i)=>'<div class="arb-card" style="animation:fadeUp .4s ease '+(i*.1)+'s both"><div class="accent"></div><div class="live-dot"></div><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><div style="font-size:13px;font-weight:800">'+a.sport+' '+a.match+'</div><div style="padding:3px 10px;background:rgba(0,230,118,0.06);border:1px solid rgba(0,230,118,0.1);border-radius:16px;font-family:\'JetBrains Mono\';font-size:11px;font-weight:700;color:var(--green)">'+a.roi+'</div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px"><div style="padding:8px;background:var(--bg);border-radius:6px;font-size:11px"><div style="color:var(--t3);font-size:9px">'+a.b1+'</div><div style="font-weight:700">'+a.s1+' <span style="color:var(--gold);font-family:\'JetBrains Mono\'">'+a.o1+'</span></div></div><div style="padding:8px;background:var(--bg);border-radius:6px;font-size:11px"><div style="color:var(--t3);font-size:9px">'+a.b2+'</div><div style="font-weight:700">'+a.s2+' <span style="color:var(--gold);font-family:\'JetBrains Mono\'">'+a.o2+'</span></div></div></div><div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--t3)">$2K bet</span><span style="font-weight:800;color:var(--green)">'+a.p+' guaranteed</span></div></div>').join('')}
+renderLiveArbs();setInterval(renderLiveArbs,8000);
 
-function renderLiveArbs(){
-  const el=document.getElementById('liveArbs');
-  if(!el)return;
-  const shuffled=[...ARBS].sort(()=>Math.random()-0.5).slice(0,3);
-  el.innerHTML=shuffled.map((a,i)=>`
-    <div class="reveal visible" style="background:var(--card);border:1px solid rgba(0,230,118,0.1);border-radius:12px;padding:14px;position:relative;overflow:hidden;animation:fadeUp 0.4s ease ${i*0.1}s both;">
-      <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--green),var(--gold));"></div>
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-        <div style="font-size:13px;font-weight:800;">${a.sport} ${a.match}</div>
-        <div style="padding:3px 10px;background:rgba(0,230,118,0.08);border:1px solid rgba(0,230,118,0.15);border-radius:20px;font-family:'JetBrains Mono';font-size:11px;font-weight:700;color:var(--green);">${a.roi} ROI</div>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px;">
-        <div style="padding:8px;background:var(--bg);border-radius:6px;font-size:11px;">
-          <div style="color:var(--t3);font-size:9px;">${a.book1}</div>
-          <div style="font-weight:700;">${a.side1} <span style="color:var(--gold);font-family:'JetBrains Mono';">${a.odds1}</span></div>
-        </div>
-        <div style="padding:8px;background:var(--bg);border-radius:6px;font-size:11px;">
-          <div style="color:var(--t3);font-size:9px;">${a.book2}</div>
-          <div style="font-weight:700;">${a.side2} <span style="color:var(--gold);font-family:'JetBrains Mono';">${a.odds2}</span></div>
-        </div>
-      </div>
-      <div style="display:flex;justify-content:space-between;font-size:12px;">
-        <span style="color:var(--t3);">$2,000 total bet</span>
-        <span style="font-weight:800;color:var(--green);">${a.profit} guaranteed</span>
-      </div>
-      <div style="position:absolute;top:8px;right:8px;width:6px;height:6px;background:var(--green);border-radius:50%;animation:pulse 2s infinite;"></div>
-    </div>
-  `).join('');
-}
+function updateCountdown(){const el=document.getElementById('countdown');if(!el)return;const t=new Date('2026-04-07T23:59:59-04:00')-new Date();if(t<=0){el.textContent='CLOSED';return;}el.textContent=Math.floor(t/864e5)+'D '+Math.floor(t%864e5/36e5)+'H '+Math.floor(t%36e5/6e4)+'M '+Math.floor(t%6e4/1e3)+'S'}
+updateCountdown();setInterval(updateCountdown,1000);
 
-// Rotate arbs every 8 seconds
-renderLiveArbs();
-setInterval(renderLiveArbs,8000);
-
-// Countdown to April 7
-function updateCountdown(){
-  const el=document.getElementById('countdown');
-  if(!el)return;
-  const target=new Date('2026-04-07T23:59:59-04:00');
-  const now=new Date();
-  const diff=target-now;
-  if(diff<=0){el.textContent='WINDOW CLOSED';return;}
-  const d=Math.floor(diff/(1000*60*60*24));
-  const h=Math.floor((diff%(1000*60*60*24))/(1000*60*60));
-  const m=Math.floor((diff%(1000*60*60))/(1000*60));
-  const s=Math.floor((diff%(1000*60))/1000);
-  el.textContent=d+'D '+h+'H '+m+'M '+s+'S';
-}
-updateCountdown();
-setInterval(updateCountdown,1000);
-
-function setType(type){joinType=type;document.getElementById('typePaid').classList.toggle('active',type==='paid');document.getElementById('typeFree').classList.toggle('active',type==='free');document.getElementById('paidSection').style.display=type==='paid'?'block':'none';document.getElementById('freeSection').style.display=type==='free'?'block':'none';document.getElementById('submitBtn').textContent=type==='paid'?(payMethod==='card'?'💳 PAY WITH CARD':payMethod==='crypto'?'₿ PAY WITH CRYPTO':'🚀 JOIN SBA GENIUS'):'🆓 CREATE FREE ACCOUNT';}
-function setPkg(pkg){selectedPkg=pkg;document.querySelectorAll('.pkg-card').forEach(c=>c.classList.remove('active'));document.getElementById('pkg'+pkg.charAt(0).toUpperCase()+pkg.slice(1))?.classList.add('active');if(pkg==='promo')document.getElementById('pkgPromo').classList.add('active');}
-function toggleVPN(){vpnSelected=!vpnSelected;document.getElementById('vpnToggle').classList.toggle('active',vpnSelected);document.getElementById('vpnCheck').textContent=vpnSelected?'✓':'';}
-function setPayMethod(m){payMethod=m;document.querySelectorAll('.pay-btn').forEach(b=>b.classList.remove('active'));document.getElementById('pay'+m.charAt(0).toUpperCase()+m.slice(1))?.classList.add('active');document.getElementById('manualPayNote').style.display=m==='manual'?'block':'none';if(m==='card')document.getElementById('submitBtn').textContent='💳 PAY WITH CARD';else if(m==='crypto')document.getElementById('submitBtn').textContent='₿ PAY WITH CRYPTO';else document.getElementById('submitBtn').textContent='🚀 JOIN SBA GENIUS';}
-function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
+function setType(t){joinType=t;document.getElementById('typePaid').classList.toggle('active',t==='paid');document.getElementById('typeFree').classList.toggle('active',t==='free');document.getElementById('paidSection').style.display=t==='paid'?'block':'none';document.getElementById('freeSection').style.display=t==='free'?'block':'none';document.getElementById('submitBtn').textContent=t==='paid'?(payMethod==='card'?'💳 PAY WITH CARD':payMethod==='crypto'?'₿ PAY WITH CRYPTO':'🚀 JOIN SBA GENIUS'):'🆓 CREATE FREE ACCOUNT'}
+function setPkg(p){selectedPkg=p;document.querySelectorAll('.pkg-card').forEach(c=>c.classList.remove('active'));(document.getElementById('pkg'+p.charAt(0).toUpperCase()+p.slice(1))||document.getElementById('pkgPromo')).classList.add('active')}
+function toggleVPN(){vpnSelected=!vpnSelected;document.getElementById('vpnToggle').classList.toggle('active',vpnSelected);document.getElementById('vpnCheck').textContent=vpnSelected?'✓':''}
+function setPayMethod(m){payMethod=m;document.querySelectorAll('.pay-btn').forEach(b=>b.classList.remove('active'));document.getElementById('pay'+m.charAt(0).toUpperCase()+m.slice(1))?.classList.add('active');document.getElementById('manualPayNote').style.display=m==='manual'?'block':'none';document.getElementById('submitBtn').textContent=m==='card'?'💳 PAY WITH CARD':m==='crypto'?'₿ PAY WITH CRYPTO':'🚀 JOIN SBA GENIUS'}
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000)}
 
 async function submitSignup(){
   const name=document.getElementById('sName').value.trim(),email=document.getElementById('sEmail').value.trim().toLowerCase(),phone=document.getElementById('sPhone').value.trim(),discord=document.getElementById('sDiscord').value.trim();
-  if(!name||!email){toast('⚠️ Name and email required');return;}
-  if(!email.includes('@')){toast('⚠️ Enter a valid email');return;}
+  if(!name||!email){toast('⚠️ Name and email required');return}
+  if(!email.includes('@')){toast('⚠️ Enter a valid email');return}
   const{data:existing}=await sb.from('onboarding_members').select('id').eq('email',email).single();
-  if(existing){toast('⚠️ This email is already registered');return;}
+  if(existing){toast('⚠️ This email is already registered');return}
   const btn=document.getElementById('submitBtn');btn.disabled=true;btn.textContent='Processing...';
-  const firstName=name.split(' ')[0].toLowerCase().replace(/[^a-z]/g,''),refCode=firstName+Math.floor(1000+Math.random()*9000);
-  const chars='ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';let password='SBA-';for(let i=0;i<8;i++)password+=chars[Math.floor(Math.random()*chars.length)];
-  const pkgMap={promo:'plus',basic:'basic',plus:'plus',elite:'elite',pro:'pro'},amtMap={promo:1000,basic:1000,plus:2000,elite:5000,pro:10000};
-  const isFree=joinType==='free',dbPkg=isFree?'none':(pkgMap[selectedPkg]||'basic'),amount=isFree?0:(amtMap[selectedPkg]||1000),vpn=isFree?false:vpnSelected,isPaidNow=!isFree&&(payMethod==='card'||payMethod==='crypto');
-  const{data:phantom}=await sb.from('onboarding_members').select('*').eq('member_type','phantom').ilike('name',name).single();
-  const member={name,email,phone:phone||'',discord:discord||'',pkg:dbPkg,paid_pkg:selectedPkg==='promo'?'plus':null,package_amount:amount,vpn,vpn_status:vpn?'pending':null,payment:isFree?'affiliate':isPaidNow?'processing':'pending_payment',member_type:isFree?'affiliate_only':'active',affiliate_type:'standard',commission_status:isFree?'held':'pending',status:isFree?'active':'pending_payment',step_progress:1,password,password_changed:false,tos_accepted:false,checklist:'{}',upgrade_requests:'[]',cycle_start:'2026-03-26T21:00:00-04:00',cycle_end:'2026-05-04T21:00:00-04:00',affiliate_rank:'starter',total_referrals:0,held_commissions:0,genius_access:!isFree,cycle_number:1,promo_code:selectedPkg==='promo'?'LAUNCH-SPECIAL':null,promo_value:selectedPkg==='promo'?3000:0};
-  if(referrerCode)member.referred_by_code=referrerCode;
-  let result,error;
-  if(phantom){member.referral_code=phantom.referral_code;if(!member.referred_by_code)member.referred_by_code=phantom.referred_by_code;const r=await sb.from('onboarding_members').update(member).eq('id',phantom.id).select();result=r.data;error=r.error;}else{member.referral_code=refCode;const r=await sb.from('onboarding_members').insert([member]).select();result=r.data;error=r.error;}
-  if(error){toast('❌ '+error.message);btn.disabled=false;btn.textContent='🚀 JOIN SBA GENIUS';return;}
-  const memberId=result?.[0]?.id,memberRefCode=result?.[0]?.referral_code||member.referral_code;
-  if(!isFree&&payMethod==='card'){btn.textContent='Redirecting to checkout...';const pk=vpn?selectedPkg+'_vpn':selectedPkg;try{const r=await fetch('/api/checkout',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({price_id:STRIPE_PRICES[pk]||STRIPE_PRICES[selectedPkg],email,name,ref_code:referrerCode||'',member_id:memberId||''})});const d=await r.json();if(d.url){window.location.href=d.url;return;}else{toast('⚠️ Checkout error — try CashApp instead');btn.disabled=false;btn.textContent='💳 PAY WITH CARD';return;}}catch(e){toast('⚠️ Checkout error');btn.disabled=false;return;}}
-  if(!isFree&&payMethod==='crypto'){btn.textContent='Redirecting...';const ck=vpn?selectedPkg+'_vpn':selectedPkg;window.location.href='https://commerce.coinbase.com/checkout/'+(COINBASE_IDS[ck]||COINBASE_IDS[selectedPkg])+'?metadata[email]='+encodeURIComponent(email)+'&metadata[name]='+encodeURIComponent(name)+'&metadata[ref]='+encodeURIComponent(referrerCode||'');return;}
-  document.getElementById('signupForm').style.display='none';document.getElementById('successCard').style.display='block';document.querySelector('.hero').style.display='none';
-  if(isFree){document.getElementById('successMsg').textContent='Your free affiliate account is ready! Log in to start building.';document.getElementById('successCreds').style.display='block';document.getElementById('credEmail').textContent=email;document.getElementById('credPass').textContent=password;document.getElementById('credRef').textContent='onboarding.sportsbetarbitrage.com/join.html?ref='+memberRefCode;}else{document.getElementById('successMsg').innerHTML='Application submitted!<br><br>Your team leader will confirm payment and activate your account.<br><br>💬 <a href="https://discord.gg/hZXxJMgHb3" style="color:var(--gold);">Join our Discord</a>';}
+  const fn=name.split(' ')[0].toLowerCase().replace(/[^a-z]/g,''),rc=fn+Math.floor(1e3+Math.random()*9e3);
+  const ch='ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';let pw='SBA-';for(let i=0;i<8;i++)pw+=ch[Math.floor(Math.random()*ch.length)];
+  const pm={promo:'plus',basic:'basic',plus:'plus',elite:'elite',pro:'pro'},am={promo:1000,basic:1000,plus:2000,elite:5000,pro:10000};
+  const isFree=joinType==='free',dp=isFree?'none':(pm[selectedPkg]||'basic'),amt=isFree?0:(am[selectedPkg]||1000),vpn=isFree?false:vpnSelected,isNow=!isFree&&(payMethod==='card'||payMethod==='crypto');
+  const{data:ph}=await sb.from('onboarding_members').select('*').eq('member_type','phantom').ilike('name',name).single();
+  const m={name,email,phone:phone||'',discord:discord||'',pkg:dp,paid_pkg:selectedPkg==='promo'?'plus':null,package_amount:amt,vpn,vpn_status:vpn?'pending':null,payment:isFree?'affiliate':isNow?'processing':'pending_payment',member_type:isFree?'affiliate_only':'active',affiliate_type:'grandfathered',commission_status:isFree?'held':'pending',status:isFree?'active':'pending_payment',step_progress:1,password:pw,password_changed:false,tos_accepted:false,checklist:'{}',upgrade_requests:'[]',cycle_start:'2026-03-26T21:00:00-04:00',cycle_end:'2026-05-04T21:00:00-04:00',affiliate_rank:'starter',total_referrals:0,held_commissions:0,genius_access:!isFree,cycle_number:1,promo_code:selectedPkg==='promo'?'LAUNCH-SPECIAL':null,promo_value:selectedPkg==='promo'?3000:0};
+  if(referrerCode)m.referred_by_code=referrerCode;
+  let r,e;
+  if(ph){m.referral_code=ph.referral_code;if(!m.referred_by_code)m.referred_by_code=ph.referred_by_code;const x=await sb.from('onboarding_members').update(m).eq('id',ph.id).select();r=x.data;e=x.error}else{m.referral_code=rc;const x=await sb.from('onboarding_members').insert([m]).select();r=x.data;e=x.error}
+  if(e){toast('❌ '+e.message);btn.disabled=false;btn.textContent='🚀 JOIN';return}
+  const mid=r?.[0]?.id,mrc=r?.[0]?.referral_code||m.referral_code;
+  if(!isFree&&payMethod==='card'){btn.textContent='Redirecting...';const pk=vpn?selectedPkg+'_vpn':selectedPkg;try{const x=await fetch('/api/checkout',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({price_id:STRIPE_PRICES[pk]||STRIPE_PRICES[selectedPkg],email,name,ref_code:referrerCode||'',member_id:mid||''})});const d=await x.json();if(d.url){window.location.href=d.url;return}else{toast('⚠️ Error — try CashApp');btn.disabled=false;btn.textContent='💳 PAY';return}}catch(ex){toast('⚠️ Error');btn.disabled=false;return}}
+  if(!isFree&&payMethod==='crypto'){btn.textContent='Redirecting...';const ck=vpn?selectedPkg+'_vpn':selectedPkg;window.location.href='https://commerce.coinbase.com/checkout/'+(COINBASE_IDS[ck]||COINBASE_IDS[selectedPkg])+'?metadata[email]='+encodeURIComponent(email)+'&metadata[name]='+encodeURIComponent(name);return}
+  document.getElementById('signupForm').style.display='none';document.getElementById('successWrap').style.display='flex';document.querySelector('.hero').style.display='none';
+  if(isFree){document.getElementById('successMsg').textContent='Your free affiliate account is ready!';document.getElementById('successCreds').style.display='block';document.getElementById('credEmail').textContent=email;document.getElementById('credPass').textContent=pw;document.getElementById('credRef').textContent='onboarding.sportsbetarbitrage.com/join.html?ref='+mrc}else{document.getElementById('successMsg').innerHTML='Application submitted!<br><br>Your leader will confirm payment and activate your account.<br><br>💬 <a href="https://discord.gg/hZXxJMgHb3" style="color:var(--gold)">Join Discord</a>'}
 }
 </script>
 </body>
