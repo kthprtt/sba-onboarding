@@ -166,8 +166,28 @@ body::before{content:'';position:fixed;top:-50%;left:-50%;width:200%;height:200%
           </div>
         </div>
         
-        <div class="payment-note">
-          💰 <strong>Payment:</strong> After signing up, your team leader will reach out to arrange payment via CashApp, Zelle, PayPal, or crypto. Your account activates once payment is confirmed.
+        <div style="margin-bottom:16px;">
+          <div class="form-label" style="margin-bottom:8px;">Payment Method</div>
+          <div class="type-toggle" style="grid-template-columns:1fr 1fr 1fr;">
+            <div class="type-btn active" id="payCard" onclick="setPayMethod('card')" style="padding:10px;">
+              <span class="emoji" style="font-size:18px;">💳</span>
+              Card
+              <div class="sub">Visa/MC/Amex</div>
+            </div>
+            <div class="type-btn" id="payCrypto" onclick="setPayMethod('crypto')" style="padding:10px;">
+              <span class="emoji" style="font-size:18px;">₿</span>
+              Crypto
+              <div class="sub">BTC/ETH/USDC</div>
+            </div>
+            <div class="type-btn" id="payManual" onclick="setPayMethod('manual')" style="padding:10px;">
+              <span class="emoji" style="font-size:18px;">📱</span>
+              CashApp/Zelle
+              <div class="sub">Pay your leader</div>
+            </div>
+          </div>
+          <div id="manualPayNote" style="display:none;margin-top:6px;font-size:11px;color:var(--t2);padding:8px;background:var(--bg);border-radius:6px;">
+            After signing up, your team leader will reach out to arrange payment. Your access activates once confirmed.
+          </div>
         </div>
       </div>
       
@@ -215,14 +235,53 @@ const sb = supabase.createClient(
 let joinType = 'paid';
 let selectedPkg = 'promo';
 let vpnSelected = true;
+let payMethod = 'card';
 let referrerCode = null;
 let referrerMember = null;
+
+// Stripe Price IDs
+const STRIPE_PRICES = {
+  basic: 'price_1SdKIJ03TcuWq8t5SELJaivD',
+  plus: 'price_1SdKMv03TcuWq8t57xR3XCT2',
+  elite: 'price_1SdKQ403TcuWq8t5LJFFeOQs',
+  pro: 'price_1SdKho03TcuWq8t5Nb7yQqUa',
+  basic_vpn: 'price_1Sh3cT03TcuWq8t5d37imWd0',
+  plus_vpn: 'price_1Sh3bp03TcuWq8t5c1njhLHF',
+  elite_vpn: 'price_1Sh3an03TcuWq8t5aHqwGN3f',
+  pro_vpn: 'price_1Sh3a303TcuWq8t5ceESGmqX',
+  promo: 'price_1SdKIJ03TcuWq8t5SELJaivD' // Launch special = basic price
+};
+
+// Coinbase Checkout IDs
+const COINBASE_IDS = {
+  basic: '2cff8e7e-2a9d-4b16-9330-ab0e42fa083f',
+  plus: '8708e845-c7c1-47c1-9725-cd3001aa2f19',
+  elite: '17d6e616-13b7-4cb2-91c4-8ba1ddb68a8f',
+  pro: '7ca1a2ea-17c9-4b4d-aa07-dc4004d036be',
+  basic_vpn: '7cc10bbd-01bb-407a-a02c-68bf78aa1291',
+  plus_vpn: '7164d336-a1b7-41fc-af42-9a62c7ff700a',
+  elite_vpn: '281b5608-3ad1-414a-a4f4-f2ed6a244904',
+  pro_vpn: '2bc88828-56f4-4649-bfe6-14473bb77253',
+  promo: '7cc10bbd-01bb-407a-a02c-68bf78aa1291' // Launch = basic+vpn
+};
 
 // Get referral code from URL
 const params = new URLSearchParams(window.location.search);
 referrerCode = params.get('ref') || null;
 
 async function init(){
+  // Handle return from Stripe checkout
+  if(params.get('success')==='true'){
+    const returnEmail = params.get('email');
+    document.getElementById('signupForm').style.display='none';
+    document.getElementById('successCard').style.display='block';
+    document.getElementById('successMsg').innerHTML='🎉 <strong>Payment confirmed!</strong><br><br>Your account is being activated. You\'ll receive a welcome email shortly with your login credentials, VPN setup, and getting started guide.<br><br>💬 <a href="https://discord.gg/hZXxJMgHb3" style="color:var(--gold);">Join our Discord now</a>';
+    return;
+  }
+  if(params.get('cancelled')==='true'){
+    toast('Payment cancelled — you can try again or choose a different method.');
+  }
+  
   if(referrerCode){
     const{data}=await sb.from('onboarding_members').select('name,referral_code').eq('referral_code',referrerCode).single();
     if(data){
@@ -234,6 +293,8 @@ async function init(){
   // Default VPN on
   document.getElementById('vpnToggle').classList.add('active');
   document.getElementById('vpnCheck').textContent='✓';
+  // Default button text
+  document.getElementById('submitBtn').textContent='💳 Pay with Card';
 }
 init();
 
@@ -259,6 +320,17 @@ function toggleVPN(){
   document.getElementById('vpnCheck').textContent=vpnSelected?'✓':'';
 }
 
+function setPayMethod(method){
+  payMethod=method;
+  document.querySelectorAll('#payCard,#payCrypto,#payManual').forEach(b=>b.classList.remove('active'));
+  document.getElementById('pay'+method.charAt(0).toUpperCase()+method.slice(1))?.classList.add('active');
+  document.getElementById('manualPayNote').style.display=method==='manual'?'block':'none';
+  // Update button text
+  if(method==='card') document.getElementById('submitBtn').textContent='💳 Pay with Card';
+  else if(method==='crypto') document.getElementById('submitBtn').textContent='₿ Pay with Crypto';
+  else document.getElementById('submitBtn').textContent='🚀 Join SBA Genius';
+}
+
 function toast(msg){
   const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
   setTimeout(()=>t.classList.remove('show'),3000);
@@ -278,7 +350,7 @@ async function submitSignup(){
   if(existing){toast('⚠️ This email is already registered');return;}
   
   const btn=document.getElementById('submitBtn');
-  btn.disabled=true;btn.textContent='Creating account...';
+  btn.disabled=true;btn.textContent='Processing...';
   
   const firstName=name.split(' ')[0].toLowerCase().replace(/[^a-z]/g,'');
   const refCode=firstName+Math.floor(1000+Math.random()*9000);
@@ -293,8 +365,13 @@ async function submitSignup(){
   const amount = isFreeMember ? 0 : (amtMap[selectedPkg]||1000);
   const vpn = isFreeMember ? false : vpnSelected;
   
+  // For Card or Crypto — create account first then redirect to payment
+  // For Manual — create account with pending_payment status
+  
   // Check for phantom conversion
   const{data:phantom}=await sb.from('onboarding_members').select('*').eq('member_type','phantom').ilike('name',name).single();
+  
+  const isPaidNow = !isFreeMember && (payMethod==='card'||payMethod==='crypto');
   
   const member={
     name,email,phone:phone||'',discord:discord||'',
@@ -302,7 +379,7 @@ async function submitSignup(){
     paid_pkg:selectedPkg==='promo'?'plus':null,
     package_amount:amount,
     vpn,vpn_status:vpn?'pending':null,
-    payment:isFreeMember?'affiliate':'pending_payment',
+    payment:isFreeMember?'affiliate':isPaidNow?'processing':'pending_payment',
     member_type:isFreeMember?'affiliate_only':'active',
     affiliate_type:'standard',
     commission_status:isFreeMember?'held':'pending',
@@ -320,13 +397,11 @@ async function submitSignup(){
     promo_value:selectedPkg==='promo'?3000:0
   };
   
-  // Set referrer
   if(referrerCode) member.referred_by_code=referrerCode;
   
   let result, error;
   
   if(phantom){
-    // Convert phantom
     member.referral_code=phantom.referral_code;
     if(!member.referred_by_code) member.referred_by_code=phantom.referred_by_code;
     const resp=await sb.from('onboarding_members').update(member).eq('id',phantom.id).select();
@@ -343,7 +418,32 @@ async function submitSignup(){
     return;
   }
   
-  // Show success
+  const memberId = result?.[0]?.id;
+  const memberRefCode = result?.[0]?.referral_code || member.referral_code;
+  
+  // CARD PAYMENT — redirect to Stripe
+  if(!isFreeMember && payMethod==='card'){
+    btn.textContent='Redirecting to checkout...';
+    const priceKey = vpn ? selectedPkg+'_vpn' : selectedPkg;
+    const priceId = STRIPE_PRICES[priceKey] || STRIPE_PRICES[selectedPkg];
+    try{
+      const r = await fetch('/api/checkout',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({price_id:priceId,email,name,ref_code:referrerCode||'',member_id:memberId||''})});
+      const data = await r.json();
+      if(data.url){window.location.href=data.url;return;}
+      else{toast('⚠️ Checkout error — try CashApp/Zelle instead');btn.disabled=false;btn.textContent='💳 Pay with Card';return;}
+    }catch(e){toast('⚠️ Checkout error');btn.disabled=false;btn.textContent='💳 Pay with Card';return;}
+  }
+  
+  // CRYPTO PAYMENT — redirect to Coinbase Commerce
+  if(!isFreeMember && payMethod==='crypto'){
+    btn.textContent='Redirecting to crypto checkout...';
+    const cbKey = vpn ? selectedPkg+'_vpn' : selectedPkg;
+    const cbId = COINBASE_IDS[cbKey] || COINBASE_IDS[selectedPkg];
+    window.location.href='https://commerce.coinbase.com/checkout/'+cbId+'?metadata[email]='+encodeURIComponent(email)+'&metadata[name]='+encodeURIComponent(name)+'&metadata[ref]='+encodeURIComponent(referrerCode||'');
+    return;
+  }
+  
+  // MANUAL or FREE — show success
   document.getElementById('signupForm').style.display='none';
   document.getElementById('successCard').style.display='block';
   
@@ -352,9 +452,9 @@ async function submitSignup(){
     document.getElementById('successCreds').style.display='block';
     document.getElementById('credEmail').textContent=email;
     document.getElementById('credPass').textContent=password;
-    document.getElementById('credRef').textContent='sportsbetarbitrage.com/?ref='+member.referral_code;
+    document.getElementById('credRef').textContent='sportsbetarbitrage.com/?ref='+memberRefCode;
   } else {
-    document.getElementById('successMsg').innerHTML='Your application has been submitted!<br><br>Your team leader will reach out to confirm payment. Once confirmed, you\'ll receive a welcome email with your login credentials and getting started guide.<br><br>💬 <a href="https://discord.gg/hZXxJMgHb3" style="color:var(--gold);">Join our Discord</a> in the meantime!';
+    document.getElementById('successMsg').innerHTML='Your application has been submitted!<br><br>Your team leader will reach out to confirm payment. Once confirmed, you\'ll receive a welcome email with your login credentials.<br><br>💬 <a href="https://discord.gg/hZXxJMgHb3" style="color:var(--gold);">Join our Discord</a> in the meantime!';
   }
 }
 </script>
