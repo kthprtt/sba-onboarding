@@ -493,60 +493,34 @@ body{background:var(--bg);color:var(--t1);font-family:'Outfit',sans-serif;overfl
   </div>
   <div class="reveal" style="text-align:center;font-size:9px;color:var(--t3);margin-top:10px">Based on $1K bankroll/bet. Higher bankroll = proportionally higher profits.</div>
 
-  <!-- 40-DAY EARNINGS CALCULATOR -->
+  <!-- INTERACTIVE EARNINGS SIMULATOR -->
   <div class="reveal" style="margin-top:24px">
-    <div style="font-family:'Bebas Neue';font-size:24px;text-align:center;margin-bottom:12px">📊 YOUR 40-DAY <span style="color:var(--gold)">EARNINGS</span> — $1K BANKROLL</div>
-    <div style="font-size:11px;color:var(--t3);text-align:center;margin-bottom:16px">At 15% average ROI per round · recycling your $1K bankroll</div>
+    <div style="font-family:'Bebas Neue';font-size:28px;text-align:center;margin-bottom:4px">📊 EARNINGS <span style="color:var(--gold)">SIMULATOR</span></div>
+    <div style="font-size:11px;color:var(--t3);text-align:center;margin-bottom:16px">Select your package. Watch the money stack up in real-time.</div>
     
-    <div style="overflow-x:auto">
-      <table style="width:100%;border-collapse:collapse;font-size:11px;min-width:400px">
-        <thead><tr style="border-bottom:2px solid var(--border)">
-          <th style="text-align:left;padding:8px;color:var(--t3);font-weight:600">BETS/DAY</th>
-          <th style="text-align:center;padding:8px;color:var(--t2)">DAILY</th>
-          <th style="text-align:center;padding:8px;color:var(--t2)">WEEKLY</th>
-          <th style="text-align:center;padding:8px;color:var(--gold);font-weight:800">40 DAYS</th>
-        </tr></thead>
-        <tbody>
-          <tr style="border-bottom:1px solid var(--border)">
-            <td style="padding:10px 8px;font-weight:700">2 bets/day</td>
-            <td style="text-align:center;padding:8px;color:var(--green)">$300</td>
-            <td style="text-align:center;padding:8px;color:var(--green)">$2,100</td>
-            <td style="text-align:center;padding:8px"><span style="font-family:'Bebas Neue';font-size:20px;color:var(--gold)">$12,000</span></td>
-          </tr>
-          <tr style="border-bottom:1px solid var(--border)">
-            <td style="padding:10px 8px;font-weight:700">3 bets/day</td>
-            <td style="text-align:center;padding:8px;color:var(--green)">$450</td>
-            <td style="text-align:center;padding:8px;color:var(--green)">$3,150</td>
-            <td style="text-align:center;padding:8px"><span style="font-family:'Bebas Neue';font-size:20px;color:var(--gold)">$18,000</span></td>
-          </tr>
-          <tr style="border-bottom:1px solid var(--border);background:rgba(212,168,67,0.03)">
-            <td style="padding:10px 8px;font-weight:700">4 bets/day ⭐</td>
-            <td style="text-align:center;padding:8px;color:var(--green)">$600</td>
-            <td style="text-align:center;padding:8px;color:var(--green)">$4,200</td>
-            <td style="text-align:center;padding:8px"><span style="font-family:'Bebas Neue';font-size:20px;color:var(--gold)">$24,000</span></td>
-          </tr>
-          <tr style="border-bottom:1px solid var(--border)">
-            <td style="padding:10px 8px;font-weight:700">5 bets/day</td>
-            <td style="text-align:center;padding:8px;color:var(--green)">$750</td>
-            <td style="text-align:center;padding:8px;color:var(--green)">$5,250</td>
-            <td style="text-align:center;padding:8px"><span style="font-family:'Bebas Neue';font-size:20px;color:var(--gold)">$30,000</span></td>
-          </tr>
-          <tr>
-            <td style="padding:10px 8px;font-weight:700">6 bets/day 🔥</td>
-            <td style="text-align:center;padding:8px;color:var(--green)">$900</td>
-            <td style="text-align:center;padding:8px;color:var(--green)">$6,300</td>
-            <td style="text-align:center;padding:8px"><span style="font-family:'Bebas Neue';font-size:22px;color:var(--green)">$36,000</span></td>
-          </tr>
-        </tbody>
-      </table>
+    <!-- Tier selector -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-bottom:16px" id="simTierBtns">
+      <button onclick="runSim('basic')" id="simBasic" class="sim-tier active" style="padding:10px 4px;border-radius:8px;border:2px solid var(--green);background:rgba(0,230,118,0.04);color:var(--green);font-family:'Outfit';font-size:10px;font-weight:800;cursor:pointer;text-align:center">BASIC<br><span style="font-family:'Bebas Neue';font-size:20px">$1K</span><br><span style="font-size:8px;color:var(--t3)">3%</span></button>
+      <button onclick="runSim('plus')" id="simPlus" class="sim-tier" style="padding:10px 4px;border-radius:8px;border:2px solid var(--border);background:var(--card);color:var(--t2);font-family:'Outfit';font-size:10px;font-weight:800;cursor:pointer;text-align:center">PLUS<br><span style="font-family:'Bebas Neue';font-size:20px">$2K</span><br><span style="font-size:8px;color:var(--t3)">5%</span></button>
+      <button onclick="runSim('elite')" id="simElite" class="sim-tier" style="padding:10px 4px;border-radius:8px;border:2px solid var(--border);background:var(--card);color:var(--t2);font-family:'Outfit';font-size:10px;font-weight:800;cursor:pointer;text-align:center">ELITE<br><span style="font-family:'Bebas Neue';font-size:20px">$5K</span><br><span style="font-size:8px;color:var(--t3)">10%</span></button>
+      <button onclick="runSim('pro')" id="simPro" class="sim-tier" style="padding:10px 4px;border-radius:8px;border:2px solid var(--border);background:var(--card);color:var(--t2);font-family:'Outfit';font-size:10px;font-weight:800;cursor:pointer;text-align:center">PRO<br><span style="font-family:'Bebas Neue';font-size:20px">$10K</span><br><span style="font-size:8px;color:var(--t3)">15%</span></button>
     </div>
     
-    <div style="text-align:center;margin-top:12px;padding:14px;background:linear-gradient(135deg,rgba(0,230,118,0.04),rgba(212,168,67,0.04));border:1px solid rgba(0,230,118,0.08);border-radius:10px">
-      <div style="font-size:11px;color:var(--t2);margin-bottom:4px">WITH A $2K BANKROLL — DOUBLE THESE NUMBERS</div>
-      <div style="font-family:'Bebas Neue';font-size:28px;color:var(--green)">4 BETS/DAY = $48,000 IN 40 DAYS</div>
-      <div style="font-size:10px;color:var(--t3);margin-top:4px">SBA Genius runs 24/7. Arbs appear across all sports, all leagues, all time zones.</div>
+    <!-- Sim display -->
+    <div id="simDisplay" class="gcard" style="border-color:rgba(0,230,118,0.1)">
+      <div id="simHeader" style="text-align:center;margin-bottom:12px"></div>
+      
+      <!-- Live bet ticker -->
+      <div id="simTicker" style="background:var(--bg);border-radius:8px;padding:10px;margin-bottom:12px;max-height:160px;overflow:hidden;font-family:'JetBrains Mono';font-size:10px;line-height:1.8"></div>
+      
+      <!-- Progress bars for 30/90/365 -->
+      <div id="simTimeline" style="display:grid;gap:8px"></div>
+      
+      <!-- Pro breakdown -->
+      <div id="simProBreakdown" style="display:none;margin-top:12px;padding:12px;background:var(--bg);border-radius:8px"></div>
     </div>
-    <div style="text-align:center;font-size:9px;color:var(--t3);margin-top:8px">15% avg ROI based on real platform data. Results vary by market conditions and execution speed.</div>
+    
+    <div style="text-align:center;font-size:9px;color:var(--t3);margin-top:8px">Estimates based on 3 bets/day, recycling bankroll. Results vary by market conditions.</div>
   </div>
 </div>
 
@@ -754,6 +728,182 @@ function setPkg(p){selectedPkg=p;document.querySelectorAll('.pkg-card').forEach(
 function toggleVPN(){vpnSelected=!vpnSelected;document.getElementById('vpnToggle').classList.toggle('active',vpnSelected);document.getElementById('vpnCheck').textContent=vpnSelected?'✓':''}
 function setPayMethod(m){payMethod=m;document.querySelectorAll('.pay-btn').forEach(b=>b.classList.remove('active'));document.getElementById('pay'+m.charAt(0).toUpperCase()+m.slice(1))?.classList.add('active');document.getElementById('manualPayNote').style.display=m==='manual'?'block':'none';document.getElementById('submitBtn').textContent=m==='card'?'💳 PAY WITH CARD':m==='crypto'?'₿ PAY WITH CRYPTO':'🚀 JOIN SBA GENIUS'}
 function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000)}
+
+// === EARNINGS SIMULATOR ===
+const SIM_CONFIGS={
+  basic:{name:'BASIC',bankroll:1000,roi:0.03,betsDay:3,color:'var(--green)',betTypes:['Sure Bet'],desc:'Pure arbitrage — guaranteed profit on every bet. Both sides covered.'},
+  plus:{name:'PLUS',bankroll:2000,roi:0.05,betsDay:3,color:'var(--gold)',betTypes:['Sure Bet','Value Bet'],desc:'Sure bets + value bets. More edge, more opportunities, higher ROI.'},
+  elite:{name:'ELITE',bankroll:5000,roi:0.10,betsDay:3,color:'var(--orange)',betTypes:['Sure Bet','Value Bet','Double Value'],desc:'The full scanner. Double value bets find hidden edges other tools miss entirely.'},
+  pro:{name:'PRO',bankroll:10000,roi:0.15,betsDay:3,color:'var(--blue)',betTypes:['Sure Bet','Value Bet','Double Value','Power Play'],desc:'Maximum edge. War Room protection. Value + double value on every bet. 1-on-1 with Keith.'}
+};
+
+const SIM_GAMES=[
+  {sport:'🏀',t1:'Lakers',t2:'Celtics'},{sport:'🏀',t1:'Bucks',t2:'76ers'},{sport:'🏈',t1:'Chiefs',t2:'Bills'},
+  {sport:'🏈',t1:'Cowboys',t2:'Eagles'},{sport:'⚽',t1:'Liverpool',t2:'Arsenal'},{sport:'⚽',t1:'Real Madrid',t2:'Barcelona'},
+  {sport:'🏒',t1:'Rangers',t2:'Bruins'},{sport:'⚾',t1:'Yankees',t2:'Dodgers'},{sport:'🎾',t1:'Djokovic',t2:'Alcaraz'},
+  {sport:'🥊',t1:'Fighter A',t2:'Fighter B'},{sport:'🏀',t1:'Warriors',t2:'Suns'},{sport:'🏈',t1:'Ravens',t2:'Bengals'}
+];
+const SIM_BOOKS=['DraftKings','FanDuel','BetMGM','Caesars','Bovada','Pinnacle','BetRivers','1xBet','BetOnline'];
+
+let simInterval=null;
+
+function runSim(tier){
+  // Update buttons
+  document.querySelectorAll('.sim-tier').forEach(b=>{b.style.borderColor='var(--border)';b.style.background='var(--card)';b.style.color='var(--t2)'});
+  const btn=document.getElementById('sim'+tier.charAt(0).toUpperCase()+tier.slice(1));
+  const cfg=SIM_CONFIGS[tier];
+  btn.style.borderColor=cfg.color;btn.style.background=cfg.color+'08';btn.style.color=cfg.color;
+  
+  const perBet=cfg.bankroll*cfg.roi;
+  const daily=perBet*cfg.betsDay;
+  const d30=daily*30;
+  const d40=daily*40;
+  const d90=daily*90;
+  const d365=daily*365;
+  
+  // Header
+  document.getElementById('simHeader').innerHTML=`
+    <div style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:1px">${cfg.name} PACKAGE — $${(cfg.bankroll/1000)}K BANKROLL — ${(cfg.roi*100)}% AVG ROI</div>
+    <div style="font-size:11px;color:var(--t2);margin-top:4px">${cfg.desc}</div>
+    <div style="display:flex;gap:4px;justify-content:center;margin-top:8px;flex-wrap:wrap">${cfg.betTypes.map(t=>'<span style="padding:3px 8px;background:'+cfg.color+'0a;border:1px solid '+cfg.color+'20;border-radius:10px;font-size:9px;font-weight:700;color:'+cfg.color+'">'+t+'</span>').join('')}</div>
+  `;
+  
+  // Timeline
+  document.getElementById('simTimeline').innerHTML=`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+      <div style="padding:10px;background:var(--bg);border-radius:8px;text-align:center">
+        <div style="font-size:8px;color:var(--t3)">PER BET</div>
+        <div style="font-family:'Bebas Neue';font-size:22px;color:var(--green)">+$${perBet.toLocaleString()}</div>
+      </div>
+      <div style="padding:10px;background:var(--bg);border-radius:8px;text-align:center">
+        <div style="font-size:8px;color:var(--t3)">DAILY (${cfg.betsDay} BETS)</div>
+        <div style="font-family:'Bebas Neue';font-size:22px;color:var(--green)">+$${daily.toLocaleString()}</div>
+      </div>
+    </div>
+    
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px">
+      <div style="padding:10px;background:var(--bg);border-radius:8px;text-align:center">
+        <div style="font-size:8px;color:var(--t3)">30 DAYS</div>
+        <div style="font-family:'Bebas Neue';font-size:20px;color:${cfg.color}">$${(d30/1000).toFixed(1)}K</div>
+        <div style="height:4px;background:var(--border);border-radius:2px;margin-top:4px;overflow:hidden"><div style="height:100%;width:${Math.min(100,d30/d365*100)}%;background:${cfg.color};border-radius:2px"></div></div>
+      </div>
+      <div style="padding:10px;background:rgba(212,168,67,0.02);border:1px solid rgba(212,168,67,0.06);border-radius:8px;text-align:center">
+        <div style="font-size:8px;color:var(--gold)">40-DAY CYCLE</div>
+        <div style="font-family:'Bebas Neue';font-size:20px;color:var(--gold)">$${(d40/1000).toFixed(1)}K</div>
+        <div style="height:4px;background:var(--border);border-radius:2px;margin-top:4px;overflow:hidden"><div style="height:100%;width:${Math.min(100,d40/d365*100)}%;background:var(--gold);border-radius:2px"></div></div>
+      </div>
+      <div style="padding:10px;background:var(--bg);border-radius:8px;text-align:center">
+        <div style="font-size:8px;color:var(--t3)">90 DAYS</div>
+        <div style="font-family:'Bebas Neue';font-size:20px;color:${cfg.color}">$${(d90/1000).toFixed(0)}K</div>
+        <div style="height:4px;background:var(--border);border-radius:2px;margin-top:4px;overflow:hidden"><div style="height:100%;width:${Math.min(100,d90/d365*100)}%;background:${cfg.color};border-radius:2px"></div></div>
+      </div>
+      <div style="padding:10px;background:rgba(0,230,118,0.02);border:1px solid rgba(0,230,118,0.06);border-radius:8px;text-align:center">
+        <div style="font-size:8px;color:var(--green)">12 MONTHS</div>
+        <div style="font-family:'Bebas Neue';font-size:20px;color:var(--green)">$${(d365/1000).toFixed(0)}K</div>
+        <div style="height:4px;background:var(--border);border-radius:2px;margin-top:4px;overflow:hidden"><div style="height:100%;width:100%;background:var(--green);border-radius:2px"></div></div>
+      </div>
+    </div>
+    
+    ${tier==='pro'?'':'<div style="text-align:center;margin-top:8px;padding:10px;background:linear-gradient(135deg,rgba(0,230,118,0.03),rgba(212,168,67,0.03));border:1px solid rgba(0,230,118,0.06);border-radius:8px"><div style="font-size:10px;color:var(--t3)">YOUR $'+(cfg.bankroll/1000)+'K MEMBERSHIP PAYS BACK IN</div><div style="font-family:\\'Bebas Neue\\';font-size:24px;color:var(--green)">'+(daily>0?Math.ceil(cfg.bankroll/daily):99)+' DAYS</div></div>'}
+  `;
+  
+  // Pro breakdown
+  const proEl=document.getElementById('simProBreakdown');
+  if(tier==='pro'){
+    const favROI=0.08,dogROI=0.25;
+    const dailyFav=cfg.bankroll*favROI*2;
+    const dailyDog=cfg.bankroll*dogROI*1;
+    const dailyMix=dailyFav+dailyDog;
+    proEl.style.display='block';
+    proEl.innerHTML=`
+      <div style="font-size:11px;font-weight:800;margin-bottom:8px;color:var(--blue)">🎯 PRO BET MIX — 3 BETS/DAY BREAKDOWN</div>
+      <div style="font-size:10px;color:var(--t2);margin-bottom:10px">2 favorite-side value bets (8% ROI) + 1 underdog double-value bet (25% ROI)</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:10px">
+        <div style="padding:8px;background:rgba(0,230,118,0.03);border-radius:6px;text-align:center">
+          <div style="font-size:8px;color:var(--t3)">BET 1 — FAV VALUE</div>
+          <div style="font-size:9px;color:var(--t2);margin:2px 0">$10K × 8%</div>
+          <div style="font-family:'Bebas Neue';font-size:18px;color:var(--green)">+$800</div>
+        </div>
+        <div style="padding:8px;background:rgba(0,230,118,0.03);border-radius:6px;text-align:center">
+          <div style="font-size:8px;color:var(--t3)">BET 2 — FAV VALUE</div>
+          <div style="font-size:9px;color:var(--t2);margin:2px 0">$10K × 8%</div>
+          <div style="font-family:'Bebas Neue';font-size:18px;color:var(--green)">+$800</div>
+        </div>
+        <div style="padding:8px;background:rgba(212,168,67,0.03);border-radius:6px;text-align:center">
+          <div style="font-size:8px;color:var(--gold)">BET 3 — DOG VALUE 🔥</div>
+          <div style="font-size:9px;color:var(--t2);margin:2px 0">$10K × 25%</div>
+          <div style="font-family:'Bebas Neue';font-size:18px;color:var(--gold)">+$2,500</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;text-align:center">
+        <div style="padding:8px;background:var(--card);border-radius:6px"><div style="font-size:8px;color:var(--t3)">DAILY</div><div style="font-family:'Bebas Neue';font-size:18px;color:var(--green)">$${dailyMix.toLocaleString()}</div></div>
+        <div style="padding:8px;background:var(--card);border:1px solid rgba(212,168,67,0.08);border-radius:6px"><div style="font-size:8px;color:var(--gold)">40-DAY CYCLE</div><div style="font-family:'Bebas Neue';font-size:18px;color:var(--gold)">$${(dailyMix*40/1000).toFixed(0)}K</div></div>
+        <div style="padding:8px;background:var(--card);border-radius:6px"><div style="font-size:8px;color:var(--t3)">90 DAYS</div><div style="font-family:'Bebas Neue';font-size:18px;color:var(--green)">$${(dailyMix*90/1000).toFixed(0)}K</div></div>
+        <div style="padding:8px;background:var(--card);border:1px solid rgba(0,230,118,0.08);border-radius:6px"><div style="font-size:8px;color:var(--green)">12 MONTHS</div><div style="font-family:'Bebas Neue';font-size:18px;color:var(--green)">$${(dailyMix*365/1000).toFixed(0)}K</div></div>
+      </div>
+      <div style="text-align:center;margin-top:10px;padding:10px;background:linear-gradient(135deg,rgba(68,136,255,0.04),rgba(139,92,246,0.04));border:1px solid rgba(68,136,255,0.08);border-radius:8px">
+        <div style="font-size:10px;color:var(--t3)">$10K MEMBERSHIP PAYS BACK IN</div>
+        <div style="font-family:'Bebas Neue';font-size:28px;color:var(--green)">${Math.ceil(10000/dailyMix)} DAYS</div>
+      </div>
+    `;
+  } else {
+    proEl.style.display='none';
+  }
+  
+  // Animated bet ticker
+  if(simInterval)clearInterval(simInterval);
+  const ticker=document.getElementById('simTicker');
+  ticker.innerHTML='';
+  let totalProfit=0;
+  let betCount=0;
+  
+  function addBet(){
+    const game=SIM_GAMES[Math.floor(Math.random()*SIM_GAMES.length)];
+    const book=SIM_BOOKS[Math.floor(Math.random()*SIM_BOOKS.length)];
+    const betType=cfg.betTypes[Math.floor(Math.random()*cfg.betTypes.length)];
+    const thisROI=(cfg.roi*0.6+Math.random()*cfg.roi*0.8);
+    const profit=Math.round(cfg.bankroll*thisROI);
+    totalProfit+=profit;
+    betCount++;
+    
+    const colors={
+      'Sure Bet':'var(--green)',
+      'Value Bet':'var(--gold)',
+      'Double Value':'var(--orange)',
+      'Power Play':'var(--blue)'
+    };
+    const c=colors[betType]||'var(--green)';
+    
+    const line=document.createElement('div');
+    line.style.cssText='opacity:0;transform:translateY(-8px);transition:all .3s;padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.02)';
+    line.innerHTML='<span style="color:var(--t3)">'+(new Date().toLocaleTimeString('en',{hour:'numeric',minute:'2-digit'}))+'</span> '+game.sport+' <span style="color:var(--t1)">'+game.t1+' vs '+game.t2+'</span> · <span style="color:'+c+';font-weight:700">'+betType+'</span> · '+book+' → <span style="color:var(--green);font-weight:700">+$'+profit+'</span>';
+    ticker.insertBefore(line,ticker.firstChild);
+    requestAnimationFrame(()=>{line.style.opacity='1';line.style.transform='translateY(0)'});
+    
+    // Keep only 8 lines
+    while(ticker.children.length>8)ticker.removeChild(ticker.lastChild);
+    
+    // Update running total
+    const totalLine=document.getElementById('simRunningTotal');
+    if(totalLine){totalLine.innerHTML='<span style="color:var(--t3)">'+betCount+' bets</span> · <span style="font-weight:800;color:var(--green)">Total: +$'+totalProfit.toLocaleString()+'</span>'}
+  }
+  
+  // Add running total line
+  const totalDiv=document.createElement('div');
+  totalDiv.id='simRunningTotal';
+  totalDiv.style.cssText='text-align:center;padding:6px;font-size:11px;margin-top:4px';
+  ticker.after(totalDiv);
+  // Remove any old total
+  const existing=document.querySelectorAll('#simRunningTotal');
+  if(existing.length>1)existing[0].remove();
+  
+  // Fire first bet immediately, then every 2 seconds
+  addBet();
+  simInterval=setInterval(addBet,2000);
+}
+
+// Start with basic
+runSim('basic');
 
 async function submitSignup(){
   const name=document.getElementById('sName').value.trim(),email=document.getElementById('sEmail').value.trim().toLowerCase(),phone=document.getElementById('sPhone').value.trim(),discord=document.getElementById('sDiscord').value.trim();
