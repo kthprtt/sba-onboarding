@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Join SBA Genius</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--bg:#0a0b10;--card:#12141c;--border:#252839;--gold:#d4a843;--green:#00e676;--red:#ff4466;--t1:#e8e6e0;--t2:#8b8d9e;--t3:#6b7086;}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--t1);font-family:'Outfit',sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;position:relative;overflow-x:hidden}
+body::before{content:'';position:fixed;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle at 30% 40%,rgba(212,168,67,0.03),transparent 50%),radial-gradient(circle at 70% 60%,rgba(0,230,118,0.02),transparent 50%);animation:drift 20s ease-in-out infinite alternate;pointer-events:none}
+@keyframes drift{0%{transform:translate(0,0)}100%{transform:translate(-3%,2%)}}
+
+.container{width:100%;max-width:480px;position:relative;z-index:1}
+.logo{text-align:center;margin-bottom:24px}
+.logo h1{font-size:28px;font-weight:900;letter-spacing:-0.5px}
+.logo h1 span{color:var(--gold)}
+.logo p{font-size:13px;color:var(--t2);margin-top:4px}
+.referrer-bar{text-align:center;padding:8px 16px;background:rgba(212,168,67,0.06);border:1px solid rgba(212,168,67,0.12);border-radius:8px;margin-bottom:16px;font-size:12px;color:var(--gold);display:none}
+.referrer-bar strong{font-weight:800}
+
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:28px;margin-bottom:16px}
+.card h2{font-size:18px;font-weight:800;margin-bottom:16px}
+
+.form-group{margin-bottom:12px}
+.form-label{font-size:11px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px}
+.form-input,.form-select{width:100%;padding:10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--t1);font-family:'Outfit';font-size:13px;outline:none;transition:border-color 0.2s}
+.form-input:focus,.form-select:focus{border-color:var(--gold)}
+.form-select option{background:var(--bg);color:var(--t1)}
+
+.type-toggle{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
+.type-btn{padding:14px;text-align:center;border-radius:10px;cursor:pointer;border:2px solid var(--border);background:var(--bg);transition:all 0.2s;font-weight:700;font-size:13px}
+.type-btn:hover{border-color:var(--gold)}
+.type-btn.active{border-color:var(--gold);background:rgba(212,168,67,0.06)}
+.type-btn .emoji{font-size:24px;display:block;margin-bottom:4px}
+.type-btn .sub{font-size:10px;color:var(--t3);font-weight:400;margin-top:2px}
+
+.pkg-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
+.pkg-card{padding:12px;text-align:center;border-radius:10px;cursor:pointer;border:2px solid var(--border);background:var(--bg);transition:all 0.2s}
+.pkg-card:hover{border-color:var(--green)}
+.pkg-card.active{border-color:var(--green);background:rgba(0,230,118,0.04)}
+.pkg-card .price{font-size:20px;font-weight:900;margin:4px 0}
+.pkg-card .name{font-size:12px;font-weight:700}
+.pkg-card .sub{font-size:9px;color:var(--t3)}
+.pkg-card.promo{border-color:rgba(245,158,11,0.3)}
+.pkg-card.promo.active{border-color:#f59e0b;background:rgba(245,158,11,0.06)}
+
+.vpn-toggle{padding:12px;border-radius:10px;border:2px solid var(--border);background:var(--bg);cursor:pointer;display:flex;align-items:center;gap:10px;margin-bottom:16px;transition:all 0.2s}
+.vpn-toggle:hover{border-color:rgba(139,92,246,0.3)}
+.vpn-toggle.active{border-color:rgba(139,92,246,0.5);background:rgba(139,92,246,0.04)}
+.vpn-check{width:20px;height:20px;border-radius:5px;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:12px;transition:all 0.2s}
+.vpn-toggle.active .vpn-check{border-color:rgba(139,92,246,0.5);background:rgba(139,92,246,0.2);color:#b388ff}
+
+.btn{width:100%;padding:14px;border:none;border-radius:10px;font-family:'Outfit';font-size:15px;font-weight:800;cursor:pointer;transition:all 0.2s;text-transform:uppercase;letter-spacing:1px}
+.btn-gold{background:linear-gradient(135deg,var(--gold),#b8942e);color:#000}
+.btn-gold:hover{transform:translateY(-1px);box-shadow:0 4px 20px rgba(212,168,67,0.3)}
+.btn-gold:disabled{opacity:0.5;transform:none;cursor:not-allowed}
+
+.btn-green{background:linear-gradient(135deg,var(--green),#00c853);color:#000}
+.btn-green:hover{transform:translateY(-1px);box-shadow:0 4px 20px rgba(0,230,118,0.3)}
+
+.success-card{display:none;text-align:center;padding:40px 20px}
+.success-card .check{font-size:60px;margin-bottom:12px}
+.success-card h2{font-size:22px;font-weight:900;margin-bottom:8px}
+.success-card p{font-size:13px;color:var(--t2);line-height:1.6}
+.success-card .creds{margin-top:16px;padding:16px;background:var(--bg);border-radius:10px;text-align:left;font-family:'JetBrains Mono';font-size:12px;line-height:2}
+
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);padding:10px 20px;background:var(--card);border:1px solid var(--border);border-radius:8px;font-size:12px;font-weight:700;z-index:9999;opacity:0;transition:opacity 0.3s}
+.toast.show{opacity:1}
+
+.payment-note{padding:10px;background:rgba(212,168,67,0.04);border:1px solid rgba(212,168,67,0.1);border-radius:8px;font-size:11px;color:var(--t2);line-height:1.6;margin-bottom:16px}
+
+@media(max-width:480px){.container{padding:0}.card{padding:20px;border-radius:12px}.pkg-grid{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="logo">
+    <h1>SBA <span>GENIUS</span></h1>
+    <p>Sports Bet Arbitrage — Join the Movement</p>
+  </div>
+  
+  <div class="referrer-bar" id="referrerBar">
+    Invited by <strong id="referrerName">—</strong>
+  </div>
+  
+  <!-- SIGNUP FORM -->
+  <div id="signupForm">
+    <div class="card">
+      <h2>Create Your Account</h2>
+      
+      <div class="form-group">
+        <div class="form-label">Full Name *</div>
+        <input class="form-input" id="sName" placeholder="John Smith">
+      </div>
+      <div class="form-group">
+        <div class="form-label">Email *</div>
+        <input class="form-input" id="sEmail" type="email" placeholder="john@email.com">
+      </div>
+      <div class="form-group">
+        <div class="form-label">Phone</div>
+        <input class="form-input" id="sPhone" placeholder="(555) 123-4567">
+      </div>
+      <div class="form-group">
+        <div class="form-label">Discord Username</div>
+        <input class="form-input" id="sDiscord" placeholder="john#1234">
+      </div>
+    </div>
+    
+    <div class="card">
+      <h2>How do you want to join?</h2>
+      
+      <div class="type-toggle">
+        <div class="type-btn active" id="typePaid" onclick="setType('paid')">
+          <span class="emoji">💎</span>
+          Get Access
+          <div class="sub">Buy a package & start betting</div>
+        </div>
+        <div class="type-btn" id="typeFree" onclick="setType('free')">
+          <span class="emoji">🆓</span>
+          Free Affiliate
+          <div class="sub">Build a team & earn first</div>
+        </div>
+      </div>
+      
+      <!-- PAID OPTIONS -->
+      <div id="paidSection">
+        <div class="form-label" style="margin-bottom:8px;">Choose Your Package</div>
+        <div class="pkg-grid">
+          <div class="pkg-card promo active" id="pkgPromo" onclick="setPkg('promo')">
+            <div class="name">🔥 LAUNCH SPECIAL</div>
+            <div class="price">$1K</div>
+            <div class="sub">$3K value (Plus + VPN)</div>
+          </div>
+          <div class="pkg-card" id="pkgBasic" onclick="setPkg('basic')">
+            <div class="name">Basic</div>
+            <div class="price">$1K</div>
+            <div class="sub">Sure Bets</div>
+          </div>
+          <div class="pkg-card" id="pkgPlus" onclick="setPkg('plus')">
+            <div class="name">Plus</div>
+            <div class="price">$2K</div>
+            <div class="sub">+ Value Bets</div>
+          </div>
+          <div class="pkg-card" id="pkgElite" onclick="setPkg('elite')">
+            <div class="name">Elite</div>
+            <div class="price">$5K</div>
+            <div class="sub">+ Double Value</div>
+          </div>
+          <div class="pkg-card" id="pkgPro" onclick="setPkg('pro')">
+            <div class="name">Pro</div>
+            <div class="price">$10K</div>
+            <div class="sub">Everything + War Room</div>
+          </div>
+        </div>
+        
+        <div class="vpn-toggle" id="vpnToggle" onclick="toggleVPN()">
+          <div class="vpn-check" id="vpnCheck"></div>
+          <div>
+            <div style="font-weight:700;font-size:13px;">🔒 Add VPN — <span style="color:var(--green);">FREE thru Apr 7</span></div>
+            <div style="font-size:10px;color:var(--t3);">Access 20+ offshore sportsbooks (normally $1K)</div>
+          </div>
+        </div>
+        
+        <div class="payment-note">
+          💰 <strong>Payment:</strong> After signing up, your team leader will reach out to arrange payment via CashApp, Zelle, PayPal, or crypto. Your account activates once payment is confirmed.
+        </div>
+      </div>
+      
+      <!-- FREE SECTION -->
+      <div id="freeSection" style="display:none;">
+        <div style="padding:16px;background:rgba(212,168,67,0.04);border:1px solid rgba(212,168,67,0.1);border-radius:10px;font-size:12px;color:var(--t2);line-height:1.8;">
+          <div style="font-size:14px;font-weight:800;color:var(--gold);margin-bottom:6px;">🆓 Free Affiliate Account</div>
+          ✅ Get your referral link immediately<br>
+          ✅ Access the AI Closer tools<br>
+          ✅ Earn commissions on every signup<br>
+          ✅ Track your team in real-time<br>
+          ❌ No Genius betting access (upgrade anytime)<br>
+          ❌ No VPN access
+        </div>
+      </div>
+    </div>
+    
+    <button class="btn btn-gold" id="submitBtn" onclick="submitSignup()">🚀 Join SBA Genius</button>
+  </div>
+  
+  <!-- SUCCESS -->
+  <div class="success-card card" id="successCard">
+    <div class="check">✅</div>
+    <h2>Welcome to SBA Genius!</h2>
+    <p id="successMsg">Your application has been submitted. Your team leader will confirm your payment and activate your account.</p>
+    <div class="creds" id="successCreds" style="display:none;">
+      <div><strong>📧 Email:</strong> <span id="credEmail"></span></div>
+      <div><strong>🔑 Password:</strong> <span id="credPass"></span></div>
+      <div><strong>🔗 Your Referral Link:</strong> <span id="credRef"></span></div>
+      <div><strong>💬 Discord:</strong> <a href="https://discord.gg/hZXxJMgHb3" style="color:var(--gold);">Join Here</a></div>
+    </div>
+    <button class="btn btn-green" style="margin-top:16px;" onclick="window.location.href='https://affiliate.sportsbetarbitrage.com'">Open SBA Bookie Portal →</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const sb = supabase.createClient(
+  'https://anjlmooskwvjystmrhxr.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFuamxtb29za3d2anlzdG1yaHhyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU0NjYzNTUsImV4cCI6MjA4MTA0MjM1NX0.DVLjp9PzNIPNSp2HAGtKTaPVfKy3QLs4HTJsy96UsyM',
+  {auth:{storage:{getItem:()=>null,setItem:()=>{},removeItem:()=>{}},autoRefreshToken:false,persistSession:false,detectSessionInUrl:false}}
+);
+
+let joinType = 'paid';
+let selectedPkg = 'promo';
+let vpnSelected = true;
+let referrerCode = null;
+let referrerMember = null;
+
+// Get referral code from URL
+const params = new URLSearchParams(window.location.search);
+referrerCode = params.get('ref') || null;
+
+async function init(){
+  if(referrerCode){
+    const{data}=await sb.from('onboarding_members').select('name,referral_code').eq('referral_code',referrerCode).single();
+    if(data){
+      referrerMember = data;
+      document.getElementById('referrerBar').style.display='block';
+      document.getElementById('referrerName').textContent=data.name;
+    }
+  }
+  // Default VPN on
+  document.getElementById('vpnToggle').classList.add('active');
+  document.getElementById('vpnCheck').textContent='✓';
+}
+init();
+
+function setType(type){
+  joinType=type;
+  document.getElementById('typePaid').classList.toggle('active',type==='paid');
+  document.getElementById('typeFree').classList.toggle('active',type==='free');
+  document.getElementById('paidSection').style.display=type==='paid'?'block':'none';
+  document.getElementById('freeSection').style.display=type==='free'?'block':'none';
+  document.getElementById('submitBtn').textContent=type==='paid'?'🚀 Join SBA Genius':'🆓 Create Free Account';
+}
+
+function setPkg(pkg){
+  selectedPkg=pkg;
+  document.querySelectorAll('.pkg-card').forEach(c=>c.classList.remove('active'));
+  document.getElementById('pkg'+pkg.charAt(0).toUpperCase()+pkg.slice(1))?.classList.add('active');
+  if(pkg==='promo') document.getElementById('pkgPromo').classList.add('active');
+}
+
+function toggleVPN(){
+  vpnSelected=!vpnSelected;
+  document.getElementById('vpnToggle').classList.toggle('active',vpnSelected);
+  document.getElementById('vpnCheck').textContent=vpnSelected?'✓':'';
+}
+
+function toast(msg){
+  const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+async function submitSignup(){
+  const name=document.getElementById('sName').value.trim();
+  const email=document.getElementById('sEmail').value.trim().toLowerCase();
+  const phone=document.getElementById('sPhone').value.trim();
+  const discord=document.getElementById('sDiscord').value.trim();
+  
+  if(!name||!email){toast('⚠️ Name and email required');return;}
+  if(!email.includes('@')){toast('⚠️ Enter a valid email');return;}
+  
+  // Check duplicate email
+  const{data:existing}=await sb.from('onboarding_members').select('id').eq('email',email).single();
+  if(existing){toast('⚠️ This email is already registered');return;}
+  
+  const btn=document.getElementById('submitBtn');
+  btn.disabled=true;btn.textContent='Creating account...';
+  
+  const firstName=name.split(' ')[0].toLowerCase().replace(/[^a-z]/g,'');
+  const refCode=firstName+Math.floor(1000+Math.random()*9000);
+  const chars='ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
+  let password='SBA-';for(let i=0;i<8;i++)password+=chars[Math.floor(Math.random()*chars.length)];
+  
+  const pkgMap={promo:'plus',basic:'basic',plus:'plus',elite:'elite',pro:'pro'};
+  const amtMap={promo:1000,basic:1000,plus:2000,elite:5000,pro:10000};
+  
+  const isFreeMember = joinType==='free';
+  const dbPkg = isFreeMember ? 'none' : (pkgMap[selectedPkg]||'basic');
+  const amount = isFreeMember ? 0 : (amtMap[selectedPkg]||1000);
+  const vpn = isFreeMember ? false : vpnSelected;
+  
+  // Check for phantom conversion
+  const{data:phantom}=await sb.from('onboarding_members').select('*').eq('member_type','phantom').ilike('name',name).single();
+  
+  const member={
+    name,email,phone:phone||'',discord:discord||'',
+    pkg:dbPkg,
+    paid_pkg:selectedPkg==='promo'?'plus':null,
+    package_amount:amount,
+    vpn,vpn_status:vpn?'pending':null,
+    payment:isFreeMember?'affiliate':'pending_payment',
+    member_type:isFreeMember?'affiliate_only':'active',
+    affiliate_type:'standard',
+    commission_status:isFreeMember?'held':'pending',
+    status:isFreeMember?'active':'pending_payment',
+    step_progress:1,
+    password,password_changed:false,
+    tos_accepted:false,checklist:'{}',upgrade_requests:'[]',
+    cycle_start:'2026-03-26T21:00:00-04:00',
+    cycle_end:'2026-05-04T21:00:00-04:00',
+    affiliate_rank:'starter',
+    total_referrals:0,held_commissions:0,
+    genius_access:!isFreeMember,
+    cycle_number:1,
+    promo_code:selectedPkg==='promo'?'LAUNCH-SPECIAL':null,
+    promo_value:selectedPkg==='promo'?3000:0
+  };
+  
+  // Set referrer
+  if(referrerCode) member.referred_by_code=referrerCode;
+  
+  let result, error;
+  
+  if(phantom){
+    // Convert phantom
+    member.referral_code=phantom.referral_code;
+    if(!member.referred_by_code) member.referred_by_code=phantom.referred_by_code;
+    const resp=await sb.from('onboarding_members').update(member).eq('id',phantom.id).select();
+    result=resp.data;error=resp.error;
+  } else {
+    member.referral_code=refCode;
+    const resp=await sb.from('onboarding_members').insert([member]).select();
+    result=resp.data;error=resp.error;
+  }
+  
+  if(error){
+    toast('❌ '+error.message);
+    btn.disabled=false;btn.textContent='🚀 Join SBA Genius';
+    return;
+  }
+  
+  // Show success
+  document.getElementById('signupForm').style.display='none';
+  document.getElementById('successCard').style.display='block';
+  
+  if(isFreeMember){
+    document.getElementById('successMsg').textContent='Your free affiliate account is ready! Log in to start building your team and earning commissions.';
+    document.getElementById('successCreds').style.display='block';
+    document.getElementById('credEmail').textContent=email;
+    document.getElementById('credPass').textContent=password;
+    document.getElementById('credRef').textContent='sportsbetarbitrage.com/?ref='+member.referral_code;
+  } else {
+    document.getElementById('successMsg').innerHTML='Your application has been submitted!<br><br>Your team leader will reach out to confirm payment. Once confirmed, you\'ll receive a welcome email with your login credentials and getting started guide.<br><br>💬 <a href="https://discord.gg/hZXxJMgHb3" style="color:var(--gold);">Join our Discord</a> in the meantime!';
+  }
+}
+</script>
+</body>
+</html>
