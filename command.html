@@ -515,16 +515,20 @@ body{background:var(--bg);color:var(--t1);font-family:'Outfit',sans-serif;min-he
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
         <h1 style="font-size:22px;font-weight:900;">👥 All People</h1>
         <div style="display:flex;gap:6px;">
-          <button onclick="document.getElementById('treeViewSection').style.display=document.getElementById('treeViewSection').style.display==='none'?'block':'none'" style="padding:4px 10px;background:rgba(139,92,246,0.1);border:1px solid rgba(139,92,246,0.2);border-radius:6px;color:var(--purple);font-size:10px;font-weight:700;cursor:pointer;">🌳 Tree View</button>
+          <button onclick="const s=document.getElementById('treeViewSection');s.style.display=s.style.display==='none'?'block':'none'" style="padding:4px 10px;background:rgba(139,92,246,0.1);border:1px solid rgba(139,92,246,0.2);border-radius:6px;color:var(--purple);font-size:10px;font-weight:700;cursor:pointer;">🌳 Toggle Tree</button>
         </div>
       </div>
       <div style="font-size:13px;color:var(--t2);margin-bottom:20px;">Everyone in the system — active, holding tank, and pending. SBA HQ handles placements.</div>
       
-      <!-- Tree View (toggle) -->
-      <div id="treeViewSection" class="card" style="display:none;border-color:rgba(139,92,246,0.2);margin-bottom:12px;">
-        <h3 style="color:var(--purple);margin-bottom:8px;">🌳 Organization Tree</h3>
-        <div style="font-size:10px;color:var(--t3);margin-bottom:12px;">Full hierarchy — who's under who. Click the toggle above to show/hide.</div>
-        <div id="orgTree" style="font-family:'JetBrains Mono';font-size:11px;line-height:2;"></div>
+      <!-- Tree View -->
+      <div id="treeViewSection" class="card" style="border-color:rgba(139,92,246,0.2);margin-bottom:12px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <h3 style="color:var(--purple);">🌳 Organization Tree</h3>
+          <button onclick="document.getElementById('treeViewSection').style.display='none'" style="padding:2px 8px;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:4px;color:var(--t3);font-size:10px;cursor:pointer;">Hide</button>
+        </div>
+        <div style="font-size:10px;color:var(--t3);margin-bottom:10px;">Full hierarchy — who's under who. Shows ✅ Active · 🆓 Free Affiliate · ⏳ Phantom · 👴 Legacy</div>
+        <input id="treeSearch" class="form-input" placeholder="🔍 Search tree..." style="font-size:11px;margin-bottom:8px;" oninput="filterTree(this.value)">
+        <div id="orgTree" style="font-family:'JetBrains Mono';font-size:11px;line-height:2;max-height:500px;overflow-y:auto;"></div>
       </div>
       
       <!-- Pending Move Suggestions -->
@@ -1691,6 +1695,11 @@ function renderOrgTree(){
     return members.filter(m=>m.referred_by_code===refCode && !m.is_core_team);
   }
   
+  function countAll(refCode){
+    const kids = getChildren(refCode);
+    return kids.length + kids.reduce((s,k)=>s+countAll(k.referral_code),0);
+  }
+  
   function buildNode(m, depth, isLast, prefix){
     const connector = depth===0 ? '' : (isLast ? '└── ' : '├── ');
     const childPrefix = depth===0 ? '' : (isLast ? '    ' : '│   ');
@@ -1699,8 +1708,11 @@ function renderOrgTree(){
     const badgeColor = type==='phantom'?'var(--orange)':type==='affiliate_only'?'var(--gold)':type==='legacy'?'var(--purple)':'var(--green)';
     const pkg = m.pkg && m.pkg!=='none' ? ' <span style="padding:1px 5px;border-radius:3px;font-size:8px;font-weight:700;background:rgba(0,255,136,0.08);color:var(--green);">'+m.pkg.toUpperCase()+'</span>' : '';
     const vpnB = m.vpn ? ' <span style="padding:1px 5px;border-radius:3px;font-size:8px;font-weight:700;background:rgba(139,92,246,0.08);color:var(--purple);">VPN</span>' : '';
+    const childCount = countAll(m.referral_code);
+    const countBadge = childCount > 0 ? ' <span style="font-size:8px;color:var(--t3);">('+childCount+' below)</span>' : '';
+    const affType = m.affiliate_type && m.affiliate_type!=='standard' ? ' <span style="padding:1px 5px;border-radius:3px;font-size:7px;font-weight:700;background:rgba(212,168,67,0.08);color:var(--gold);">'+m.affiliate_type.toUpperCase()+'</span>' : '';
     
-    let html = '<div style="white-space:nowrap;"><span style="color:var(--t3);">'+prefix+connector+'</span><span style="color:'+badgeColor+';">'+badge+'</span> <span style="font-weight:700;color:var(--t1);">'+m.name+'</span>'+pkg+vpnB+'</div>';
+    let html = '<div class="tree-node-item" data-name="'+(m.name||'').toLowerCase()+'" style="white-space:nowrap;"><span style="color:var(--t3);">'+prefix+connector+'</span><span style="color:'+badgeColor+';">'+badge+'</span> <span style="font-weight:700;color:var(--t1);">'+m.name+'</span>'+pkg+vpnB+affType+countBadge+'</div>';
     
     const children = getChildren(m.referral_code);
     children.forEach((child, i)=>{
@@ -1738,6 +1750,16 @@ function renderOrgTree(){
   
   if(!html) html = '<div style="color:var(--t3);text-align:center;padding:20px;">No members in the tree yet</div>';
   el.innerHTML = '<div style="overflow-x:auto;padding:8px;">'+html+'</div>';
+}
+
+function filterTree(q){
+  const items = document.querySelectorAll('.tree-node-item');
+  const query = q.toLowerCase().trim();
+  if(!query){items.forEach(i=>i.style.display='');return;}
+  items.forEach(i=>{
+    const name = i.getAttribute('data-name')||'';
+    i.style.display = name.includes(query) ? '' : 'none';
+  });
 }
 
 async function editMemberEmail(id){
