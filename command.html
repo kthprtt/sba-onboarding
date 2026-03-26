@@ -178,7 +178,7 @@ body{background:var(--bg);color:var(--t1);font-family:'Outfit',sans-serif;min-he
 <div class="login-screen" id="loginScreen">
   <div class="login-card">
     <div class="login-logo">SBA</div>
-    <h1>Command Center <span style="margin-left:8px;padding:2px 8px;background:rgba(0,255,136,0.08);border:1px solid rgba(0,255,136,0.2);border-radius:10px;font-family:JetBrains Mono;font-size:9px;color:#00ff88;font-weight:700;letter-spacing:1px;">v57</span></h1>
+    <h1>Command Center <span style="margin-left:8px;padding:2px 8px;background:rgba(0,255,136,0.08);border:1px solid rgba(0,255,136,0.2);border-radius:10px;font-family:JetBrains Mono;font-size:9px;color:#00ff88;font-weight:700;letter-spacing:1px;">v58</span></h1>
     <div class="sub">SBA Leadership Portal — Onboarding & Code Management</div>
     <input type="text" id="loginUser" placeholder="Username" style="width:100%;padding:14px;background:var(--card);border:1px solid var(--border);border-radius:10px;color:var(--t1);font-family:Outfit;font-size:15px;margin-bottom:10px;outline:none;" onkeypress="if(event.key==='Enter')document.getElementById('loginPass').focus()">
     <div style="position:relative;margin-bottom:12px;">
@@ -463,6 +463,10 @@ body{background:var(--bg);color:var(--t1);font-family:'Outfit',sans-serif;min-he
             <select class="form-select" id="obType" onchange="if(this.value==='affiliate_only'){document.getElementById('obPkg').value='none';document.getElementById('obCode').parentElement.style.opacity='0.3';document.getElementById('obVPN').value='no';document.getElementById('obVPNCode').parentElement.style.display='none';document.getElementById('obPay').value='affiliate';}else{document.getElementById('obCode').parentElement.style.opacity='1';}"><option value="active">Active — Paid</option><option value="affiliate_only">Affiliate Only — Free</option><option value="legacy">Legacy — Already Paid Out</option></select>
           </div>
           <div class="form-group">
+            <div class="form-label">Affiliate Tier <span style="font-size:9px;color:var(--t3);">(commission %)</span></div>
+            <select class="form-select" id="obAffType"><option value="standard">Standard (20% L1)</option><option value="grandfathered">Grandfathered (25% L1)</option><option value="ambassador">Builder/Ambassador (30% L1)</option></select>
+          </div>
+          <div class="form-group">
             <div class="form-label">VPN Add-On</div>
             <select class="form-select" id="obVPN" onchange="document.getElementById('obVPNCode').parentElement.style.display=(this.value==='yes'||this.value==='free'||this.value==='incentive')?'flex':'none';document.getElementById('vpnIncentiveNote').style.display=this.value==='incentive'?'block':'none'"><option value="no">No VPN</option><option value="free" style="color:#22c55e;">VPN — FREE (Launch Promo thru Apr 7)</option><option value="yes">VPN — Paid $1K</option><option value="incentive" style="color:#d4a843;">VPN — FREE Incentive (no commission)</option></select>
             <div id="vpnIncentiveNote" style="display:none;margin-top:4px;padding:6px 8px;background:rgba(212,168,67,0.06);border:1px solid rgba(212,168,67,0.12);border-radius:6px;font-size:10px;color:var(--gold);">⭐ VPN given as incentive — they get access but no $1K added to commissions.</div>
@@ -731,6 +735,7 @@ function clearOnboardForm(){
   const pay=document.getElementById('obPay');if(pay)pay.value='paid';
   const typ=document.getElementById('obType');if(typ)typ.value='active';
   const pp=document.getElementById('obPaidPkg');if(pp)pp.value='';
+  const at=document.getElementById('obAffType');if(at)at.value='standard';
   const inn=document.getElementById('incentiveNote');if(inn)inn.style.display='none';
   const search=document.getElementById('obRefSearch');if(search)search.value='';
   document.getElementById('obCode')?.parentElement&&(document.getElementById('obCode').parentElement.style.opacity='1');
@@ -1329,7 +1334,7 @@ async function onboardMember(){
     tos_accepted:false,checklist:{},upgrade_requests:[],
     cycle_start:now.toISOString(),
     cycle_end:type==='legacy'?null:cycleEnd.toISOString(),
-    affiliate_rank:'starter',affiliate_type:'standard',
+    affiliate_rank:'starter',affiliate_type:document.getElementById('obAffType')?.value||'standard',
     total_referrals:0,held_commissions:0,genius_access:type!=="affiliate_only",cycle_number:1,
     activation_code:code||null,vpn_activation_code:vpnCode||null,
     pending_upline:document.getElementById('obPendingUpline')?.value?.trim()||null
@@ -1628,7 +1633,7 @@ function renderPeople(){
     tank.forEach(m=>{
       const status = m.member_type==='affiliate_only'?{l:'FREE',c:'var(--gold)'}:{l:m.pkg?.toUpperCase()||'ACTIVE',c:'var(--green)'};
       const hasSuggestion = m.pending_upline && m.pending_upline.trim();
-      html+='<div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--bg);border:1px solid rgba(59,130,246,0.1);border-radius:6px;margin-bottom:3px;"><span style="font-size:13px;font-weight:700;flex:1;">'+m.name+'</span><span style="font-size:10px;color:var(--t3);">'+m.email+'</span><span style="padding:2px 8px;border-radius:4px;font-size:9px;font-weight:700;background:'+status.c+'22;color:'+status.c+';">'+status.l+'</span>'+(hasSuggestion?'<span style="font-size:8px;color:var(--purple);">📍 suggested</span>':'<button onclick="suggestPlacement(\''+m.id+'\')" style="padding:3px 8px;background:rgba(139,92,246,0.1);border:1px solid rgba(139,92,246,0.2);border-radius:4px;color:var(--purple);font-size:8px;font-weight:700;cursor:pointer;">📍 Place</button>')+'</div>';
+      html+='<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--bg);border:1px solid rgba(59,130,246,0.1);border-radius:6px;margin-bottom:3px;flex-wrap:wrap;"><span style="font-size:13px;font-weight:700;flex:1;min-width:100px;">'+m.name+'</span><span style="font-size:10px;color:var(--t3);">'+m.email+'</span><span style="padding:2px 8px;border-radius:4px;font-size:9px;font-weight:700;background:'+status.c+'22;color:'+status.c+';">'+status.l+'</span>'+(hasSuggestion?'<span style="font-size:8px;color:var(--purple);">📍 suggested</span>':'<button onclick="suggestPlacement(\''+m.id+'\')" style="padding:3px 8px;background:rgba(139,92,246,0.1);border:1px solid rgba(139,92,246,0.2);border-radius:4px;color:var(--purple);font-size:8px;font-weight:700;cursor:pointer;">📍 Place</button>')+'<button onclick="editMemberEmail(\''+m.id+'\')" style="padding:2px 6px;background:rgba(68,136,255,0.1);border:1px solid rgba(68,136,255,0.15);border-radius:4px;color:var(--blue);font-size:8px;font-weight:700;cursor:pointer;">✏️</button><button onclick="resendWelcome(\''+m.id+'\')" style="padding:2px 6px;background:rgba(0,230,118,0.1);border:1px solid rgba(0,230,118,0.15);border-radius:4px;color:var(--green);font-size:8px;font-weight:700;cursor:pointer;">📨</button></div>';
     });
     document.getElementById('tankList').innerHTML=html;
   } else {
