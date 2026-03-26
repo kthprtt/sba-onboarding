@@ -178,7 +178,7 @@ body{background:var(--bg);color:var(--t1);font-family:'Outfit',sans-serif;min-he
 <div class="login-screen" id="loginScreen">
   <div class="login-card">
     <div class="login-logo">SBA</div>
-    <h1>Command Center <span style="margin-left:8px;padding:2px 8px;background:rgba(0,255,136,0.08);border:1px solid rgba(0,255,136,0.2);border-radius:10px;font-family:JetBrains Mono;font-size:9px;color:#00ff88;font-weight:700;letter-spacing:1px;">v65</span></h1>
+    <h1>Command Center <span style="margin-left:8px;padding:2px 8px;background:rgba(0,255,136,0.08);border:1px solid rgba(0,255,136,0.2);border-radius:10px;font-family:JetBrains Mono;font-size:9px;color:#00ff88;font-weight:700;letter-spacing:1px;">v66</span></h1>
     <div class="sub">SBA Leadership Portal — Onboarding & Code Management</div>
     <input type="text" id="loginUser" placeholder="Username" style="width:100%;padding:14px;background:var(--card);border:1px solid var(--border);border-radius:10px;color:var(--t1);font-family:Outfit;font-size:15px;margin-bottom:10px;outline:none;" onkeypress="if(event.key==='Enter')document.getElementById('loginPass').focus()">
     <div style="position:relative;margin-bottom:12px;">
@@ -967,7 +967,41 @@ async function markSentToHQ(){
 
 
 async function createPhantom(){
-  // Stub — createPhantom logic is handled inline via onclick in the onboard form
+  const nameEl = document.getElementById('obPendingUpline');
+  const name = nameEl?.value?.trim();
+  if(!name){showToast('⚠️ Enter a name first');return;}
+  
+  // Check for duplicates
+  const existing = members.find(m=>m.name?.toLowerCase()===name.toLowerCase());
+  if(existing){showToast('⚠️ "'+name+'" already exists in the system');return;}
+  
+  const firstName = name.split(' ')[0].toLowerCase().replace(/[^a-z]/g,'');
+  const refCode = 'pending_'+firstName+Math.floor(1000+Math.random()*9000);
+  const leaderMember = members.find(m=>(m.referral_code||'').startsWith(leader)||(m.name||'').toLowerCase().includes(leader)) || members.find(m=>m.is_core_team&&(m.referral_code||'').startsWith(leader));
+  
+  const{error}=await sb.from('onboarding_members').insert([{
+    name: name,
+    email: 'pending_'+firstName+Math.floor(100+Math.random()*900)+'@placeholder.sba',
+    phone: '',
+    discord: '',
+    member_type: 'phantom',
+    affiliate_type: 'standard',
+    commission_status: 'phantom',
+    referral_code: refCode,
+    referred_by_code: leaderMember?.referral_code || null,
+    pkg: 'none',
+    package_amount: 0,
+    payment: 'none',
+    status: 'phantom',
+    password: 'PENDING',
+    total_referrals: 0
+  }]);
+  
+  if(error){showToast('❌ '+error.message);return;}
+  
+  nameEl.value='';
+  showToast('⏳ Phantom "'+name+'" created! They appear in the referrer dropdown now.');
+  await loadAll();
 }
 
 async function batchCreatePhantoms(){
