@@ -178,7 +178,7 @@ body{background:var(--bg);color:var(--t1);font-family:'Outfit',sans-serif;min-he
 <div class="login-screen" id="loginScreen">
   <div class="login-card">
     <div class="login-logo">SBA</div>
-    <h1>Command Center <span style="margin-left:8px;padding:2px 8px;background:rgba(0,255,136,0.08);border:1px solid rgba(0,255,136,0.2);border-radius:10px;font-family:JetBrains Mono;font-size:9px;color:#00ff88;font-weight:700;letter-spacing:1px;">v62</span></h1>
+    <h1>Command Center <span style="margin-left:8px;padding:2px 8px;background:rgba(0,255,136,0.08);border:1px solid rgba(0,255,136,0.2);border-radius:10px;font-family:JetBrains Mono;font-size:9px;color:#00ff88;font-weight:700;letter-spacing:1px;">v63</span></h1>
     <div class="sub">SBA Leadership Portal — Onboarding & Code Management</div>
     <input type="text" id="loginUser" placeholder="Username" style="width:100%;padding:14px;background:var(--card);border:1px solid var(--border);border-radius:10px;color:var(--t1);font-family:Outfit;font-size:15px;margin-bottom:10px;outline:none;" onkeypress="if(event.key==='Enter')document.getElementById('loginPass').focus()">
     <div style="position:relative;margin-bottom:12px;">
@@ -1656,9 +1656,27 @@ function renderPeople(){
   if(tank.length){
     let html='';
     tank.forEach(m=>{
-      const status = m.member_type==='affiliate_only'?{l:'FREE',c:'var(--gold)'}:{l:m.pkg?.toUpperCase()||'ACTIVE',c:'var(--green)'};
+      const status = m.member_type==='affiliate_only'?{l:'FREE',c:'var(--gold)'}:m.member_type==='legacy'?{l:'LEGACY',c:'var(--purple)'}:{l:m.pkg?.toUpperCase()||'ACTIVE',c:'var(--green)'};
       const hasSuggestion = m.pending_upline && m.pending_upline.trim();
-      html+='<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--bg);border:1px solid rgba(59,130,246,0.1);border-radius:6px;margin-bottom:3px;flex-wrap:wrap;"><span style="font-size:13px;font-weight:700;flex:1;min-width:100px;">'+m.name+'</span><span style="font-size:10px;color:var(--t3);">'+m.email+'</span><span style="padding:2px 8px;border-radius:4px;font-size:9px;font-weight:700;background:'+status.c+'22;color:'+status.c+';">'+status.l+'</span>'+(hasSuggestion?'<span style="font-size:8px;color:var(--purple);">📍 suggested</span>':'<button onclick="suggestPlacement(\''+m.id+'\')" style="padding:3px 8px;background:rgba(139,92,246,0.1);border:1px solid rgba(139,92,246,0.2);border-radius:4px;color:var(--purple);font-size:8px;font-weight:700;cursor:pointer;">📍 Place</button>')+'<button onclick="editMemberEmail(\''+m.id+'\')" style="padding:2px 6px;background:rgba(68,136,255,0.1);border:1px solid rgba(68,136,255,0.15);border-radius:4px;color:var(--blue);font-size:8px;font-weight:700;cursor:pointer;">✏️</button><button onclick="resendWelcome(\''+m.id+'\')" style="padding:2px 6px;background:rgba(0,230,118,0.1);border:1px solid rgba(0,230,118,0.15);border-radius:4px;color:var(--green);font-size:8px;font-weight:700;cursor:pointer;">📨</button></div>';
+      const vpnBadge = m.vpn?'<span style="padding:1px 5px;border-radius:3px;font-size:8px;font-weight:700;background:rgba(139,92,246,0.08);color:var(--purple);">VPN</span>':'';
+      const payBadge = m.payment==='paid'?'<span style="font-size:8px;color:var(--green);">✅ Paid</span>':m.payment==='partial_collected'?'<span style="font-size:8px;color:var(--orange);">⚠️ Partial</span>':m.payment==='affiliate'?'':'<span style="font-size:8px;color:var(--red);">❌ Owed</span>';
+      html+='<div style="padding:10px;background:var(--bg);border:1px solid rgba(59,130,246,0.1);border-radius:8px;margin-bottom:4px;">';
+      html+='<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">';
+      html+='<span style="font-size:14px;font-weight:800;flex:1;min-width:120px;">'+m.name+'</span>';
+      html+='<span style="padding:2px 8px;border-radius:4px;font-size:9px;font-weight:700;background:'+status.c+'22;color:'+status.c+';">'+status.l+'</span>';
+      html+=vpnBadge+payBadge;
+      html+='</div>';
+      html+='<div style="display:flex;gap:12px;margin-top:4px;font-size:10px;color:var(--t3);flex-wrap:wrap;">';
+      html+='<span>📧 '+(m.email||'no email')+'</span>';
+      if(m.phone)html+='<span>📱 '+m.phone+'</span>';
+      if(m.discord)html+='<span>💬 '+m.discord+'</span>';
+      if(m.package_amount)html+='<span>💰 $'+m.package_amount.toLocaleString()+'</span>';
+      html+='</div>';
+      html+='<div style="display:flex;gap:4px;margin-top:6px;">';
+      html+=hasSuggestion?'<span style="padding:3px 8px;background:rgba(139,92,246,0.1);border-radius:4px;font-size:8px;font-weight:700;color:var(--purple);">📍 Placement suggested</span>':'<button onclick="suggestPlacement(\''+m.id+'\')" style="padding:3px 8px;background:rgba(139,92,246,0.1);border:1px solid rgba(139,92,246,0.2);border-radius:4px;color:var(--purple);font-size:8px;font-weight:700;cursor:pointer;">📍 Place</button>';
+      html+='<button onclick="editMemberEmail(\''+m.id+'\')" style="padding:2px 6px;background:rgba(68,136,255,0.1);border:1px solid rgba(68,136,255,0.15);border-radius:4px;color:var(--blue);font-size:8px;font-weight:700;cursor:pointer;">✏️ Email</button>';
+      html+='<button onclick="resendWelcome(\''+m.id+'\')" style="padding:2px 6px;background:rgba(0,230,118,0.1);border:1px solid rgba(0,230,118,0.15);border-radius:4px;color:var(--green);font-size:8px;font-weight:700;cursor:pointer;">📨 Resend</button>';
+      html+='</div></div>';
     });
     document.getElementById('tankList').innerHTML=html;
   } else {
