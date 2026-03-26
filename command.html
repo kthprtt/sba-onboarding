@@ -178,7 +178,7 @@ body{background:var(--bg);color:var(--t1);font-family:'Outfit',sans-serif;min-he
 <div class="login-screen" id="loginScreen">
   <div class="login-card">
     <div class="login-logo">SBA</div>
-    <h1>Command Center <span style="margin-left:8px;padding:2px 8px;background:rgba(0,255,136,0.08);border:1px solid rgba(0,255,136,0.2);border-radius:10px;font-family:JetBrains Mono;font-size:9px;color:#00ff88;font-weight:700;letter-spacing:1px;">v63</span></h1>
+    <h1>Command Center <span style="margin-left:8px;padding:2px 8px;background:rgba(0,255,136,0.08);border:1px solid rgba(0,255,136,0.2);border-radius:10px;font-family:JetBrains Mono;font-size:9px;color:#00ff88;font-weight:700;letter-spacing:1px;">v64</span></h1>
     <div class="sub">SBA Leadership Portal — Onboarding & Code Management</div>
     <input type="text" id="loginUser" placeholder="Username" style="width:100%;padding:14px;background:var(--card);border:1px solid var(--border);border-radius:10px;color:var(--t1);font-family:Outfit;font-size:15px;margin-bottom:10px;outline:none;" onkeypress="if(event.key==='Enter')document.getElementById('loginPass').focus()">
     <div style="position:relative;margin-bottom:12px;">
@@ -1687,9 +1687,23 @@ function renderPeople(){
   if(phantoms.length){
     let html='';
     phantoms.forEach(m=>{
-      const subs = members.filter(x=>x.referred_by_code===m.referral_code).length;
+      const subs = members.filter(x=>x.referred_by_code===m.referral_code);
+      const subsNames = subs.map(s=>s.name).join(', ');
+      const upline = m.referred_by_code ? members.find(x=>x.referral_code===m.referred_by_code) : null;
+      const upName = upline ? upline.name : 'Not placed';
       const hasSuggestion = m.pending_upline && m.pending_upline.trim();
-      html+='<div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--bg);border:2px dashed rgba(245,158,11,0.15);border-radius:6px;margin-bottom:3px;"><span style="font-size:13px;font-weight:700;color:var(--orange);flex:1;">⏳ '+m.name+'</span><span style="font-size:10px;color:var(--t3);">'+subs+' people under</span><span style="padding:2px 8px;border-radius:4px;font-size:9px;font-weight:700;background:rgba(245,158,11,0.1);color:var(--orange);">PENDING</span>'+(hasSuggestion?'<span style="font-size:8px;color:var(--purple);">📍 suggested</span>':'<button onclick="suggestPlacement(\''+m.id+'\')" style="padding:3px 8px;background:rgba(139,92,246,0.1);border:1px solid rgba(139,92,246,0.2);border-radius:4px;color:var(--purple);font-size:8px;font-weight:700;cursor:pointer;">📍 Place</button>')+'</div>';
+      html+='<div style="padding:10px;background:var(--bg);border:2px dashed rgba(245,158,11,0.15);border-radius:8px;margin-bottom:4px;">';
+      html+='<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">';
+      html+='<span style="font-size:14px;font-weight:800;color:var(--orange);flex:1;min-width:120px;">⏳ '+m.name+'</span>';
+      html+='<span style="padding:2px 8px;border-radius:4px;font-size:9px;font-weight:700;background:rgba(245,158,11,0.1);color:var(--orange);">PHANTOM</span>';
+      html+='</div>';
+      html+='<div style="font-size:10px;color:var(--t3);margin-top:4px;">';
+      html+='📍 Under: <span style="color:var(--t2);">'+upName+'</span>';
+      if(subs.length) html+=' · 👥 '+subs.length+' below: <span style="color:var(--t2);">'+subsNames+'</span>';
+      html+='</div>';
+      html+='<div style="display:flex;gap:4px;margin-top:6px;">';
+      html+=hasSuggestion?'<span style="padding:3px 8px;background:rgba(139,92,246,0.1);border-radius:4px;font-size:8px;font-weight:700;color:var(--purple);">📍 Placement suggested</span>':'<button onclick="suggestPlacement(\''+m.id+'\')" style="padding:3px 8px;background:rgba(139,92,246,0.1);border:1px solid rgba(139,92,246,0.2);border-radius:4px;color:var(--purple);font-size:8px;font-weight:700;cursor:pointer;">📍 Place</button>';
+      html+='</div></div>';
     });
     document.getElementById('phantomList').innerHTML=html;
   } else {
