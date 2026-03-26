@@ -178,7 +178,7 @@ body{background:var(--bg);color:var(--t1);font-family:'Outfit',sans-serif;min-he
 <div class="login-screen" id="loginScreen">
   <div class="login-card">
     <div class="login-logo">SBA</div>
-    <h1>Command Center <span style="margin-left:8px;padding:2px 8px;background:rgba(0,255,136,0.08);border:1px solid rgba(0,255,136,0.2);border-radius:10px;font-family:JetBrains Mono;font-size:9px;color:#00ff88;font-weight:700;letter-spacing:1px;">v64</span></h1>
+    <h1>Command Center <span style="margin-left:8px;padding:2px 8px;background:rgba(0,255,136,0.08);border:1px solid rgba(0,255,136,0.2);border-radius:10px;font-family:JetBrains Mono;font-size:9px;color:#00ff88;font-weight:700;letter-spacing:1px;">v65</span></h1>
     <div class="sub">SBA Leadership Portal — Onboarding & Code Management</div>
     <input type="text" id="loginUser" placeholder="Username" style="width:100%;padding:14px;background:var(--card);border:1px solid var(--border);border-radius:10px;color:var(--t1);font-family:Outfit;font-size:15px;margin-bottom:10px;outline:none;" onkeypress="if(event.key==='Enter')document.getElementById('loginPass').focus()">
     <div style="position:relative;margin-bottom:12px;">
@@ -1333,6 +1333,10 @@ async function onboardMember(){
   }
   
   btn.textContent='Saving member...';
+  
+  // Check if a phantom exists with this name — convert instead of duplicate
+  const existingPhantom = members.find(m=>m.member_type==='phantom' && m.name.toLowerCase()===name.toLowerCase());
+  
   const member={
     name,email:email.toLowerCase(),phone,discord,pkg:dbPkg,
     paid_pkg:paidPkg||null,
@@ -1342,7 +1346,7 @@ async function onboardMember(){
     promo_value:pkg==='promo_launch'?3000:0,
     vpn_username:vpnUser,vpn_password:vpnPass,
     vpn_status:vpn?(vpnUser?'provisioned':'pending'):null,
-    referral_code:refCode,referred_by_code:(ref==='HOLDING_TANK'?null:ref)||null,
+    referred_by_code:(ref==='HOLDING_TANK'?null:ref)||null,
     package_amount:(pkgAmounts[paidPkg||pkg]||0)+(vpnPaid?1000:0),
     member_type:type,
     commission_status:type==='affiliate_only'?'held':type==='legacy'?'legacy_paid':'active',
@@ -1365,7 +1369,23 @@ async function onboardMember(){
     pending_upline:document.getElementById('obPendingUpline')?.value?.trim()||null
   };
   
-  const{data:result,error}=await sb.from('onboarding_members').insert([member]).select();
+  let result, error;
+  
+  if(existingPhantom){
+    // CONVERT phantom → real member (keep referral_code + tree position)
+    btn.textContent='Converting phantom → real member...';
+    member.referral_code = existingPhantom.referral_code; // preserve their spot in tree
+    if(!member.referred_by_code) member.referred_by_code = existingPhantom.referred_by_code; // keep existing placement
+    const resp = await sb.from('onboarding_members').update(member).eq('id',existingPhantom.id).select();
+    result = resp.data; error = resp.error;
+    if(!error) showToast('🔄 Phantom "'+name+'" converted to real member! Tree preserved.');
+  } else {
+    // NEW member — generate referral code
+    member.referral_code = refCode;
+    const resp = await sb.from('onboarding_members').insert([member]).select();
+    result = resp.data; error = resp.error;
+  }
+  
   if(error){showToast('❌ '+error.message);btn.disabled=false;btn.textContent='⚡ Onboard Member';return;}
   
   // Burn codes
