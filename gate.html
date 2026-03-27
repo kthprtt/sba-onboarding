@@ -1,0 +1,173 @@
+<!-- 
+  SBA GENIUS LAUNCH GATE
+  Paste this ENTIRE block at the very TOP of genius_v3.html, right after <body>
+  
+  HOW IT WORKS:
+  - Checks Supabase platform_config for genius_live = 'true'
+  - If false → shows cinematic deploying screen, blocks the platform
+  - If true → hides the gate, platform loads normally
+  - Keith bypass: add ?admin=genius to the URL to skip the gate
+  
+  TO OPEN GENIUS TO EVERYONE:
+  UPDATE platform_config SET value = 'true' WHERE key = 'genius_live';
+  
+  TO CLOSE IT AGAIN:
+  UPDATE platform_config SET value = 'false' WHERE key = 'genius_live';
+-->
+
+<div id="launchGate" style="position:fixed;inset:0;z-index:999999;background:#0a0b10;display:flex;align-items:center;justify-content:center;flex-direction:column;padding:30px;text-align:center;transition:opacity 0.5s;">
+  
+  <!-- Animated background -->
+  <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 40%,rgba(212,168,67,0.06),transparent 60%),radial-gradient(ellipse at 30% 70%,rgba(0,230,118,0.03),transparent 50%);pointer-events:none;"></div>
+  
+  <div style="position:relative;z-index:1;max-width:500px;">
+    <!-- Logo -->
+    <div style="font-family:'Bebas Neue',Impact,sans-serif;font-size:48px;letter-spacing:3px;margin-bottom:4px;">
+      SBA <span style="color:#d4a843;">GENIUS</span>
+    </div>
+    <div style="font-size:12px;color:#8b8d9e;letter-spacing:2px;text-transform:uppercase;margin-bottom:40px;">V3 · THE FUTURE OF SPORTS BETTING</div>
+    
+    <!-- Deploying animation -->
+    <div style="margin-bottom:32px;">
+      <div id="gateSpinner" style="width:60px;height:60px;margin:0 auto 16px;border:3px solid #252839;border-top:3px solid #d4a843;border-radius:50%;animation:gateSpin 1.2s linear infinite;"></div>
+      <div style="font-family:'Bebas Neue',Impact,sans-serif;font-size:24px;color:#e8e6e0;letter-spacing:1px;" id="gateTitle">DEPLOYING</div>
+      <div style="font-size:13px;color:#8b8d9e;margin-top:8px;line-height:1.6;" id="gateMsg">
+        Syncing 39 sportsbooks across 60 leagues.<br>
+        Calibrating 432 market types.<br>
+        You'll be notified the moment it's live.
+      </div>
+    </div>
+    
+    <!-- Fake progress indicators -->
+    <div style="max-width:350px;margin:0 auto;">
+      <div style="display:grid;gap:8px;">
+        <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:#12141c;border:1px solid #252839;border-radius:8px;">
+          <div id="dot1" style="width:8px;height:8px;border-radius:50%;background:#d4a843;animation:gatePulse 2s infinite;"></div>
+          <div style="flex:1;font-size:11px;color:#8b8d9e;">Sportsbook API connections</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#d4a843;" id="statusBooks">syncing...</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:#12141c;border:1px solid #252839;border-radius:8px;">
+          <div id="dot2" style="width:8px;height:8px;border-radius:50%;background:#252839;"></div>
+          <div style="flex:1;font-size:11px;color:#8b8d9e;">Market scanner calibration</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#5a5d72;" id="statusScanner">waiting...</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:#12141c;border:1px solid #252839;border-radius:8px;">
+          <div id="dot3" style="width:8px;height:8px;border-radius:50%;background:#252839;"></div>
+          <div style="flex:1;font-size:11px;color:#8b8d9e;">AI Synthesis engine</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#5a5d72;" id="statusAI">waiting...</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:#12141c;border:1px solid #252839;border-radius:8px;">
+          <div id="dot4" style="width:8px;height:8px;border-radius:50%;background:#252839;"></div>
+          <div style="flex:1;font-size:11px;color:#8b8d9e;">Live odds feed</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#5a5d72;" id="statusOdds">waiting...</div>
+        </div>
+      </div>
+      
+      <!-- Progress bar -->
+      <div style="margin-top:12px;height:4px;background:#252839;border-radius:2px;overflow:hidden;">
+        <div id="gateProgress" style="height:100%;background:linear-gradient(90deg,#d4a843,#00e676);border-radius:2px;width:0%;transition:width 2s ease;"></div>
+      </div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#5a5d72;margin-top:6px;text-align:right;" id="gatePercent">0%</div>
+    </div>
+    
+    <!-- Bottom message -->
+    <div style="margin-top:32px;font-size:11px;color:#5a5d72;">
+      💬 <a href="https://discord.gg/hZXxJMgHb3" style="color:#d4a843;text-decoration:none;">Join Discord</a> for the launch notification
+    </div>
+  </div>
+</div>
+
+<style>
+@keyframes gateSpin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+@keyframes gatePulse{0%,100%{opacity:1}50%{opacity:0.3}}
+</style>
+
+<script>
+(function(){
+  // Admin bypass — Keith adds ?admin=genius to URL
+  const params = new URLSearchParams(window.location.search);
+  const adminCodes = ['genius','vegas5580','waleed'];if(adminCodes.includes(params.get('admin'))){
+    document.getElementById('launchGate').style.display = 'none';
+    return;
+  }
+  
+  // Check Supabase for genius_live status
+  const SUPA_URL = 'https://anjlmooskwvjystmrhxr.supabase.co';
+  const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFuamxtb29za3d2anlzdG1yaHhyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU0NjYzNTUsImV4cCI6MjA4MTA0MjM1NX0.DVLjp9PzNIPNSp2HAGtKTaPVfKy3QLs4HTJsy96UsyM';
+  
+  async function checkLaunch(){
+    try{
+      const r = await fetch(SUPA_URL + '/rest/v1/platform_config?key=eq.genius_live&select=value', {
+        headers: {'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY}
+      });
+      const data = await r.json();
+      if(data && data[0] && data[0].value === 'true'){
+        // GENIUS IS LIVE — remove gate
+        const gate = document.getElementById('launchGate');
+        gate.style.opacity = '0';
+        setTimeout(() => gate.style.display = 'none', 500);
+        return true;
+      }
+    }catch(e){}
+    return false;
+  }
+  
+  // Animated deployment progress
+  let progress = 0;
+  const steps = [
+    {pct:15, dot:'dot1', status:'statusBooks', text:'connecting...', delay:3000},
+    {pct:28, dot:'dot1', status:'statusBooks', text:'22/39 connected', delay:5000},
+    {pct:38, dot:'dot1', status:'statusBooks', text:'39/39 ✓', dotColor:'#00e676', delay:7000},
+    {pct:42, dot:'dot2', status:'statusScanner', text:'initializing...', dotColor2:'#d4a843', delay:9000},
+    {pct:52, dot:'dot2', status:'statusScanner', text:'scanning...', delay:12000},
+    {pct:58, dot:'dot2', status:'statusScanner', text:'432 markets ✓', dotColor:'#00e676', delay:16000},
+    {pct:63, dot:'dot3', status:'statusAI', text:'loading models...', dotColor2:'#d4a843', delay:19000},
+    {pct:72, dot:'dot3', status:'statusAI', text:'ESPN sync...', delay:23000},
+    {pct:78, dot:'dot3', status:'statusAI', text:'synthesis ready ✓', dotColor:'#00e676', delay:28000},
+    {pct:82, dot:'dot4', status:'statusOdds', text:'connecting feeds...', dotColor2:'#d4a843', delay:32000},
+    {pct:88, dot:'dot4', status:'statusOdds', text:'streaming...', delay:38000},
+    {pct:92, dot:'dot4', status:'statusOdds', text:'live ✓', dotColor:'#00e676', delay:45000},
+    {pct:95, delay:50000},
+    {pct:97, delay:55000},
+  ];
+  
+  steps.forEach(s => {
+    setTimeout(() => {
+      document.getElementById('gateProgress').style.width = s.pct + '%';
+      document.getElementById('gatePercent').textContent = s.pct + '%';
+      if(s.status){
+        document.getElementById(s.status).textContent = s.text;
+        document.getElementById(s.status).style.color = s.text.includes('✓') ? '#00e676' : '#d4a843';
+      }
+      if(s.dotColor) document.getElementById(s.dot).style.background = s.dotColor;
+      if(s.dotColor2) document.getElementById(s.dot).style.background = s.dotColor2;
+      if(s.dotColor2) document.getElementById(s.dot).style.animation = 'gatePulse 2s infinite';
+      if(s.dotColor === '#00e676') document.getElementById(s.dot).style.animation = 'none';
+    }, s.delay);
+  });
+  
+  // After animation completes, show provisioning message
+  setTimeout(() => {
+    document.getElementById('gateTitle').textContent = 'PROVISIONING COMPLETE';
+    document.getElementById('gateMsg').innerHTML = 'All systems connected and calibrated.<br>AI Synthesis engine is processing initial league data.<br><br><span style="color:#d4a843;font-weight:700">Due to AI provisioning across 60 leagues,<br>full deployment can take up to 24-48 hours.</span><br><br><span style="color:#5a5d72">This page checks automatically every 30 seconds.<br>You\'ll also get a notification in Discord the moment it\'s live.</span>';
+    document.getElementById('gateProgress').style.width = '99%';
+    document.getElementById('gatePercent').textContent = '99%';
+    document.getElementById('gateSpinner').style.borderTopColor = '#00e676';
+    document.getElementById('gateTitle').style.color = '#00e676';
+  }, 60000);
+  
+  // After 90 seconds, settle into calm waiting state
+  setTimeout(() => {
+    document.getElementById('gateSpinner').style.animation = 'gateSpin 3s linear infinite';
+    document.getElementById('gateTitle').textContent = 'STANDING BY';
+    document.getElementById('gateMsg').innerHTML = '<span style="color:#8b8d9e">SBA Genius is fully provisioned and waiting for final launch authorization.</span><br><br><span style="color:#d4a843;font-weight:700">Estimated: within 24-48 hours</span><br><br><span style="color:#5a5d72">This page auto-refreshes. No need to keep checking.<br>Join Discord for the instant launch notification.</span><br><br><div style="margin-top:12px;padding:12px;background:#12141c;border:1px solid #252839;border-radius:8px;font-size:11px;color:#8b8d9e;line-height:1.8"><strong style="color:#e8e6e0">While you wait:</strong><br>✅ Set up your sportsbook accounts<br>✅ Fund your bankroll<br>✅ Go through the Betting Academy<br>✅ Share your referral link — start building your team<br>✅ <a href=\"https://affiliate.sportsbetarbitrage.com\" style=\"color:#d4a843\">Open SBA Bookie</a> to see your dashboard</div>';
+    document.getElementById('gateProgress').style.width = '100%';
+    document.getElementById('gatePercent').textContent = 'READY';
+    document.getElementById('gatePercent').style.color = '#00e676';
+  }, 90000);
+  
+  // Check every 30 seconds if genius is live
+  checkLaunch();
+  setInterval(checkLaunch, 30000);
+})();
+</script>
