@@ -155,6 +155,29 @@ body{background:var(--bg);color:var(--t1);font-family:'Outfit',sans-serif;min-he
   .mobile-nav{display:grid!important;}
   select[size]{max-height:120px;}
 }
+
+/* Assignments */
+.assign-filter{padding:6px 14px;border-radius:16px;border:1px solid var(--border);background:transparent;color:var(--t2);font-size:11px;font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif;transition:all 0.2s;text-transform:uppercase;letter-spacing:1px;}
+.assign-filter.active{background:var(--gold);color:#000;border-color:var(--gold);}
+.assign-filter:hover:not(.active){border-color:var(--gold);color:var(--t1);}
+.assign-card{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin:6px 0;cursor:pointer;transition:all 0.15s;}
+.assign-card:hover{border-color:rgba(255,255,255,0.12);background:rgba(255,255,255,0.04);}
+.assign-card.expanded{border-color:rgba(212,168,67,0.3);background:rgba(212,168,67,0.03);}
+.assign-status{font-size:9px;padding:2px 8px;border-radius:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;}
+.assign-status.need-info{background:rgba(255,255,255,0.05);color:#666;border:1px solid rgba(255,255,255,0.08);}
+.assign-status.has-info{background:rgba(180,77,255,0.1);color:#b44dff;border:1px solid rgba(180,77,255,0.2);}
+.assign-status.pushed{background:rgba(0,150,255,0.1);color:#0096ff;border:1px solid rgba(0,150,255,0.2);}
+.assign-status.onboarded{background:rgba(0,255,136,0.1);color:var(--green);border:1px solid rgba(0,255,136,0.2);}
+.assign-status.holding{background:rgba(255,136,68,0.1);color:var(--orange);border:1px solid rgba(255,136,68,0.2);}
+.assign-expand{display:none;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);}
+.assign-card.expanded .assign-expand{display:block;}
+.assign-input{width:100%;padding:8px 10px;background:var(--card);border:1px solid var(--border);border-radius:6px;color:var(--t1);font-size:12px;font-family:'Outfit',sans-serif;margin-top:4px;}
+.assign-input:focus{outline:none;border-color:rgba(212,168,67,0.4);}
+.assign-input-label{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:1px;margin-top:8px;display:block;}
+.assign-push-btn{width:100%;margin-top:10px;padding:10px;border-radius:8px;border:none;font-weight:700;font-size:12px;cursor:pointer;font-family:'Outfit',sans-serif;transition:all 0.2s;letter-spacing:1px;}
+.assign-push-btn.ready{background:linear-gradient(135deg,var(--green),#00aa55);color:#000;}
+.assign-push-btn.ready:hover{transform:translateY(-1px);box-shadow:0 4px 15px rgba(0,255,136,0.2);}
+.assign-push-btn.not-ready{background:var(--card);color:var(--t3);border:1px solid var(--border);cursor:default;}
 </style>
 </head>
 <body>
@@ -170,6 +193,7 @@ body{background:var(--bg);color:var(--t1);font-family:'Outfit',sans-serif;min-he
   <button onclick="showPage('people')" id="mb-people"><span>👤</span><span>People</span></button>
   <button onclick="showPage('activity')" id="mb-activity"><span>📊</span><span>Activity</span></button>
   <button onclick="showPage('playbook')" id="mb-playbook"><span>📋</span><span>Book</span></button>
+  <button onclick="showPage('assign')" id="mb-assign"><span>📊</span><span>Assign</span></button>
 </div>
 <div class="bg-glow-2"></div>
 <div id="toast" class="toast"></div>
@@ -212,6 +236,7 @@ body{background:var(--bg);color:var(--t1);font-family:'Outfit',sans-serif;min-he
     <div class="nav-item" onclick="showPage('activity')">📊 Activity</div>
     <div class="nav-item" onclick="showPage('people')">👥 All People</div>
     <div class="nav-item" onclick="showPage('playbook')">📋 Playbook</div>
+    <div class="nav-item" onclick="showPage('assign')">📊 Assignments <span class="badge" id="assignBadge" style="background:var(--gold);">0</span></div>
     
     <div class="sidebar-footer">
       <a href="https://affiliate.sportsbetarbitrage.com" target="_blank">🏠 Affiliate Portal →</a>
@@ -655,6 +680,74 @@ body{background:var(--bg);color:var(--t1);font-family:'Outfit',sans-serif;min-he
         <button class="btn btn-gold" style="margin-top:8px;" onclick="batchCreatePhantoms()">⚡ Create All as Pending</button>
       </div>
     </div>
+
+    <!-- ============ ASSIGNMENTS PAGE ============ -->
+    <div class="page" id="page-assign">
+      <h1 style="font-size:22px;font-weight:900;margin-bottom:4px;">📊 Contact Assignments</h1>
+      <div style="font-size:13px;color:var(--t2);margin-bottom:20px;">Waleed & Vegas — Get these people onboarded. Tap a card to fill info, then push to onboard.</div>
+
+      <!-- Progress to 100 -->
+      <div class="card" style="border-color:rgba(212,168,67,0.2);margin-bottom:16px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <span style="font-size:13px;font-weight:800;">🎯 ROAD TO 100</span>
+          <span style="font-family:'JetBrains Mono';font-size:20px;font-weight:900;color:var(--gold);" id="assign-progress">0/100</span>
+        </div>
+        <div style="height:8px;background:var(--card2);border-radius:4px;overflow:hidden;">
+          <div id="assign-bar" style="height:100%;background:linear-gradient(90deg,var(--gold),var(--green));border-radius:4px;width:0%;transition:width 0.5s;"></div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px;">
+          <div style="text-align:center;padding:8px;background:var(--card2);border-radius:8px;border:1px solid rgba(0,150,255,0.15);">
+            <div style="font-family:'JetBrains Mono';font-size:18px;font-weight:900;color:#0096ff;" id="assign-w-total">0</div>
+            <div style="font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:1px;">Waleed</div>
+          </div>
+          <div style="text-align:center;padding:8px;background:var(--card2);border-radius:8px;border:1px solid rgba(255,60,60,0.15);">
+            <div style="font-family:'JetBrains Mono';font-size:18px;font-weight:900;color:#ff3c3c;" id="assign-v-total">0</div>
+            <div style="font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:1px;">Vegas</div>
+          </div>
+          <div style="text-align:center;padding:8px;background:var(--card2);border-radius:8px;border:1px solid rgba(0,255,136,0.15);">
+            <div style="font-family:'JetBrains Mono';font-size:18px;font-weight:900;color:var(--green);" id="assign-done">0</div>
+            <div style="font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:1px;">Onboarded</div>
+          </div>
+          <div style="text-align:center;padding:8px;background:var(--card2);border-radius:8px;border:1px solid rgba(255,136,68,0.15);">
+            <div style="font-family:'JetBrains Mono';font-size:18px;font-weight:900;color:var(--orange);" id="assign-need">0</div>
+            <div style="font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:1px;">Need Info</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filter tabs -->
+      <div style="display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap;">
+        <button class="assign-filter active" data-f="all" onclick="setAssignFilter('all',this)">All</button>
+        <button class="assign-filter" data-f="need-info" onclick="setAssignFilter('need-info',this)">Need Info</button>
+        <button class="assign-filter" data-f="has-info" onclick="setAssignFilter('has-info',this)">Ready to Push</button>
+        <button class="assign-filter" data-f="pushed" onclick="setAssignFilter('pushed',this)">Pushed</button>
+        <button class="assign-filter" data-f="onboarded" onclick="setAssignFilter('onboarded',this)">Onboarded</button>
+        <button class="assign-filter" data-f="holding" onclick="setAssignFilter('holding',this)">Holding</button>
+      </div>
+
+      <!-- Two columns -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+        <div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:3px;color:#0096ff;padding:10px 14px;background:rgba(0,150,255,0.06);border:1px solid rgba(0,150,255,0.15);border-radius:10px 10px 0 0;display:flex;justify-content:space-between;align-items:center;">
+            WALEED <span style="font-family:'JetBrains Mono';font-size:0.7rem;color:var(--t3);" id="assign-w-count"></span>
+          </div>
+          <div id="assign-waleed-list" style="max-height:70vh;overflow-y:auto;"></div>
+        </div>
+        <div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:3px;color:#ff3c3c;padding:10px 14px;background:rgba(255,60,60,0.06);border:1px solid rgba(255,60,60,0.15);border-radius:10px 10px 0 0;display:flex;justify-content:space-between;align-items:center;">
+            VEGAS <span style="font-family:'JetBrains Mono';font-size:0.7rem;color:var(--t3);" id="assign-v-count"></span>
+          </div>
+          <div id="assign-vegas-list" style="max-height:70vh;overflow-y:auto;"></div>
+        </div>
+      </div>
+
+      <!-- Keith Personal -->
+      <div class="card" style="margin-top:16px;border-color:rgba(212,168,67,0.15);">
+        <h3 style="color:var(--gold);font-size:13px;">🏆 KEITH — PERSONAL</h3>
+        <div id="assign-keith-list"></div>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -2061,6 +2154,221 @@ function startAutoRefresh(){
 
 // Auto-refresh pending queue every 10 seconds
 setInterval(function(){if(typeof loadPendingQueue==="function")loadPendingQueue()},10000);
+
+// ============================================================
+// ASSIGNMENTS TAB
+// ============================================================
+var assignPeople = [
+  // WALEED — Already Onboarded
+  {id:'w1',name:'Diane',phone:'(404) 406-4684',owner:'waleed',status:'onboarded',email:'',discord:'',pkg:'',note:''},
+  {id:'w2',name:'Dee Jones',phone:'(205) 475-3209',owner:'waleed',status:'onboarded',email:'',discord:'',pkg:'',note:''},
+  {id:'w3',name:'Ramone',phone:'832-906-5142',owner:'waleed',status:'onboarded',email:'',discord:'',pkg:'',note:''},
+  {id:'w4',name:'Gerald',phone:'404-484-3471',owner:'waleed',status:'onboarded',email:'',discord:'',pkg:'',note:''},
+  {id:'w5',name:'Zeke',phone:'317-820-9109',owner:'waleed',status:'onboarded',email:'',discord:'',pkg:'',note:''},
+  {id:'w6',name:'Shaun',phone:'919-673-9256',owner:'waleed',status:'onboarded',email:'',discord:'',pkg:'',note:''},
+  {id:'w7',name:'Doug',phone:'702-689-2560',owner:'waleed',status:'onboarded',email:'',discord:'',pkg:'',note:''},
+  {id:'w8',name:'Quay',phone:'347-796-9897',owner:'waleed',status:'onboarded',email:'',discord:'',pkg:'',note:''},
+  {id:'w9',name:'Dr. Lynn',phone:'812-241-4749',owner:'waleed',status:'onboarded',email:'',discord:'',pkg:'',note:''},
+  {id:'w10',name:'Nina',phone:'629-932-9032',owner:'waleed',status:'onboarded',email:'',discord:'',pkg:'',note:''},
+  // WALEED — Need Onboarding
+  {id:'w11',name:'Fabian',phone:'732-492-1511',owner:'waleed',status:'need-info',email:'',discord:'',pkg:'',note:''},
+  {id:'w12',name:'Rob',phone:'609-784-4755',owner:'waleed',status:'need-info',email:'',discord:'',pkg:'',note:''},
+  {id:'w13',name:'Vaughn',phone:'347-932-0689',owner:'waleed',status:'need-info',email:'',discord:'',pkg:'',note:''},
+  {id:'w14',name:'Twanzell',phone:'586-404-5942',owner:'waleed',status:'need-info',email:'',discord:'',pkg:'',note:'Already phantom under Waleed'},
+  {id:'w15',name:'Gary',phone:'804-426-6987',owner:'waleed',status:'need-info',email:'',discord:'',pkg:'',note:''},
+  {id:'w16',name:'Mike',phone:'309-252-8537',owner:'waleed',status:'need-info',email:'',discord:'',pkg:'',note:''},
+  {id:'w17',name:'Judy',phone:'302-341-4804',owner:'waleed',status:'need-info',email:'',discord:'',pkg:'',note:''},
+  {id:'w18',name:'Levella',phone:'414-737-4341',owner:'waleed',status:'need-info',email:'',discord:'',pkg:'',note:''},
+  {id:'w19',name:'Ray',phone:'713-252-2132',owner:'waleed',status:'need-info',email:'',discord:'',pkg:'',note:''},
+  {id:'w20',name:'Dr. Saleem',phone:'609-694-8413',owner:'waleed',status:'need-info',email:'',discord:'',pkg:'',note:''},
+  {id:'w21',name:'Luna',phone:'773-996-2722',owner:'waleed',status:'need-info',email:'',discord:'',pkg:'',note:''},
+  {id:'w22',name:'Jillian',phone:'415-710-9798',owner:'waleed',status:'need-info',email:'',discord:'',pkg:'',note:''},
+  {id:'w23',name:'Suzy',phone:'979-864-5179',owner:'waleed',status:'need-info',email:'',discord:'',pkg:'',note:''},
+  {id:'w24',name:'Dwayne',phone:'973-941-5907',owner:'waleed',status:'need-info',email:'',discord:'',pkg:'',note:''},
+  {id:'w25',name:'Ivy',phone:'505-215-4916',owner:'waleed',status:'need-info',email:'',discord:'',pkg:'',note:''},
+  // WALEED — Holding/Convince
+  {id:'w26',name:'Dr. Steve Branch',phone:'804-356-0577',owner:'waleed',status:'holding',email:'',discord:'',pkg:'',note:'Builder — offer Pro package'},
+  {id:'w27',name:'Robert Dean',phone:'678-592-8024',owner:'waleed',status:'holding',email:'',discord:'',pkg:'',note:"Wayne's lawyer — offer package"},
+  {id:'w28',name:'Dean',phone:'973-747-7344',owner:'waleed',status:'holding',email:'',discord:'',pkg:'',note:'Same as Dr. Steve — offer package'},
+  {id:'w29',name:'Twink',phone:'317-652-2129',owner:'waleed',status:'holding',email:'',discord:'',pkg:'',note:"Zeke's friend, barber — offer package"},
+  // VEGAS — Already Onboarded
+  {id:'v1',name:'Mario',phone:'404-640-4897',owner:'vegas',status:'onboarded',email:'',discord:'',pkg:'',note:''},
+  {id:'v2',name:'Big Al',phone:'770-912-3163',owner:'vegas',status:'onboarded',email:'',discord:'',pkg:'',note:''},
+  {id:'v3',name:'Mena',phone:'470-774-7087',owner:'vegas',status:'onboarded',email:'',discord:'',pkg:'',note:''},
+  {id:'v4',name:'Terrance',phone:'770-899-1172',owner:'vegas',status:'onboarded',email:'',discord:'',pkg:'',note:''},
+  {id:'v5',name:'Ron G',phone:'404-849-3645',owner:'vegas',status:'onboarded',email:'',discord:'',pkg:'',note:''},
+  {id:'v6',name:'Dr. Rhonda',phone:'678-462-7024',owner:'vegas',status:'onboarded',email:'',discord:'',pkg:'',note:''},
+  // VEGAS — Need Onboarding
+  {id:'v7',name:'Karl',phone:'702-860-1277',owner:'vegas',status:'need-info',email:'',discord:'',pkg:'',note:'May need lite package'},
+  {id:'v8',name:'Frank',phone:'678-677-9065',owner:'vegas',status:'need-info',email:'',discord:'',pkg:'',note:''},
+  {id:'v9',name:'James',phone:'313-523-2674',owner:'vegas',status:'need-info',email:'',discord:'',pkg:'',note:''},
+  {id:'v10',name:'Curtis',phone:'650-776-8570',owner:'vegas',status:'need-info',email:'',discord:'',pkg:'',note:''},
+  {id:'v11',name:'Ernest',phone:'414-514-2827',owner:'vegas',status:'need-info',email:'',discord:'',pkg:'',note:''},
+  {id:'v12',name:'Mitchell',phone:'313-595-5370',owner:'vegas',status:'need-info',email:'',discord:'',pkg:'',note:''},
+  {id:'v13',name:'Roshaun',phone:'816-605-9218',owner:'vegas',status:'need-info',email:'',discord:'',pkg:'',note:''},
+  {id:'v14',name:'Carla & Carlos',phone:'404-707-5520',owner:'vegas',status:'need-info',email:'',discord:'',pkg:'',note:''},
+  {id:'v15',name:'Marcella',phone:'510-759-8105',owner:'vegas',status:'need-info',email:'',discord:'',pkg:'',note:''},
+  {id:'v16',name:'Alon',phone:'916-730-4251',owner:'vegas',status:'need-info',email:'',discord:'',pkg:'',note:''},
+  {id:'v17',name:'Mark',phone:'804-305-1975',owner:'vegas',status:'need-info',email:'',discord:'',pkg:'',note:''},
+  {id:'v18',name:'Darryl Waller',phone:'313-377-0743',owner:'vegas',status:'need-info',email:'',discord:'',pkg:'',note:''},
+  {id:'v19',name:'Henry',phone:'317-749-4932',owner:'vegas',status:'need-info',email:'',discord:'',pkg:'',note:''},
+  {id:'v20',name:'Ronald',phone:'313-999-3666',owner:'vegas',status:'need-info',email:'',discord:'',pkg:'',note:''},
+  {id:'v21',name:'Derrick',phone:'201-362-8068',owner:'vegas',status:'need-info',email:'',discord:'',pkg:'',note:''},
+  {id:'v22',name:'Will',phone:'504-442-2085',owner:'vegas',status:'need-info',email:'',discord:'',pkg:'',note:''},
+  {id:'v23',name:'Ebey',phone:'856-952-9493',owner:'vegas',status:'need-info',email:'',discord:'',pkg:'',note:''},
+  {id:'v24',name:'Mike (470)',phone:'470-696-2999',owner:'vegas',status:'need-info',email:'',discord:'',pkg:'',note:'Vegas needs to ID'},
+  {id:'v25',name:'Joshua Jones',phone:'281-889-7658',owner:'vegas',status:'need-info',email:'',discord:'',pkg:'',note:'Vegas needs to ID'},
+  {id:'v26',name:'Preston',phone:'919-428-0609',owner:'vegas',status:'need-info',email:'',discord:'',pkg:'',note:'Vegas needs to ID'},
+  {id:'v27',name:'Pastor Shirley',phone:'707-567-7067',owner:'vegas',status:'holding',email:'',discord:'',pkg:'',note:'Big congregation — may pay or offer package'},
+];
+var assignKeith = [
+  {name:'Pierre',phone:'718-807-7328',note:'Keith handling personally'},
+  {name:'KT',phone:'720-588-5944',note:'Unassigned — Keith to decide'}
+];
+var assignFilter = 'all';
+var assignExpanded = null;
+
+// Load saved assignment data
+(function(){
+  var saved = localStorage.getItem('sba_assign_data');
+  if(saved){try{var s=JSON.parse(saved);s.forEach(function(sp){var p=assignPeople.find(function(x){return x.id===sp.id});if(p){if(sp.status)p.status=sp.status;if(sp.email)p.email=sp.email;if(sp.discord)p.discord=sp.discord;if(sp.pkg)p.pkg=sp.pkg;if(sp.note!==undefined)p.note=sp.note;if(sp.name)p.name=sp.name;}});}catch(e){}}
+})();
+
+function saveAssignData(){
+  localStorage.setItem('sba_assign_data',JSON.stringify(assignPeople.map(function(p){return{id:p.id,status:p.status,email:p.email,discord:p.discord,pkg:p.pkg,note:p.note,name:p.name}})));
+}
+
+function setAssignFilter(f,btn){
+  assignFilter=f;
+  document.querySelectorAll('.assign-filter').forEach(function(b){b.classList.remove('active')});
+  if(btn)btn.classList.add('active');
+  renderAssignments();
+}
+
+function toggleAssignCard(id){
+  assignExpanded = assignExpanded===id ? null : id;
+  renderAssignments();
+}
+
+function updateAssignField(id,field,val){
+  var p=assignPeople.find(function(x){return x.id===id});
+  if(p){p[field]=val;
+    // Auto-detect status
+    if(p.status==='need-info' && p.email && p.pkg) p.status='has-info';
+    saveAssignData();
+    renderAssignments();
+  }
+}
+
+function pushToOnboard(id){
+  var p=assignPeople.find(function(x){return x.id===id});
+  if(!p||!p.email||!p.pkg)return;
+  // Pre-fill the onboard form and switch to it
+  window._prefilling=true;
+  showPage('onboard');
+  setTimeout(function(){
+    var nm=document.getElementById('obName');if(nm)nm.value=p.name;
+    var em=document.getElementById('obEmail');if(em)em.value=p.email;
+    var ph=document.getElementById('obPhone');if(ph)ph.value=p.phone;
+    var dc=document.getElementById('obDiscord');if(dc)dc.value=p.discord||'';
+    var pk=document.getElementById('obPkg');if(pk)pk.value=p.pkg;
+    p.status='pushed';
+    saveAssignData();
+  },100);
+}
+
+function getAssignStatusLabel(s){return{
+  'need-info':'Need Info','has-info':'Ready to Push','pushed':'Pushed','onboarded':'Onboarded','holding':'Holding'
+}[s]||s;}
+
+function renderAssignCard(p){
+  var isExpanded = assignExpanded===p.id;
+  var hasEnoughInfo = p.email && p.pkg;
+  var statusClass = p.status;
+
+  var html = '<div class="assign-card'+(isExpanded?' expanded':'')+'" onclick="toggleAssignCard(\''+p.id+'\')">';
+  html += '<div style="display:flex;justify-content:space-between;align-items:center;">';
+  html += '<div><div style="font-weight:700;font-size:13px;">'+p.name+'</div>';
+  html += '<div style="font-family:JetBrains Mono;font-size:11px;color:var(--t3);margin-top:2px;">'+p.phone+'</div>';
+  if(p.note) html += '<div style="font-size:10px;color:var(--orange);margin-top:3px;font-style:italic;">'+p.note+'</div>';
+  html += '</div>';
+  html += '<span class="assign-status '+statusClass+'">'+getAssignStatusLabel(p.status)+'</span>';
+  html += '</div>';
+
+  // Expanded form
+  html += '<div class="assign-expand" onclick="event.stopPropagation()">';
+  html += '<label class="assign-input-label">Full Name</label>';
+  html += '<input class="assign-input" value="'+p.name+'" onchange="updateAssignField(\''+p.id+'\',\'name\',this.value)" placeholder="Full legal name">';
+  html += '<label class="assign-input-label">Email</label>';
+  html += '<input class="assign-input" value="'+(p.email||'')+'" onchange="updateAssignField(\''+p.id+'\',\'email\',this.value)" placeholder="their@email.com">';
+  html += '<label class="assign-input-label">Discord</label>';
+  html += '<input class="assign-input" value="'+(p.discord||'')+'" onchange="updateAssignField(\''+p.id+'\',\'discord\',this.value)" placeholder="username#1234">';
+  html += '<label class="assign-input-label">Package</label>';
+  html += '<select class="assign-input" onchange="updateAssignField(\''+p.id+'\',\'pkg\',this.value)">';
+  html += '<option value=""'+(p.pkg===''?' selected':'')+'>— Select —</option>';
+  html += '<option value="basic"'+(p.pkg==='basic'?' selected':'')+'>Basic ($1K)</option>';
+  html += '<option value="plus"'+(p.pkg==='plus'?' selected':'')+'>Plus ($2K)</option>';
+  html += '<option value="elite"'+(p.pkg==='elite'?' selected':'')+'>Elite ($5K)</option>';
+  html += '<option value="pro"'+(p.pkg==='pro'?' selected':'')+'>Pro ($10K)</option>';
+  html += '<option value="free"'+(p.pkg==='free'?' selected':'')+'>Free Affiliate</option>';
+  html += '</select>';
+  html += '<label class="assign-input-label">Notes</label>';
+  html += '<input class="assign-input" value="'+(p.note||'')+'" onchange="updateAssignField(\''+p.id+'\',\'note\',this.value)" placeholder="Any notes...">';
+
+  if(hasEnoughInfo && p.status!=='onboarded' && p.status!=='pushed'){
+    html += '<button class="assign-push-btn ready" onclick="event.stopPropagation();pushToOnboard(\''+p.id+'\')">⚡ PUSH TO ONBOARD</button>';
+  } else if(p.status==='pushed'){
+    html += '<button class="assign-push-btn not-ready">✅ Already pushed — complete in Onboard tab</button>';
+  } else if(p.status==='onboarded'){
+    html += '<button class="assign-push-btn not-ready">✅ Onboarded</button>';
+  } else {
+    html += '<button class="assign-push-btn not-ready">Need email + package to push</button>';
+  }
+  html += '</div></div>';
+  return html;
+}
+
+function renderAssignments(){
+  var wList=document.getElementById('assign-waleed-list');
+  var vList=document.getElementById('assign-vegas-list');
+  var kList=document.getElementById('assign-keith-list');
+  if(!wList)return;
+
+  var order={'need-info':0,'has-info':1,'holding':2,'pushed':3,'onboarded':4};
+  function matchFilter(p){
+    if(assignFilter==='all')return true;
+    return p.status===assignFilter;
+  }
+
+  var wPeople=assignPeople.filter(function(p){return p.owner==='waleed'&&matchFilter(p)}).sort(function(a,b){return(order[a.status]||0)-(order[b.status]||0)});
+  var vPeople=assignPeople.filter(function(p){return p.owner==='vegas'&&matchFilter(p)}).sort(function(a,b){return(order[a.status]||0)-(order[b.status]||0)});
+
+  wList.innerHTML=wPeople.length?wPeople.map(renderAssignCard).join(''):'<div style="padding:20px;color:#333;text-align:center;font-size:11px;">No matches</div>';
+  vList.innerHTML=vPeople.length?vPeople.map(renderAssignCard).join(''):'<div style="padding:20px;color:#333;text-align:center;font-size:11px;">No matches</div>';
+
+  // Keith
+  if(kList) kList.innerHTML=assignKeith.map(function(k){return '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--card2);border-radius:8px;margin:4px 0;border:1px solid var(--border);"><div><div style="font-weight:700;font-size:12px;color:var(--gold);">'+k.name+'</div><div style="font-family:JetBrains Mono;font-size:10px;color:var(--t3);">'+k.phone+'</div>'+(k.note?'<div style="font-size:10px;color:var(--orange);margin-top:2px;">'+k.note+'</div>':'')+'</div><span style="font-size:9px;padding:2px 8px;border-radius:10px;background:rgba(212,168,67,0.1);color:var(--gold);border:1px solid rgba(212,168,67,0.2);">Keith</span></div>'}).join('');
+
+  // Stats
+  var totalOnboarded=assignPeople.filter(function(p){return p.status==='onboarded'}).length;
+  var wTotal=assignPeople.filter(function(p){return p.owner==='waleed'&&p.status!=='onboarded'}).length;
+  var vTotal=assignPeople.filter(function(p){return p.owner==='vegas'&&p.status!=='onboarded'}).length;
+  var needInfo=assignPeople.filter(function(p){return p.status==='need-info'}).length;
+
+  var el;
+  el=document.getElementById('assign-progress');if(el)el.textContent=totalOnboarded+'/100';
+  el=document.getElementById('assign-bar');if(el)el.style.width=Math.min(totalOnboarded,100)+'%';
+  el=document.getElementById('assign-w-total');if(el)el.textContent=wTotal;
+  el=document.getElementById('assign-v-total');if(el)el.textContent=vTotal;
+  el=document.getElementById('assign-done');if(el)el.textContent=totalOnboarded;
+  el=document.getElementById('assign-need');if(el)el.textContent=needInfo;
+  el=document.getElementById('assign-w-count');if(el)el.textContent=wPeople.length+' shown';
+  el=document.getElementById('assign-v-count');if(el)el.textContent=vPeople.length+' shown';
+  el=document.getElementById('assignBadge');if(el)el.textContent=needInfo;
+}
+
+// Render on page load
+setTimeout(renderAssignments,500);
 </script>
 </body>
 </html>
