@@ -2260,21 +2260,38 @@ function updateAssignField(id,field,val){
   }
 }
 
-function pushToOnboard(id){
+async function pushToOnboard(id){
   var p=assignPeople.find(function(x){return x.id===id});
   if(!p||!p.email||!p.pkg)return;
-  // Pre-fill the onboard form and switch to it
-  window._prefilling=true;
-  showPage('onboard');
-  setTimeout(function(){
-    var nm=document.getElementById('obName');if(nm)nm.value=p.name;
-    var em=document.getElementById('obEmail');if(em)em.value=p.email;
-    var ph=document.getElementById('obPhone');if(ph)ph.value=p.phone;
-    var dc=document.getElementById('obDiscord');if(dc)dc.value=p.discord||'';
-    var pk=document.getElementById('obPkg');if(pk)pk.value=p.pkg;
+  
+  var btn=event?.target;
+  if(btn){btn.textContent='Pushing...';btn.disabled=true;}
+  
+  try{
+    // 1. Insert code request so Keith sees it on codes.html
+    var reqData={
+      requested_by: p.owner, // 'waleed' or 'vegas'
+      member_name: p.name,
+      code_type: p.pkg==='free'?'basic':p.pkg,
+      status: 'pending',
+      notes: 'Email: '+p.email+' | Phone: '+p.phone+(p.discord?' | Discord: '+p.discord:'')+(p.note?' | Note: '+p.note:'')
+    };
+    
+    var{error}=await sb.from('code_requests').insert([reqData]);
+    if(error) throw error;
+    
+    // 2. Update card status
     p.status='pushed';
     saveAssignData();
-  },100);
+    renderAssignments();
+    
+    showToast('📩 '+p.name+' pushed to Keith for approval');
+    if(btn){btn.textContent='✅ Pushed';btn.disabled=true;}
+  }catch(e){
+    console.error('Push failed:',e);
+    showToast('❌ Push failed: '+e.message);
+    if(btn){btn.textContent='⚡ PUSH TO ONBOARD';btn.disabled=false;}
+  }
 }
 
 function getAssignStatusLabel(s){return{
@@ -2316,9 +2333,9 @@ function renderAssignCard(p){
   html += '<input class="assign-input" value="'+(p.note||'')+'" onchange="updateAssignField(\''+p.id+'\',\'note\',this.value)" placeholder="Any notes...">';
 
   if(hasEnoughInfo && p.status!=='onboarded' && p.status!=='pushed'){
-    html += '<button class="assign-push-btn ready" onclick="event.stopPropagation();pushToOnboard(\''+p.id+'\')">⚡ PUSH TO ONBOARD</button>';
+    html += '<button class="assign-push-btn ready" onclick="event.stopPropagation();pushToOnboard(\''+p.id+'\')">📩 PUSH TO KEITH FOR APPROVAL</button>';
   } else if(p.status==='pushed'){
-    html += '<button class="assign-push-btn not-ready">✅ Already pushed — complete in Onboard tab</button>';
+    html += '<button class="assign-push-btn not-ready">📩 Pushed to Keith — awaiting approval on codes.html</button>';
   } else if(p.status==='onboarded'){
     html += '<button class="assign-push-btn not-ready">✅ Onboarded</button>';
   } else {
