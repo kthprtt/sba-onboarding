@@ -1461,6 +1461,67 @@ async function onboardMember(){
   
   btn.textContent='Saving member...';
   
+  // ═══ AUTO-CREATE GENIUS DEMO LOGIN ═══
+  // Creates Supabase Auth account + profile with correct tier
+  let geniusCreated = false;
+  const geniusPw = firstName.charAt(0).toUpperCase() + firstName.slice(1) + '2026!';
+  const geniusTier = (dbPkg === 'none' || type === 'affiliate_only') ? 'free' : dbPkg;
+  try {
+    btn.textContent='Creating GENIUS login...';
+    const SUPA_URL = 'https://anjlmooskwvjystmrhxr.supabase.co';
+    const SUPA_SRK = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFuamxtb29za3d2anlzdG1yaHhyIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2NTQ2NjM1NSwiZXhwIjoyMDgxMDQyMzU1fQ.aH58JoF0ippcqAxyFRFlNcpA44QMFIgUAgwMpWFhXuc';
+    
+    // Create Supabase Auth user
+    const authRes = await fetch(SUPA_URL + '/auth/v1/admin/users', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + SUPA_SRK, 'apikey': SUPA_SRK, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: email.toLowerCase(),
+        password: geniusPw,
+        email_confirm: true,
+        user_metadata: { name: name, tier: geniusTier }
+      })
+    });
+    const authData = await authRes.json();
+    const geniusUid = authData.id;
+    
+    if (geniusUid) {
+      // Create profile row with tier
+      await fetch(SUPA_URL + '/rest/v1/profiles', {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer ' + SUPA_SRK, 'apikey': SUPA_SRK, 'Content-Type': 'application/json', 'Prefer': 'resolution=merge-duplicates' },
+        body: JSON.stringify({ id: geniusUid, email: email.toLowerCase(), tier: geniusTier, paid_tier: geniusTier })
+      });
+      geniusCreated = true;
+      console.log('✅ GENIUS account created:', email, '/', geniusPw, '(' + geniusTier + ')');
+    } else if (authData.msg && authData.msg.includes('already')) {
+      // User exists — update password and tier
+      const listRes = await fetch(SUPA_URL + '/auth/v1/admin/users?per_page=100', {
+        headers: { 'Authorization': 'Bearer ' + SUPA_SRK, 'apikey': SUPA_SRK }
+      });
+      const listData = await listRes.json();
+      const existingUser = (listData.users || []).find(u => u.email && u.email.toLowerCase() === email.toLowerCase());
+      if (existingUser) {
+        await fetch(SUPA_URL + '/auth/v1/admin/users/' + existingUser.id, {
+          method: 'PUT',
+          headers: { 'Authorization': 'Bearer ' + SUPA_SRK, 'apikey': SUPA_SRK, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password: geniusPw, user_metadata: { name: name, tier: geniusTier } })
+        });
+        await fetch(SUPA_URL + '/rest/v1/profiles?email=eq.' + encodeURIComponent(email.toLowerCase()), {
+          method: 'PATCH',
+          headers: { 'Authorization': 'Bearer ' + SUPA_SRK, 'apikey': SUPA_SRK, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ tier: geniusTier, paid_tier: geniusTier })
+        });
+        geniusCreated = true;
+        console.log('✅ GENIUS account updated:', email, '/', geniusPw, '(' + geniusTier + ')');
+      }
+    } else {
+      console.warn('⚠️ GENIUS creation issue:', authData);
+    }
+  } catch(geniusErr) {
+    console.error('⚠️ GENIUS auto-create failed:', geniusErr);
+  }
+  
   // Check if a phantom exists with this name — convert instead of duplicate
   const existingPhantom = members.find(m=>m.member_type==='phantom' && m.name.toLowerCase()===name.toLowerCase());
   
@@ -1530,7 +1591,8 @@ async function onboardMember(){
   showToast('✅ '+name+' onboarded! Ref code: '+refCode);
   
   // Show welcome email popup
-  showWelcomeEmailPopup({name,email,password,refCode,pkg,vpn,vpnCode,vpnUser:vpnUser||null,vpnPass:vpnPass||null,type,pkgAmounts});
+  const geniusPassword = firstName.charAt(0).toUpperCase() + firstName.slice(1) + '2026!';
+  showWelcomeEmailPopup({name,email,password,refCode,pkg,vpn,vpnCode,vpnUser:vpnUser||null,vpnPass:vpnPass||null,type,pkgAmounts,geniusPassword,geniusTier:geniusTier||'free',geniusCreated:geniusCreated||false});
   
   // Reset form
   ['obCode','obName','obEmail','obPhone','obDiscord','obVPNCode'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
@@ -2036,13 +2098,18 @@ Celtics win? You get $1,062 → profit $62 ✅
 No matter who wins, you make $62. That's arbitrage.
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-🔑 YOUR LOGIN:
+🔑 YOUR SBA GENIUS LOGIN:
+Platform: https://sba-genius-api.vercel.app/geniusapp.html
+Email: ${m.email}
+Password: ${m.geniusPassword || (firstName.charAt(0).toUpperCase() + firstName.slice(1) + '2026!')}
+Tier: ${(m.geniusTier || m.pkg || 'free').toUpperCase()}
+
+🔑 YOUR AFFILIATE PORTAL LOGIN:
 Portal: affiliate.sportsbetarbitrage.com
 Email: ${m.email}
 Password: ${m.password}
-(Same login for SBA Genius — launches Thu 9PM ET)
 ${m.vpn?`
-🔒 YOUR VPN:${m.vpnUser?`
+🔒 YOUR VPN CREDENTIALS:${m.vpnUser?`
 Username: ${m.vpnUser}
 Password: ${m.vpnPass||'See portal'}`:' Credentials coming shortly — check your portal.'}
 Your VPN access is active through your full cycle (May 4, 2026).
@@ -2056,9 +2123,9 @@ You Paid: $1,000
 You Saved: $2,000 🔥`:''}
 
 📋 YOUR FIRST 3 STEPS:
-1. Log into your portal → explore the Playbook
+1. Log into SBA GENIUS → explore the ARB Center
 2. Set up sportsbooks (DraftKings, FanDuel, BetMGM)
-3. Thursday 9PM → Genius goes live → place your first bet
+3. Talk to your rep when you're ready to place your first bet
 
 🏗️ START BUILDING NOW:
 Your referral link: sportsbetarbitrage.com/?ref=${m.refCode}
@@ -2260,38 +2327,21 @@ function updateAssignField(id,field,val){
   }
 }
 
-async function pushToOnboard(id){
+function pushToOnboard(id){
   var p=assignPeople.find(function(x){return x.id===id});
   if(!p||!p.email||!p.pkg)return;
-  
-  var btn=event?.target;
-  if(btn){btn.textContent='Pushing...';btn.disabled=true;}
-  
-  try{
-    // 1. Insert code request so Keith sees it on codes.html
-    var reqData={
-      requested_by: p.owner, // 'waleed' or 'vegas'
-      member_name: p.name,
-      code_type: p.pkg==='free'?'basic':p.pkg,
-      status: 'pending',
-      notes: 'Email: '+p.email+' | Phone: '+p.phone+(p.discord?' | Discord: '+p.discord:'')+(p.note?' | Note: '+p.note:'')
-    };
-    
-    var{error}=await sb.from('code_requests').insert([reqData]);
-    if(error) throw error;
-    
-    // 2. Update card status
+  // Pre-fill the onboard form and switch to it
+  window._prefilling=true;
+  showPage('onboard');
+  setTimeout(function(){
+    var nm=document.getElementById('obName');if(nm)nm.value=p.name;
+    var em=document.getElementById('obEmail');if(em)em.value=p.email;
+    var ph=document.getElementById('obPhone');if(ph)ph.value=p.phone;
+    var dc=document.getElementById('obDiscord');if(dc)dc.value=p.discord||'';
+    var pk=document.getElementById('obPkg');if(pk)pk.value=p.pkg;
     p.status='pushed';
     saveAssignData();
-    renderAssignments();
-    
-    showToast('📩 '+p.name+' pushed to Keith for approval');
-    if(btn){btn.textContent='✅ Pushed';btn.disabled=true;}
-  }catch(e){
-    console.error('Push failed:',e);
-    showToast('❌ Push failed: '+e.message);
-    if(btn){btn.textContent='⚡ PUSH TO ONBOARD';btn.disabled=false;}
-  }
+  },100);
 }
 
 function getAssignStatusLabel(s){return{
@@ -2333,9 +2383,9 @@ function renderAssignCard(p){
   html += '<input class="assign-input" value="'+(p.note||'')+'" onchange="updateAssignField(\''+p.id+'\',\'note\',this.value)" placeholder="Any notes...">';
 
   if(hasEnoughInfo && p.status!=='onboarded' && p.status!=='pushed'){
-    html += '<button class="assign-push-btn ready" onclick="event.stopPropagation();pushToOnboard(\''+p.id+'\')">📩 PUSH TO KEITH FOR APPROVAL</button>';
+    html += '<button class="assign-push-btn ready" onclick="event.stopPropagation();pushToOnboard(\''+p.id+'\')">⚡ PUSH TO ONBOARD</button>';
   } else if(p.status==='pushed'){
-    html += '<button class="assign-push-btn not-ready">📩 Pushed to Keith — awaiting approval on codes.html</button>';
+    html += '<button class="assign-push-btn not-ready">✅ Already pushed — complete in Onboard tab</button>';
   } else if(p.status==='onboarded'){
     html += '<button class="assign-push-btn not-ready">✅ Onboarded</button>';
   } else {
